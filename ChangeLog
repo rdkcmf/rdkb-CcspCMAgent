@@ -1,0 +1,22 @@
+- move arch/intel_usg/boards/rdkb_arm/cmpnt_build_custom_pre.mk to
+       cmpnt_build_custom_pre_arm.mk
+- move arch/pc/boards/rdkb/cmpnt_build_custom_pre.mk to
+       cmpnt_build_custom_pre_pc.mk
+- mkdir ./config
+- move arch/intel_usg/boards/arm_shared/config/CcspCMDM.cfg to
+       config/CcspCMDM_arm.cfg
+- move arch/intel_usg/boards/arm_shared/config/TR181-CM.XML to
+       config/TR181-CM_pc.XML
+- move arch/pc/boards/rdkb/config/CcspCMDM.cfg to
+       config/CcspCMDM_pc.cfg 
+- move arch/intel_usg/boards/arm_shared/config/TR181-CM.XML to
+       config/TR181-CM_arm.XML
+- move arch/pc/boards/rdkb/config/TR181-CM.XML to
+       config/TR181-CM_pc.XML 
+- move arch/pc/config/CcspCM.cfg to
+       config/CcspCM_pc.cfg
+- move arch/intel_usg/config/CcspCM.cfg to
+       config/CcspCM_arm.cfg 
+- remove arch directory
+- move Makefile Makefile.orig
+- add ChangeLog file
