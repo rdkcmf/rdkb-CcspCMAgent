@@ -231,4 +231,6 @@ int vsystem(const char *fmt, ...);
 
 void chomp(char *line);
 
+int get_if_hwaddr(const char *ifname, char *mac, size_t size);
+
 #endif
