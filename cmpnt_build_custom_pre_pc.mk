@@ -27,4 +27,4 @@
 # PNM_BUILD_TR_098    := 0
 # PNM_BUILD_Xcalibur  := 0
 
-LDFLAGS += -L$(CCSP_INSTALL_ROOT)/lib -lhal_cm
+LDFLAGS += -L$(CCSP_INSTALL_ROOT)/lib -lcm_mgnt

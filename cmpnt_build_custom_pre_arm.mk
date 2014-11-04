@@ -29,21 +29,20 @@ HAL_LDFLAGS = -L$(CCSP_INSTALL_ROOT)/lib -lcm_mgnt
 LDFLAGS += $(HAL_LDFLAGS)
 
 DHCP_LDFLAGS = -L$(SDK_PATH)/ti/netdk/src/uipc
-DHCP_LDFLAGS += -L$(SDK_PATH)/ti/netdk/src/ti_udhcp
-DHCP_LDFLAGS += -L$(SDK_PATH)/ti/netdk/src/ti_dhcpv6
-DHCP_LDFLAGS += -luipc -ldhcp4cApi -ldhcp6cApi
+DHCP_LDFLAGS += -luipc -lapi_dhcpv4c
 LDFLAGS += $(DHCP_LDFLAGS)
 
 CM_LDFLAGS = -L$(SDK_PATH)/ti/lib 
 CM_LDFLAGS += -lhal_db -lhal_global -lcmd_mbox
 CM_LDFLAGS += -lhal_phy -lm -lmask_lib -lhal_reg_access
-CM_LDFLAGS += -lus_db -lds_db
+CM_LDFLAGS += -lus_db 
 CM_LDFLAGS += -lhal_ds_calibration -lhal_tuner_api -lhal_ffs_calibration
 CM_LDFLAGS += -lhal_us_calibration
 CM_LDFLAGS += -lreinit_mac 
 CM_LDFLAGS += -ldschannellistfreqdb -lprimary_ds_freq_override_db -lgetnextfreq
 CM_LDFLAGS += -ldocsis_ext_interface -ldbridge_ctl -lcmstatus -ldmg_utils
-CM_LDFLAGS += -lhalbpi -lchdb_rx 
+CM_LDFLAGS += -lnvramstorage -lutils_docsis -lqos_internal_db -lfccfg -lti_sme -lsme
+CM_LDFLAGS += -lhal_tuner_pwrSpec -lchdb_rx
 LDFLAGS += $(CM_LDFLAGS)
 
 # UTOPIA_LDFLAGS = -L$(SDK_PATH)/ti/lib -lutapi -lutctx -lsyscfg -lsysevent -lulog

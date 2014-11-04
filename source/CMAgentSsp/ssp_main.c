@@ -164,14 +164,26 @@ int  cmd_dispatch(int  command)
 static void _print_stack_backtrace(void)
 {
 #ifdef __GNUC__
-#if (!defined _BUILD_ANDROID) && (!defined _NO_EXECINFO_H_)
+#if (!defined _BUILD_ANDROID) && (!defined _NO_EXECINFO_H_) && (!defined _COSA_SIM_)
         void* tracePtrs[100];
         char** funcNames = NULL;
         int i, count = 0;
 
-        count = backtrace( tracePtrs, 100 );
-        backtrace_symbols_fd( tracePtrs, count, 2 );
+        int fd;
+        const char* path = "/nvram/CMAgentSsp_backtrace";
+        fd = open(path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        if (fd < 0)
+        {
+            fprintf(stderr, "failed to open backtrace file: %s", path);
+            return;
+        }
 
+        count = backtrace( tracePtrs, 100 );
+
+        backtrace_symbols_fd( tracePtrs, count, fd);
+   
+        close(fd);
+ 
         funcNames = backtrace_symbols( tracePtrs, count );
 
         if ( funcNames ) {
