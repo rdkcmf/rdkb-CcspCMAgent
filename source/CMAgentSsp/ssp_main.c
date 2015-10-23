@@ -42,6 +42,7 @@
 #include "ssp_global.h"
 #include "stdlib.h"
 #include "ccsp_dm_api.h"
+#include "pcdapi.h"
 //#include <docsis_ext_interface.h>
 
 PDSLH_CPE_CONTROLLER_OBJECT     pDslhCpeController      = NULL;
@@ -266,7 +267,7 @@ static void daemonize(void) {
 
 void sig_handler(int sig)
 {
-
+	extern ANSC_HANDLE bus_handle;
     CcspBaseIf_deadlock_detection_log_print(sig);
 
     if ( sig == SIGINT ) {
@@ -298,6 +299,15 @@ void sig_handler(int sig)
     {
         CcspTraceInfo(("SIGKILL received!\n"));
         exit(0);
+    }
+	else if ( sig == SIGALRM ) {
+		printf("~~~~ Got SIGALRM Signal !!! CMAgent~~~\n");
+    	signal(SIGALRM, sig_handler); /* reset it to this function */
+    	CcspTraceInfo(("SIGALRM received!\n"));
+		RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
+		RDKLogLevel = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
+		CM_RDKLogLevel = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel");
+		CM_RDKLogEnable = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable");
     }
     else {
     	/* get stack trace first */
@@ -352,6 +362,10 @@ int main(int argc, char* argv[])
     DmErr_t                         err;
     char                            *subSys            = NULL;
     extern ANSC_HANDLE bus_handle;
+	
+	#ifdef FEATURE_SUPPORT_RDKLOG
+	rdk_logger_init("/fss/gw/lib/debug.ini");
+	#endif
 
     /*
      *  Load the start configuration
@@ -439,10 +453,17 @@ int main(int argc, char* argv[])
     signal(SIGILL, sig_handler);
     signal(SIGQUIT, sig_handler);
     signal(SIGHUP, sig_handler);
+	signal(SIGALRM, sig_handler);
     }
 
-    cmd_dispatch('e');
+    printf("Registering PCD exception handler for CcspCMAgent\n");
+    PCD_api_register_exception_handlers( argv[0], NULL );
 
+    cmd_dispatch('e');
+	RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
+	RDKLogLevel = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
+	CM_RDKLogLevel = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel");
+	CM_RDKLogEnable = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable");
     // printf("Calling Docsis\n");
 
     // ICC_init();
@@ -463,6 +484,7 @@ int main(int argc, char* argv[])
     system("touch /tmp/cm_initialized");
 
     printf("Entering CM loop\n");
+    CcspTraceWarning(("RDKB_SYSTEM_BOOT_UP_LOG : Entering CM loop\n"));
 
     if ( bRunAsDaemon )
     {

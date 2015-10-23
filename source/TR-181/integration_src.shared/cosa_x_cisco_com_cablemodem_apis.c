@@ -80,6 +80,104 @@
 #include "cm_hal.h" 
 
 #include "cosa_x_cisco_com_cablemodem_internal.h"
+// Below function will poll the Docsis diagnostic information
+void PollDocsisInformations()
+{
+
+  system("touch /nvram/docsispolltime.txt");
+
+  FILE *fp;
+  char buff[30];
+  int pollinterval=100;
+  int i,retValue;
+  while(1)
+  { 
+	   memset(buff,0,sizeof(buff));
+           fp = fopen("/nvram/docsispolltime.txt", "r");
+	   if (!fp)
+	   {
+		CcspTraceError(("Error while opening the file.\n"));
+	   }
+	   else
+	   {
+           	retValue = fscanf(fp, "%s", buff);
+           	if( (retValue != -1) && (buff != NULL ) )
+           	{
+        		pollinterval = atoi(buff);
+           	}
+
+           	fclose(fp);
+    	   }
+	   CcspTraceWarning(("pollinterval to fetch Docsis diag is= %d\n",pollinterval));
+	   sleep (pollinterval);
+	   
+// Fetching docsis gateway info
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
+    ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
+
+
+    pMyObject->DownstreamChannelNumber = 0;
+
+    ret = CosaDmlCmGetDownstreamChannel
+        (
+            (ANSC_HANDLE)NULL,
+            &pMyObject->DownstreamChannelNumber,
+            &pMyObject->pDownstreamChannel
+        );
+
+    if ( ret != ANSC_STATUS_SUCCESS )
+    {
+        pMyObject->pDownstreamChannel = NULL;
+        pMyObject->DownstreamChannelNumber = 0;
+	goto EXIT;
+    }
+    docsis_GetNumOfActiveRxChannels(&pMyObject->DownstreamChannelNumber);
+    CcspTraceWarning(("Number of Active Rxchannel is %lu\n",pMyObject->DownstreamChannelNumber));
+    for (i=0 ; i < pMyObject->DownstreamChannelNumber ; i ++)
+    {
+    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s on channel %d\n",pMyObject->pDownstreamChannel[i].Frequency,i));
+    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream is %s on channel %d\n",pMyObject->pDownstreamChannel[i].LockStatus,i));
+    }
+    pMyObject->UpstreamChannelNumber = 0;
+
+    ret = CosaDmlCmGetUpstreamChannel
+        (
+            (ANSC_HANDLE)NULL,
+            &pMyObject->UpstreamChannelNumber,
+            &pMyObject->pUpstreamChannel
+        );
+
+    if ( ret != ANSC_STATUS_SUCCESS )
+    {
+        pMyObject->pUpstreamChannel = NULL;
+        pMyObject->UpstreamChannelNumber = 0;
+	goto EXIT;
+    }
+
+    docsis_GetNumOfActiveTxChannels(&pMyObject->UpstreamChannelNumber);
+    CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: Number of Active Txchannel is %lu\n",pMyObject->UpstreamChannelNumber));
+    for (i=0 ; i < pMyObject->UpstreamChannelNumber ; i ++)
+    {
+    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s on channel %d\n",pMyObject->pUpstreamChannel[i].Frequency,i));
+    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream is %s on channel %d\n",pMyObject->pUpstreamChannel[i].LockStatus,i));
+    }
+
+EXIT:
+
+    if ( pMyObject->pDownstreamChannel )
+    {
+        AnscFreeMemory(pMyObject->pDownstreamChannel);
+        pMyObject->pDownstreamChannel = NULL;
+    }
+
+    if ( pMyObject->pUpstreamChannel )
+    {
+        AnscFreeMemory(pMyObject->pUpstreamChannel);
+        pMyObject->pUpstreamChannel = NULL;
+    }
+
+  }
+}
 
 ANSC_STATUS
 CosaDmlCMInit
@@ -92,7 +190,8 @@ CosaDmlCMInit
 
     CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
     cm_hal_InitDB();
-    
+    pthread_t docsisinfo;
+    pthread_create(&docsisinfo, NULL, &PollDocsisInformations, NULL); 
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -268,6 +367,7 @@ CosaDmlCmGetDownstreamChannel
         PCOSA_CM_DS_CHANNEL         *ppConf        
     )    
 {
+
     docsis_GetNumOfActiveRxChannels(pulCount);
 
     if(*pulCount) {
@@ -288,6 +388,7 @@ CosaDmlCmGetUpstreamChannel
         PCOSA_CM_US_CHANNEL         *ppConf        
     )    
 {
+
     docsis_GetNumOfActiveTxChannels(pulCount);
 
     if(*pulCount) {
@@ -464,6 +565,53 @@ CosaDmlCMSetStartDSFrequency
 {
     docsis_SetStartFreq(value);
 
+    return ANSC_STATUS_SUCCESS;
+}
+
+ANSC_STATUS
+CosaDmlCMGetProvType
+    (
+        ANSC_HANDLE                 hContext,
+        char*                       pValue
+    )
+{
+    if ( docsis_GetProvIpType(pValue) == RETURN_OK)
+        return ANSC_STATUS_SUCCESS; 
+    else
+        return ANSC_STATUS_FAILURE; 
+}
+
+ANSC_STATUS
+CosaDmlCMGetResetCount
+    (
+        ANSC_HANDLE                 hContext,
+		CM_RESET_TYPE         type,
+        ULONG                       *pValue
+    )
+{
+	switch(type)
+	{
+		case CABLE_MODEM_RESET:{
+				cm_hal_Get_CableModemResetCount(pValue);
+			}
+			break;
+		case LOCAL_RESET:{
+				cm_hal_Get_LocalResetCount(pValue);
+			}
+			break;
+		case DOCSIS_RESET:{
+				cm_hal_Get_DocsisResetCount(pValue);
+			}
+			break;
+		case EROUTER_RESET:{
+				cm_hal_Get_ErouterResetCount(pValue);
+			}
+			break;
+		default:{
+			 AnscTraceWarning(("Invalid type %s, %d\n", __FUNCTION__, __LINE__));
+			}
+	}
+    
     return ANSC_STATUS_SUCCESS;
 }
 

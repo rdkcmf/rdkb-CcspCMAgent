@@ -494,6 +494,38 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 		return TRUE;
 	}
 
+	if( AnscEqualString(ParamName, "CMResetCount", TRUE) )
+	{
+		if (CosaDmlCMGetResetCount(NULL,CABLE_MODEM_RESET,puLong) != ANSC_STATUS_SUCCESS)
+			return FALSE;
+
+		return TRUE;
+	}
+
+	if( AnscEqualString(ParamName, "LocalResetCount", TRUE) )
+	{
+		if (CosaDmlCMGetResetCount(NULL,LOCAL_RESET, puLong) != ANSC_STATUS_SUCCESS)
+			return FALSE;
+
+		return TRUE;
+	}
+
+	if( AnscEqualString(ParamName, "DocsisResetCount", TRUE) )
+	{
+		if (CosaDmlCMGetResetCount(NULL,DOCSIS_RESET,puLong) != ANSC_STATUS_SUCCESS)
+			return FALSE;
+
+		return TRUE;
+	}
+
+	if( AnscEqualString(ParamName, "ErouterResetCount", TRUE) )
+	{
+		if (CosaDmlCMGetResetCount(NULL,EROUTER_RESET,puLong) != ANSC_STATUS_SUCCESS)
+			return FALSE;
+
+		return TRUE;
+	}
+
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
 }
@@ -909,6 +941,15 @@ X_CISCO_COM_CableModem_GetParamStringValue
             return -1;
 
         return 0;
+    }
+
+	if( AnscEqualString(ParamName, "ProvIpType", TRUE))
+    {
+		/* collect value */
+        if (CosaDmlCMGetProvType(NULL, pValue) != ANSC_STATUS_SUCCESS)
+            return -1;
+
+        return TRUE;
     }
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return -1;

@@ -200,6 +200,15 @@ _COSA_DML_CPE_LIST
     CHAR                            MACAddress[32];
 }
 COSA_DML_CPE_LIST,  *PCOSA_DML_CPE_LIST;
+
+typedef enum _CM_RESET_TYPE
+{
+	CABLE_MODEM_RESET = 1,
+	LOCAL_RESET,
+	DOCSIS_RESET,
+	EROUTER_RESET
+}CM_RESET_TYPE;
+
 /**********************************************************************
                 FUNCTION PROTOTYPES
 **********************************************************************/
@@ -396,6 +405,22 @@ CosaDmlCmGetCMCert
     (
         ANSC_HANDLE                 hContext,
         char*                       pValue
-    );	
+    );
+
+ANSC_STATUS
+CosaDmlCMGetProvType
+    (
+        ANSC_HANDLE                 hContext,
+        char*                       pValue
+    );
+
+ANSC_STATUS
+CosaDmlCMGetResetCount
+    (
+        ANSC_HANDLE                 hContext,
+		CM_RESET_TYPE         		type,
+        ULONG                       *pValue
+    );
+	
 
 #endif
