@@ -42,7 +42,9 @@
 #include "ssp_global.h"
 #include "stdlib.h"
 #include "ccsp_dm_api.h"
+#ifdef USE_PCD_API_EXCEPTION_HANDLING
 #include "pcdapi.h"
+#endif
 //#include <docsis_ext_interface.h>
 
 #define DEBUG_INI_NAME "/etc/debug.ini"
@@ -459,8 +461,10 @@ int main(int argc, char* argv[])
 	signal(SIGALRM, sig_handler);
     }
 
+#ifdef USE_PCD_API_EXCEPTION_HANDLING
     printf("Registering PCD exception handler for CcspCMAgent\n");
     PCD_api_register_exception_handlers( argv[0], NULL );
+#endif
 
     cmd_dispatch('e');
 	RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
