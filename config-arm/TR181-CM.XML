@@ -607,8 +607,57 @@
 
 		</parameter>
 
-      </parameters>
+		<parameter>
 
+          <name>ProvIpType</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>CMResetCount</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>LocalResetCount</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>DocsisResetCount</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>ErouterResetCount</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+      </parameters>
 
         <objects>
 	    
