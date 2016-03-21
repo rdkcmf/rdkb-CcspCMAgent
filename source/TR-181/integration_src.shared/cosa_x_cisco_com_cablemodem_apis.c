@@ -88,7 +88,7 @@ void PollDocsisInformations()
 
   FILE *fp;
   char buff[30];
-  int pollinterval=100;
+  int pollinterval=4*3600;
   int i,retValue;
   while(1)
   { 
@@ -108,8 +108,7 @@ void PollDocsisInformations()
 
            	fclose(fp);
     	   }
-	   CcspTraceWarning(("pollinterval to fetch Docsis diag is= %d\n",pollinterval));
-	   sleep (pollinterval);
+	   
 	   
 // Fetching docsis gateway info
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
@@ -135,8 +134,10 @@ void PollDocsisInformations()
     CcspTraceWarning(("Number of Active Rxchannel is %lu\n",pMyObject->DownstreamChannelNumber));
     for (i=0 ; i < pMyObject->DownstreamChannelNumber ; i ++)
     {
-    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s on channel %d\n",pMyObject->pDownstreamChannel[i].Frequency,i));
-    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream is %s on channel %d\n",pMyObject->pDownstreamChannel[i].LockStatus,i));
+	if (strcmp(pMyObject->pDownstreamChannel[i].Frequency,""))
+	{
+    		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s and Downstream is %s on channel %d\n",pMyObject->pDownstreamChannel[i].Frequency,pMyObject->pDownstreamChannel[i].LockStatus,i));
+	}
     }
     pMyObject->UpstreamChannelNumber = 0;
 
@@ -158,9 +159,14 @@ void PollDocsisInformations()
     CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: Number of Active Txchannel is %lu\n",pMyObject->UpstreamChannelNumber));
     for (i=0 ; i < pMyObject->UpstreamChannelNumber ; i ++)
     {
-    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s on channel %d\n",pMyObject->pUpstreamChannel[i].Frequency,i));
-    	CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream is %s on channel %d\n",pMyObject->pUpstreamChannel[i].LockStatus,i));
+	if (strcmp(pMyObject->pUpstreamChannel[i].Frequency,""))
+	{
+    		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s and Upstream is %s on channel %d\n",pMyObject->pUpstreamChannel[i].Frequency,pMyObject->pUpstreamChannel[i].LockStatus,i));
+	}
+
     }
+    CcspTraceWarning(("pollinterval to fetch Docsis diag is= %d\n",pollinterval));
+    sleep (pollinterval);
 
 EXIT:
 
