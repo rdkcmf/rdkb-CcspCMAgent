@@ -949,7 +949,7 @@ X_CISCO_COM_CableModem_GetParamStringValue
         if (CosaDmlCMGetProvType(NULL, pValue) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        return TRUE;
+        return 0;
     }
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return -1;
