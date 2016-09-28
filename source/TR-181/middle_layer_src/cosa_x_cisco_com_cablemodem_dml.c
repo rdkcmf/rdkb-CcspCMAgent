@@ -2170,6 +2170,7 @@ DownstreamChannel_Synchronize
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 
+    Ccsp_cm_clnt_lock();
     if ( pMyObject->pDownstreamChannel )
     {
         AnscFreeMemory(pMyObject->pDownstreamChannel);
@@ -2191,6 +2192,7 @@ DownstreamChannel_Synchronize
         pMyObject->DownstreamChannelNumber = 0;
     }
     
+    Ccsp_cm_clnt_unlock();
     return 0;
 }
 
@@ -2568,6 +2570,7 @@ UpstreamChannel_Synchronize
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 
+    Ccsp_cm_clnt_lock();
     if ( pMyObject->pUpstreamChannel )
     {
         AnscFreeMemory(pMyObject->pUpstreamChannel);
@@ -2589,6 +2592,7 @@ UpstreamChannel_Synchronize
         pMyObject->UpstreamChannelNumber = 0;
     }
     
+    Ccsp_cm_clnt_unlock();
     return 0;
 }
 
