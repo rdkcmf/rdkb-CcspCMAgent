@@ -80,6 +80,20 @@
 #include "cm_hal.h" 
 
 #include "cosa_x_cisco_com_cablemodem_internal.h"
+
+static pthread_mutex_t __gw_cm_client_lock = PTHREAD_MUTEX_INITIALIZER;
+
+extern int Ccsp_cm_clnt_lock(void)
+{
+    return pthread_mutex_lock(&__gw_cm_client_lock);
+}
+
+extern int Ccsp_cm_clnt_unlock(void)
+{
+    return pthread_mutex_unlock(&__gw_cm_client_lock);
+}
+
+
 // Below function will poll the Docsis diagnostic information
 void PollDocsisInformations()
 {
@@ -115,6 +129,7 @@ void PollDocsisInformations()
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 
 
+    Ccsp_cm_clnt_lock();
     pMyObject->DownstreamChannelNumber = 0;
 
     ret = CosaDmlCmGetDownstreamChannel
@@ -128,6 +143,7 @@ void PollDocsisInformations()
     {
         pMyObject->pDownstreamChannel = NULL;
         pMyObject->DownstreamChannelNumber = 0;
+        Ccsp_cm_clnt_unlock();
 	goto EXIT;
     }
     docsis_GetNumOfActiveRxChannels(&pMyObject->DownstreamChannelNumber);
@@ -152,6 +168,7 @@ void PollDocsisInformations()
     {
         pMyObject->pUpstreamChannel = NULL;
         pMyObject->UpstreamChannelNumber = 0;
+        Ccsp_cm_clnt_unlock();
 	goto EXIT;
     }
 
@@ -165,11 +182,13 @@ void PollDocsisInformations()
 	}
 
     }
+    Ccsp_cm_clnt_unlock();
     CcspTraceWarning(("pollinterval to fetch Docsis diag is= %d\n",pollinterval));
     sleep (pollinterval);
 
 EXIT:
 
+    Ccsp_cm_clnt_lock();
     if ( pMyObject->pDownstreamChannel )
     {
         AnscFreeMemory(pMyObject->pDownstreamChannel);
@@ -181,7 +200,7 @@ EXIT:
         AnscFreeMemory(pMyObject->pUpstreamChannel);
         pMyObject->pUpstreamChannel = NULL;
     }
-
+    Ccsp_cm_clnt_unlock();
   }
 }
 
