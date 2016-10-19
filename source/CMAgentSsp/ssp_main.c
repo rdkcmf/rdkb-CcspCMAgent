@@ -49,6 +49,9 @@
 
 #define DEBUG_INI_NAME "/etc/debug.ini"
 
+#ifdef ENABLE_SD_NOTIFY
+#include <systemd/sd-daemon.h>
+#endif
 
 PDSLH_CPE_CONTROLLER_OBJECT     pDslhCpeController      = NULL;
 PCOMPONENT_COMMON_DM            g_pComponent_Common_Dm  = NULL;
@@ -427,7 +430,7 @@ int main(int argc, char* argv[])
     if ( bRunAsDaemon )
         daemonize();
 
-    /*This is used for ccsp recovery manager */
+    /*This is used for ccsp recovery manager and systemd*/
     fd = fopen("/var/tmp/CcspCMAgentSsp.pid", "w+");
     if ( !fd )
     {
@@ -487,6 +490,14 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Cdm_Init: %s\n", Cdm_StrError(err));
         exit(1);
     }
+
+#ifdef ENABLE_SD_NOTIFY
+    sd_notifyf(0, "READY=1\n"
+              "STATUS=CcspCMAgent is Successfully Initialized\n"
+              "MAINPID=%lu", (unsigned long) getpid());
+  
+    CcspTraceInfo(("RDKB_SYSTEM_BOOT_UP_LOG : CcspCMAgent sd_notify Called\n"));
+#endif
 
     system("touch /tmp/cm_initialized");
 
