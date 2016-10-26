@@ -212,8 +212,8 @@ CosaDmlCMInit
     )
 {
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)phContext;
-
-    CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
+	if(pMyObject) 
+    	CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
     cm_hal_InitDB();
     pthread_t docsisinfo;
     pthread_create(&docsisinfo, NULL, &PollDocsisInformations, NULL); 
@@ -240,7 +240,8 @@ CosaDmlCMGetLoopDiagnosticsStart
         BOOL*                       pBool
     )
 {
-    *pBool = FALSE;
+	if(pBool)
+    	*pBool = FALSE;
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -261,7 +262,8 @@ CosaDmlCMGetLoopDiagnosticsDetails
         char*                       pValue
     )
 {
-    AnscCopyString(pValue, "Dummy");
+    if(pValue)
+    	AnscCopyString(pValue, "Dummy");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -272,7 +274,8 @@ CosaDmlCMGetTelephonyDHCPStatus
         char*                       pValue
     )
 {
-    AnscCopyString(pValue, "Dummy-InProgress");
+	if(pValue)
+		 AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -283,7 +286,8 @@ CosaDmlCMGetTelephonyTftpStatus
         char*                       pValue
     )
 {
-    AnscCopyString(pValue, "Dummy-InProgress");
+    if(pValue)
+    	AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -294,7 +298,8 @@ CosaDmlCMGetTelephonyRegistrationStatus
         char*                       pValue
     )
 {
-    AnscCopyString(pValue, "Dummy-InProgress");
+	if(pValue)
+    	AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -341,7 +346,7 @@ CosaDmlCmSetLog
         PCOSA_DML_CM_LOG            pCfg
     )
 {
-    if(pCfg->CleanDocsisLog == 1){
+    if((pCfg) && (pCfg->CleanDocsisLog == 1)){
         docsis_ClearDocsisEventLog();
         pCfg->CleanDocsisLog = 0; 
     }
@@ -395,7 +400,7 @@ CosaDmlCmGetDownstreamChannel
 
     docsis_GetNumOfActiveRxChannels(pulCount);
 
-    if(*pulCount) {
+    if(pulCount && *pulCount) {
 
         *ppConf = (PCOSA_CM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_DS_CHANNEL) * (*pulCount) );
     
@@ -416,7 +421,7 @@ CosaDmlCmGetUpstreamChannel
 
     docsis_GetNumOfActiveTxChannels(pulCount);
 
-    if(*pulCount) {
+    if(pulCount && *pulCount) {
 
         *ppConf = (PCOSA_CM_US_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_US_CHANNEL) * (*pulCount) );
     
@@ -477,8 +482,7 @@ CosaDmlCmGetCMErrorCodewords
     )
 {
     docsis_GetNumOfActiveRxChannels(pulCount);
-
-    if(*pulCount) {
+    if(pulCount && *pulCount) {
 
         *ppConf = (PCOSA_DML_CMERRORCODEWORDS_FULL)AnscAllocateMemory( sizeof(COSA_DML_CMERRORCODEWORDS_FULL) * (*pulCount) );
     
@@ -522,9 +526,11 @@ CosaDmlCmGetCMCertStatus
         return ANSC_STATUS_FAILURE;
     else {
         if(ulcertStatus) {
-            *pBool = TRUE;
+			if(pBool)
+           		*pBool = TRUE;
         } else {
-            *pBool = FALSE;
+        	if(pBool)
+            	*pBool = FALSE;
         }
     }
     return ANSC_STATUS_SUCCESS;
@@ -551,7 +557,8 @@ CosaDmlCMGetLockedUpstreamChID
         PULONG                      pValue
     )
 {
-    *pValue = docsis_GetUSChannelId();
+	if(pValue)
+    	*pValue = docsis_GetUSChannelId();
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -576,7 +583,8 @@ CosaDmlCMGetStartDSFrequency
         PULONG                      pValue
     )
 {
-    *pValue = docsis_GetDownFreq();
+	if(pValue)
+    	*pValue = docsis_GetDownFreq();
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -659,13 +667,13 @@ CosaDmlCmGetCPEList
     {
         return ANSC_STATUS_FAILURE;
     }    
-
-    *pulInstanceNumber = 0;
+	if(pulInstanceNumber)
+  		*pulInstanceNumber = 0;
     PCMMGMT_DML_CPE_LIST pInfo = NULL;
     if( cm_hal_GetCPEList(&pInfo, pulInstanceNumber, LanMode) != RETURN_OK)
         return ANSC_STATUS_FAILURE;
 
-    if (*pulInstanceNumber > 0) {
+    if ((pulInstanceNumber) && (*pulInstanceNumber > 0)) {
         if( (*ppCPEList = (PCOSA_DML_CPE_LIST)AnscAllocateMemory(sizeof(COSA_DML_CPE_LIST)*(*pulInstanceNumber))) == NULL )
         {
             AnscTraceWarning(("AllocateMemory error %s, %d\n", __FUNCTION__, __LINE__));
