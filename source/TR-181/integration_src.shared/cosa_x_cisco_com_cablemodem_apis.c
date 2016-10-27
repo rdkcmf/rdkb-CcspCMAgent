@@ -227,6 +227,10 @@ CosaDmlCMGetStatus
         char*                       pValue
     )
 {
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     if( docsis_getCMStatus(pValue) == RETURN_OK )
         return ANSC_STATUS_SUCCESS;
     else
@@ -240,8 +244,11 @@ CosaDmlCMGetLoopDiagnosticsStart
         BOOL*                       pBool
     )
 {
-	if(pBool)
-    	*pBool = FALSE;
+   if(!pBool){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    *pBool = FALSE;
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -262,8 +269,11 @@ CosaDmlCMGetLoopDiagnosticsDetails
         char*                       pValue
     )
 {
-    if(pValue)
-    	AnscCopyString(pValue, "Dummy");
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    AnscCopyString(pValue, "Dummy");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -274,8 +284,11 @@ CosaDmlCMGetTelephonyDHCPStatus
         char*                       pValue
     )
 {
-	if(pValue)
-		 AnscCopyString(pValue, "Dummy-InProgress");
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -286,8 +299,11 @@ CosaDmlCMGetTelephonyTftpStatus
         char*                       pValue
     )
 {
-    if(pValue)
-    	AnscCopyString(pValue, "Dummy-InProgress");
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -298,8 +314,11 @@ CosaDmlCMGetTelephonyRegistrationStatus
         char*                       pValue
     )
 {
-	if(pValue)
-    	AnscCopyString(pValue, "Dummy-InProgress");
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    AnscCopyString(pValue, "Dummy-InProgress");
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -346,7 +365,11 @@ CosaDmlCmSetLog
         PCOSA_DML_CM_LOG            pCfg
     )
 {
-    if((pCfg) && (pCfg->CleanDocsisLog == 1)){
+    if(!pCfg){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    if(pCfg->CleanDocsisLog == 1){
         docsis_ClearDocsisEventLog();
         pCfg->CleanDocsisLog = 0; 
     }
@@ -367,6 +390,11 @@ CosaDmlCmGetDocsisLog
     int count = 0;
     int i;
     PCOSA_DML_DOCSISLOG_FULL p;
+
+    if((!pulCount) || (!ppConf)){
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
 
     memset(entries, 0, DOCSIS_EVENT_LOG_SIZE*sizeof(CMMGMT_CM_EventLogEntry_t));
 
@@ -397,10 +425,12 @@ CosaDmlCmGetDownstreamChannel
         PCOSA_CM_DS_CHANNEL         *ppConf        
     )    
 {
-
+    if((!pulCount) || (!ppConf)){
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     docsis_GetNumOfActiveRxChannels(pulCount);
-
-    if(pulCount && *pulCount) {
+    if(*pulCount) {
 
         *ppConf = (PCOSA_CM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_DS_CHANNEL) * (*pulCount) );
     
@@ -418,10 +448,13 @@ CosaDmlCmGetUpstreamChannel
         PCOSA_CM_US_CHANNEL         *ppConf        
     )    
 {
-
+    if((!pulCount) || (!ppConf)){
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     docsis_GetNumOfActiveTxChannels(pulCount);
 
-    if(pulCount && *pulCount) {
+    if(*pulCount) {
 
         *ppConf = (PCOSA_CM_US_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_US_CHANNEL) * (*pulCount) );
     
@@ -481,8 +514,13 @@ CosaDmlCmGetCMErrorCodewords
         PCOSA_DML_CMERRORCODEWORDS_FULL   *ppConf
     )
 {
+    if((!pulCount) || (!ppConf)){
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     docsis_GetNumOfActiveRxChannels(pulCount);
-    if(pulCount && *pulCount) {
+
+    if(*pulCount) {
 
         *ppConf = (PCOSA_DML_CMERRORCODEWORDS_FULL)AnscAllocateMemory( sizeof(COSA_DML_CMERRORCODEWORDS_FULL) * (*pulCount) );
     
@@ -500,7 +538,10 @@ CosaDmlCmGetCMCert
     )
 {
     char *pCert = NULL;
-
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     if( docsis_GetCert(pCert) == RETURN_OK ) {
         if(pCert) {
             AnscCopyString(pValue, pCert);      
@@ -521,16 +562,17 @@ CosaDmlCmGetCMCertStatus
     )
 {
     ULONG ulcertStatus = 0;
-
+    if(!pBool){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     if (docsis_GetCertStatus(&ulcertStatus) != ANSC_STATUS_SUCCESS)
         return ANSC_STATUS_FAILURE;
     else {
         if(ulcertStatus) {
-			if(pBool)
-           		*pBool = TRUE;
+            *pBool = TRUE;
         } else {
-        	if(pBool)
-            	*pBool = FALSE;
+            *pBool = FALSE;
         }
     }
     return ANSC_STATUS_SUCCESS;
@@ -557,8 +599,11 @@ CosaDmlCMGetLockedUpstreamChID
         PULONG                      pValue
     )
 {
-	if(pValue)
-    	*pValue = docsis_GetUSChannelId();
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    *pValue = docsis_GetUSChannelId();
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -583,8 +628,11 @@ CosaDmlCMGetStartDSFrequency
         PULONG                      pValue
     )
 {
-	if(pValue)
-    	*pValue = docsis_GetDownFreq();
+    if(!pValue){
+	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
+    *pValue = docsis_GetDownFreq();
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -663,17 +711,21 @@ CosaDmlCmGetCPEList
 {
     char    LanMode[64] = {0};
     ULONG   size = 64;
+    if((!pulInstanceNumber) || (!ppCPEList)){
+	AnscTraceWarning(("Input parameter is NULL  pulInstanceNumber = %d , ppCPEList = %d , %s, %d\n",pulInstanceNumber, ppCPEList, __FUNCTION__, __LINE__));
+	return ANSC_STATUS_FAILURE;
+	}
     if(0 != g_GetParamValueString(g_pDslhDmlAgent, LANMODE_DM, LanMode, &size))
     {
         return ANSC_STATUS_FAILURE;
     }    
-	if(pulInstanceNumber)
-  		*pulInstanceNumber = 0;
+
+    *pulInstanceNumber = 0;
     PCMMGMT_DML_CPE_LIST pInfo = NULL;
     if( cm_hal_GetCPEList(&pInfo, pulInstanceNumber, LanMode) != RETURN_OK)
         return ANSC_STATUS_FAILURE;
 
-    if ((pulInstanceNumber) && (*pulInstanceNumber > 0)) {
+    if (*pulInstanceNumber > 0) {
         if( (*ppCPEList = (PCOSA_DML_CPE_LIST)AnscAllocateMemory(sizeof(COSA_DML_CPE_LIST)*(*pulInstanceNumber))) == NULL )
         {
             AnscTraceWarning(("AllocateMemory error %s, %d\n", __FUNCTION__, __LINE__));
