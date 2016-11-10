@@ -113,6 +113,84 @@ static int g_DocsisLog_clean_flg=0;
  }
  
 ***********************************************************************/
+
+/**********************************************************************  
+
+    caller:     owner of this object 
+
+    prototype: 
+
+        BOOL
+        DeviceInfo_GetParamStringValue
+            (
+                ANSC_HANDLE                 hInsContext,
+                char*                       ParamName,
+                BOOL*                       pBool
+            );
+
+    description:
+
+        This function is called to retrieve Boolean parameter value; 
+
+    argument:   ANSC_HANDLE                 hInsContext,
+                The instance handle;
+
+                char*                       ParamName,
+                The parameter name;
+
+                BOOL*                       pBool
+                The buffer of returned boolean value;
+
+    return:     TRUE if succeeded.
+
+**********************************************************************/
+
+/***********************************************************************
+
+ APIs for Object:
+
+    DeviceInfo.
+
+    *  DeviceInfo_GetParamStringValue
+
+***********************************************************************/
+
+ULONG
+DeviceInfo_GetParamStringValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        char*                       pValue,
+        ULONG*                      pulSize
+    )
+{
+
+    COSA_CM_DHCP_INFO               Info = {0};
+
+    if( AnscEqualString(ParamName, "X_COMCAST-COM_CM_MAC", TRUE))
+    {
+        /* collect value */
+        if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
+           return -1;
+
+             AnscCopyString(pValue, Info.MACAddress);
+
+           return 0;
+    }
+
+    if( AnscEqualString(ParamName, "X_COMCAST-COM_CM_IP", TRUE))
+    {
+        if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
+            return FALSE;
+	   _ansc_strcpy(pValue, _ansc_inet_ntoa(*((struct in_addr*)&Info.IPAddress.Value)));
+
+          return TRUE;
+          return 0;
+    }
+
+}
+
+
 /***********************************************************************
 
  APIs for Object:
