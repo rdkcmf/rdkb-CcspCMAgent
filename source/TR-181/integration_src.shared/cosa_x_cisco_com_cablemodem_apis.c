@@ -670,30 +670,34 @@ CosaDmlCMGetResetCount
         ULONG                       *pValue
     )
 {
+	INT ret_val=RETURN_ERR;
 	switch(type)
 	{
 		case CABLE_MODEM_RESET:{
-				cm_hal_Get_CableModemResetCount(pValue);
+				ret_val=cm_hal_Get_CableModemResetCount(pValue);
 			}
 			break;
 		case LOCAL_RESET:{
-				cm_hal_Get_LocalResetCount(pValue);
+				ret_val=cm_hal_Get_LocalResetCount(pValue);
 			}
 			break;
 		case DOCSIS_RESET:{
-				cm_hal_Get_DocsisResetCount(pValue);
+				ret_val=cm_hal_Get_DocsisResetCount(pValue);
 			}
 			break;
 		case EROUTER_RESET:{
-				cm_hal_Get_ErouterResetCount(pValue);
+				ret_val=cm_hal_Get_ErouterResetCount(pValue);
 			}
 			break;
 		default:{
 			 AnscTraceWarning(("Invalid type %s, %d\n", __FUNCTION__, __LINE__));
 			}
 	}
-    
-    return ANSC_STATUS_SUCCESS;
+
+    	if(RETURN_ERR == ret_val)
+		return ANSC_STATUS_FAILURE;
+    	else
+		return ANSC_STATUS_SUCCESS;
 }
 
 
