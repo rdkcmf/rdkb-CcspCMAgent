@@ -72,26 +72,6 @@
 #ifndef  _COSA_CM_DML_H
 #define  _COSA_CM_DML_H
 
-
-/***********************************************************************
-
- APIs for Object:
-
-    DeviceInfo.
-
-    *  DeviceInfo_GetParamStringValue
-
-***********************************************************************/
-
-
-ULONG
-DeviceInfo_GetParamStringValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        char*                       pValue,
-        ULONG*                      pulSize
-    );
 /***********************************************************************
 
  APIs for Object:

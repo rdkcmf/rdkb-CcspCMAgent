@@ -45,43 +45,6 @@
 
   </library>
   <objects>
-
-   <object>
-
-      <name>DeviceInfo</name>
-
-      <objectType>object</objectType>
-
-      <functions>
-
-        <func_GetParamStringValue>DeviceInfo_GetParamStringValue</func_GetParamStringValue>
-
-      </functions>
-
-      <parameters>
-
-        <parameter>
-    
-          <name>X_COMCAST-COM_CM_MAC</name>
-                   
-          <type>string(64)</type>
-                                  
-          <syntax>string</syntax>
-                                                 
-        </parameter>
-        
-        <parameter>
-    
-          <name>X_COMCAST-COM_CM_IP</name>
-                   
-          <type>string(64)</type>
-                                  
-          <syntax>string</syntax>
-                                                 
-        </parameter>    
-      </parameters>
-
-   </object>
      <object>
 
       <name>X_CISCO_COM_CableModem</name>
