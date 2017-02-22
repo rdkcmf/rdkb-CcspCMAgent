@@ -232,6 +232,26 @@ DownstreamChannel_GetEntryCount
         ANSC_HANDLE                 hInsContext
     );
 
+ULONG
+DownstreamOFDMChannel_GetEntryCount
+    (
+        ANSC_HANDLE                 hInsContext
+    );
+
+BOOL
+DownstreamOFDMChannel_IsUpdated
+    (
+        ANSC_HANDLE                 hInsContext
+    );
+
+ANSC_HANDLE
+DownstreamOFDMChannel_GetEntry
+    (
+        ANSC_HANDLE                 hInsContext,
+        ULONG                       nIndex,
+        ULONG*                      pInsNumber
+    );
+
 ANSC_HANDLE
 DownstreamChannel_GetEntry
     (
@@ -252,6 +272,12 @@ DownstreamChannel_Synchronize
         ANSC_HANDLE                 hInsContext
     );
 
+ULONG
+DownstreamOFDMChannel_Synchronize
+    (
+        ANSC_HANDLE                 hInsContext
+    );
+
 BOOL
 DownstreamChannel_GetParamUlongValue
     (
@@ -262,6 +288,31 @@ DownstreamChannel_GetParamUlongValue
 
 ULONG
 DownstreamChannel_GetParamStringValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        char*                       pValue,
+        ULONG*                      pUlSize
+    );
+
+BOOL
+DownstreamOFDMChannel_GetParamIntValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        int*                        pInt
+    );
+
+BOOL
+DownstreamOFDMChannel_GetParamUlongValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        ULONG*                      puLong
+    );
+
+ULONG
+DownstreamOFDMChannel_GetParamStringValue
     (
         ANSC_HANDLE                 hInsContext,
         char*                       ParamName,
