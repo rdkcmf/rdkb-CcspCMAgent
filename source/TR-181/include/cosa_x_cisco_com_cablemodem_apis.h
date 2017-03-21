@@ -350,6 +350,7 @@ CosaDmlCmGetDownstreamChannel
         PCOSA_CM_DS_CHANNEL         *ppConf        
     );    
 
+#if defined (_XB6_PRODUCT_REQ_)
 ANSC_STATUS
 CosaDmlCmGetDownstreamOFDMChannel
     (
@@ -357,6 +358,7 @@ CosaDmlCmGetDownstreamOFDMChannel
         PULONG                      pulCount,
         PCOSA_CM_OFDM_DS_CHANNEL    *ppConf
     );
+#endif
 
 ANSC_STATUS
 CosaDmlCmGetUpstreamChannel

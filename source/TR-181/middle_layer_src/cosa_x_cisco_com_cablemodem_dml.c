@@ -2040,6 +2040,7 @@ DownstreamChannel_GetEntryCount
     return pMyObject->DownstreamChannelNumber;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 ULONG
 DownstreamOFDMChannel_GetEntryCount
     (
@@ -2050,6 +2051,7 @@ DownstreamOFDMChannel_GetEntryCount
 
     return pMyObject->DownstreamChannelNumber;
 }
+#endif
 
 /**********************************************************************  
 
@@ -2101,6 +2103,7 @@ DownstreamChannel_GetEntry
     return NULL; /* return the handle */
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 ANSC_HANDLE
 DownstreamOFDMChannel_GetEntry
     (
@@ -2120,8 +2123,10 @@ DownstreamOFDMChannel_GetEntry
 
     return NULL; /* return the handle */
 }
+#endif
 
 
+#if defined (_XB6_PRODUCT_REQ_)
 /**********************************************************************
 
     caller:     owner of this object
@@ -2170,6 +2175,7 @@ DownstreamOFDMChannel_IsUpdated
         return TRUE;
     }
 }
+#endif
 
 /**********************************************************************  
 
@@ -2277,6 +2283,7 @@ DownstreamChannel_Synchronize
     return 0;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 ULONG
 DownstreamOFDMChannel_Synchronize
     (
@@ -2311,6 +2318,7 @@ DownstreamOFDMChannel_Synchronize
     Ccsp_cm_clnt_unlock();
     return 0;
 }
+#endif
 
 /**********************************************************************  
 
@@ -2389,6 +2397,7 @@ DownstreamChannel_GetParamUlongValue
     return FALSE;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 BOOL
 DownstreamOFDMChannel_GetParamIntValue
     (
@@ -2426,7 +2435,9 @@ DownstreamOFDMChannel_GetParamIntValue
 
     return FALSE;
 }
+#endif
 
+#if defined (_XB6_PRODUCT_REQ_)
 BOOL
 DownstreamOFDMChannel_GetParamUlongValue
     (
@@ -2464,6 +2475,7 @@ DownstreamOFDMChannel_GetParamUlongValue
 
     return FALSE;
 }
+#endif
 
 /**********************************************************************  
 
@@ -2584,6 +2596,7 @@ DownstreamChannel_GetParamStringValue
     return -1;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 ULONG
 DownstreamOFDMChannel_GetParamStringValue
     (
@@ -2677,6 +2690,7 @@ DownstreamOFDMChannel_GetParamStringValue
     /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return -1;
 }
+#endif
 
 /***********************************************************************
 

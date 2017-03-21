@@ -440,6 +440,7 @@ CosaDmlCmGetDownstreamChannel
     return ANSC_STATUS_SUCCESS;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
 ANSC_STATUS
 CosaDmlCmGetDownstreamOFDMChannel
     (
@@ -461,6 +462,7 @@ CosaDmlCmGetDownstreamOFDMChannel
 
     return ANSC_STATUS_SUCCESS;
 }
+#endif
 
 ANSC_STATUS
 CosaDmlCmGetUpstreamChannel
