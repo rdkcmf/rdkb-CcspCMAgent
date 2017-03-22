@@ -40,6 +40,9 @@
 #endif
 
 #include "ssp_global.h"
+#ifdef INCLUDE_BREAKPAD
+#include "breakpad_wrapper.h"
+#endif
 #include "stdlib.h"
 #include "ccsp_dm_api.h"
 #ifdef USE_PCD_API_EXCEPTION_HANDLING
@@ -441,6 +444,10 @@ int main(int argc, char* argv[])
     fputs(cmd, fd);
     fclose(fd);
 
+#ifdef INCLUDE_BREAKPAD
+    breakpad_ExceptionHandler();
+#else
+
     if (is_core_dump_opened())
     {
         signal(SIGUSR1, sig_handler);
@@ -463,6 +470,7 @@ int main(int argc, char* argv[])
     signal(SIGHUP, sig_handler);
 	signal(SIGALRM, sig_handler);
     }
+#endif
 
 #ifdef USE_PCD_API_EXCEPTION_HANDLING
     printf("Registering PCD exception handler for CcspCMAgent\n");
