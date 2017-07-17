@@ -1153,6 +1153,85 @@
         </objects>
 		
     </object>
+	
+	<object>
+
+      <name>DeviceInfo</name>
+
+      <objectType>object</objectType>
+
+      <functions>
+
+        <func_GetParamBoolValue>DeviceInfo_GetParamBoolValue</func_GetParamBoolValue>
+
+        <func_GetParamStringValue>DeviceInfo_GetParamStringValue</func_GetParamStringValue>
+
+        <func_SetParamBoolValue>DeviceInfo_SetParamBoolValue</func_SetParamBoolValue>
+
+        <func_SetParamStringValue>DeviceInfo_SetParamStringValue</func_SetParamStringValue>
+
+      </functions>
+
+      <parameters>
+
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_FirmwareDownloadStatus</name>
+
+          <type>string</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+		
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_FirmwareDownloadProtocol</name>
+
+          <type>string</type>
+
+          <syntax>string</syntax>
+
+        </parameter>		
+
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_FirmwareDownloadURL</name>
+
+          <type>string</type>
+
+          <syntax>string</syntax>
+
+		  <writable>true</writable>
+		  
+        </parameter>	
+		
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_FirmwareToDownload</name>
+
+          <type>string</type>
+
+          <syntax>string</syntax>
+
+		  <writable>true</writable>
+		  
+        </parameter>
+
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_FirmwareDownloadNow</name>
+
+		  <type>boolean</type>
+		  
+		  <syntax>bool</syntax>
+
+		  <writable>true</writable>
+		  
+        </parameter>		
+	  </parameters>	
+	</object>
+	
   </objects>
 
 </dataModelInfo>

@@ -128,6 +128,7 @@ extern COSARegisterCallBackAfterInitDmlProc  g_RegisterCallBackAfterInitDml;
     /* duplication of the base object class content */                                      \
     COSA_BASE_CONTENT                                                                       \
     ANSC_HANDLE                  hCM;                                                       \
+    ANSC_HANDLE                  hDI;                                                       \
     PCOSA_PLUGIN_INFO            hCosaPluginInfo;
 
 typedef  struct

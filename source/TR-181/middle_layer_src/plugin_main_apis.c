@@ -205,6 +205,8 @@ CosaBackEndManagerInitialize
     // need to revisit this handling thread. causing SEGV.  RTian 5/31/2014
     // EvtDispterHandleEventAsync();
 
+    pMyObject->hDI            = (ANSC_HANDLE)CosaDeviceInfoCreate();
+    AnscTraceWarning(("  CosaDeviceInfoCreate done!\n"));
     printf("************ CM initialization done! ********************\n");
     return returnStatus;
 }
