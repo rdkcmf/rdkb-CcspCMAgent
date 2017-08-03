@@ -378,6 +378,7 @@ convert_to_validFW(char *fw,char *valid_fw)
 	int buff_len = 0;
 
 	if(buff = strstr(fw,"_signed"));
+	else if(buff = strstr(fw,"-signed"));
 	else if(buff = strstr(fw,"."));
 
 	if(buff)
