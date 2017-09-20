@@ -207,6 +207,10 @@ CosaBackEndManagerInitialize
 
     pMyObject->hDI            = (ANSC_HANDLE)CosaDeviceInfoCreate();
     AnscTraceWarning(("  CosaDeviceInfoCreate done!\n"));
+
+    pMyObject->hRDKCM            = (ANSC_HANDLE)CosaRDKCentralComCableModemCreate();
+    AnscTraceWarning(("  CosaRDKCentralComCableModemCreate done!\n"));
+
     printf("************ CM initialization done! ********************\n");
     return returnStatus;
 }
@@ -250,6 +254,10 @@ CosaBackEndManagerRemove
         CosaCableModemRemove((ANSC_HANDLE)pMyObject->hCM);
     }
 
+    if ( pMyObject->hRDKCM )
+    {
+        CosaRDKCentralComCableModemRemove((ANSC_HANDLE)pMyObject->hRDKCM);
+    }
    
 
     /* Remove self */

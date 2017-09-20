@@ -1231,7 +1231,268 @@
         </parameter>		
 	  </parameters>	
 	</object>
-	
+
+	<object>
+	<name>X_RDKCENTRAL-COM_CableModem</name>
+	<objectType>object</objectType>
+		<functions></functions>
+		<parameters></parameters>
+		<objects>
+			<object>
+			<name>DsOfdmChan</name>
+			<objectType>dynamicTable</objectType>
+			<maxInstance>128</maxInstance>
+				<functions>
+				<func_IsUpdated>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_IsUpdated</func_IsUpdated>
+				<func_Synchronize>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_Synchronize</func_Synchronize>
+				<func_GetEntryCount>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntryCount</func_GetEntryCount>
+				<func_GetEntry>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntry</func_GetEntry>
+				<func_GetParamUlongValue>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue</func_GetParamUlongValue>
+				</functions>
+				<parameters>
+					<parameter>
+					<name>ChannelID</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+
+					<parameter>
+					<name>ChanIndicator</name>
+					<type>string: other(1),primary(2),backupPrimary(3),nonPrimary(4)</type>
+					<syntax>uint32/mapped</syntax>
+					</parameter>
+
+					<parameter>
+					<name>SubcarrierZeroFreq</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>FirstActiveSubcarrierNum</name>
+					<type>unsignedInt[148:7895]</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>LastActiveSubcarrierNum</name>
+					<type>unsignedInt[148:7895]</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>NumActiveSubcarriers</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>SubcarrierSpacing</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>CyclicPrefix</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>RollOffPeriod</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>PlcFreq</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>NumPilots</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>TimeInterleaverDepth</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>PlcTotalCodewords</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>PlcUnreliableCodewords</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>NcpTotalFields</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+					
+					<parameter>
+					<name>NcpFieldCrcFailures</name>
+					<type>unsignedInt</type>
+					<syntax>uint32</syntax>
+					</parameter>
+				</parameters>
+			</object>
+
+			<object>
+			<name>UsOfdmaChan</name>
+			<objectType>dynamicTable</objectType>
+			<maxInstance>128</maxInstance>
+				<functions>
+				<func_IsUpdated>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_IsUpdated</func_IsUpdated>
+				<func_GetEntryCount>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetEntryCount</func_GetEntryCount>
+				<func_GetEntry>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetEntry</func_GetEntry>
+				<func_Synchronize>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_Synchronize</func_Synchronize>
+				<func_GetParamBoolValue>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamBoolValue</func_GetParamBoolValue>
+				<func_GetParamUlongValue>X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue</func_GetParamUlongValue>
+				</functions>
+					<parameters>
+						<parameter>
+						<name>ChannelId</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+
+						<parameter>
+						<name>ConfigChangeCt</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>SubcarrierZeroFreq</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>FirstActiveSubcarrierNum</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>LastActiveSubcarrierNum</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>NumActiveSubcarriers</name>
+						<type>unsignedInt[1:3800]</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>SubcarrierSpacing</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>CyclicPrefix</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>RollOffPeriod</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>NumSymbolsPerFrame</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>TxPower</name>
+						<type>unsignedInt</type>
+						<syntax>uint32</syntax>
+						</parameter>
+						
+						<parameter>
+						<name>PreEqEnabled</name>
+						<type>boolean</type>
+						<syntax>bool</syntax>
+						</parameter>
+					</parameters>
+				</object>
+				
+				<object>
+				<name>StatusOfdma</name>
+				<objectType>dynamicTable</objectType>
+				<maxInstance>128</maxInstance>
+					<functions>
+					<func_IsUpdated>X_RDKCENTRAL_COM_CableModem_StatusOfdma_IsUpdated</func_IsUpdated>
+					<func_GetEntryCount>X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetEntryCount</func_GetEntryCount>
+					<func_GetEntry>X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetEntry</func_GetEntry>
+					<func_Synchronize>X_RDKCENTRAL_COM_CableModem_StatusOfdma_Synchronize</func_Synchronize>
+					<func_GetParamBoolValue>X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamBoolValue</func_GetParamBoolValue>
+					<func_GetParamUlongValue>X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue</func_GetParamUlongValue>
+					</functions>
+						<parameters>
+							<parameter>
+							<name>ChannelId</name>
+							<type>unsignedInt</type>
+							<syntax>uint32</syntax>
+							</parameter>
+				
+							<parameter>
+							<name>T3Timeouts</name>
+							<type>unsignedInt</type>
+							<syntax>uint32</syntax>
+							</parameter>
+							
+							<parameter>
+							<name>T4Timeouts</name>
+							<type>unsignedInt</type>
+							<syntax>uint32</syntax>
+							</parameter>
+							
+							<parameter>
+							<name>RangingAborteds</name>
+							<type>unsignedInt</type>
+							<syntax>uint32</syntax>
+							</parameter>
+							
+							<parameter>
+							<name>T3Exceededs</name>
+							<type>unsignedInt</type>
+							<syntax>uint32</syntax>
+							</parameter>
+							
+							<parameter>
+							<name>IsMuted</name>
+							<type>boolean</type>
+							<syntax>bool</syntax>
+							</parameter>
+
+							<parameter>
+							<name>RangingStatus</name>
+							<type>string: other(1),aborted(2),retriesExceeded(3),success(4),continue(5),timeoutT4(6)</type>
+							<syntax>uint32/mapped</syntax>
+							</parameter>
+						</parameters>
+					</object>
+		</objects>
+	</object>	  
   </objects>
 
 </dataModelInfo>
