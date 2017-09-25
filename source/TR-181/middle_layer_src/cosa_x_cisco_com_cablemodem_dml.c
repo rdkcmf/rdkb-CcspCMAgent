@@ -2040,19 +2040,6 @@ DownstreamChannel_GetEntryCount
     return pMyObject->DownstreamChannelNumber;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
-ULONG
-DownstreamOFDMChannel_GetEntryCount
-    (
-        ANSC_HANDLE                 hInsContext
-    )
-{
-    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
-
-    return pMyObject->DownstreamChannelNumber;
-}
-#endif
-
 /**********************************************************************  
 
     caller:     owner of this object 
@@ -2102,80 +2089,6 @@ DownstreamChannel_GetEntry
 
     return NULL; /* return the handle */
 }
-
-#if defined (_XB6_PRODUCT_REQ_)
-ANSC_HANDLE
-DownstreamOFDMChannel_GetEntry
-    (
-        ANSC_HANDLE                 hInsContext,
-        ULONG                       nIndex,
-        ULONG*                      pInsNumber
-    )
-{
-    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
-
-    if (nIndex < pMyObject->DownstreamChannelNumber)
-    {
-        *pInsNumber  = nIndex + 1;
-
-        return &pMyObject->pDownstreamOfdmChannel[nIndex];
-    }
-
-    return NULL; /* return the handle */
-}
-#endif
-
-
-#if defined (_XB6_PRODUCT_REQ_)
-/**********************************************************************
-
-    caller:     owner of this object
-
-    prototype:
-
-        BOOL
-        DownstreamOFDMChannel_IsUpdated
-            (
-                ANSC_HANDLE                 hInsContext
-            );
-
-    description:
-
-        This function is checking whether the table is updated or not.
-
-    argument:   ANSC_HANDLE                 hInsContext,
-                The instance handle;
-
-    return:     TRUE or FALSE.
-
-**********************************************************************/
-BOOL
-DownstreamOFDMChannel_IsUpdated
-    (
-        ANSC_HANDLE                 hInsContext
-    )
-{
-    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
-
-    if ( !pMyObject->DownstreamOFDMChannelUpdateTime )
-    {
-        pMyObject->DownstreamOFDMChannelUpdateTime = AnscGetTickInSeconds();
-
-        return TRUE;
-    }
-
-    if ( pMyObject->DownstreamOFDMChannelUpdateTime >= TIME_NO_NEGATIVE(AnscGetTickInSeconds() - CM_REFRESH_INTERVAL) )
-    {
-        return FALSE;
-    }
-    else
-    {
-        pMyObject->DownstreamOFDMChannelUpdateTime = AnscGetTickInSeconds();
-
-        return TRUE;
-    }
-}
-#endif
 
 /**********************************************************************  
 
@@ -2283,43 +2196,6 @@ DownstreamChannel_Synchronize
     return 0;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
-ULONG
-DownstreamOFDMChannel_Synchronize
-    (
-        ANSC_HANDLE                 hInsContext
-    )
-{
-    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
-    ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
-
-    Ccsp_cm_clnt_lock();
-    if ( pMyObject->pDownstreamOfdmChannel )
-    {
-        AnscFreeMemory(pMyObject->pDownstreamOfdmChannel);
-        pMyObject->pDownstreamOfdmChannel = NULL;
-    }
-
-    pMyObject->DownstreamChannelNumber = 0;
-
-    ret = CosaDmlCmGetDownstreamOFDMChannel
-        (
-            (ANSC_HANDLE)NULL,
-            &pMyObject->DownstreamChannelNumber,
-            &pMyObject->pDownstreamOfdmChannel
-        );
-
-    if ( ret != ANSC_STATUS_SUCCESS )
-    {
-        pMyObject->pDownstreamOfdmChannel = NULL;
-        pMyObject->DownstreamChannelNumber = 0;
-    }
-
-    Ccsp_cm_clnt_unlock();
-    return 0;
-}
-#endif
-
 /**********************************************************************  
 
     caller:     owner of this object 
@@ -2396,86 +2272,6 @@ DownstreamChannel_GetParamUlongValue
     /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
 }
-
-#if defined (_XB6_PRODUCT_REQ_)
-BOOL
-DownstreamOFDMChannel_GetParamIntValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        int*                        pInt
-    )
-{
-    PCOSA_CM_OFDM_DS_CHANNEL             pConf        = (PCOSA_CM_OFDM_DS_CHANNEL)hInsContext;
-
-    /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "fftType", TRUE) )
-    {
-        /* collect value */
-        *pInt = pConf->fftType;
-
-        return TRUE;
-    }
-
-    if( AnscEqualString(ParamName, "cpSize", TRUE) )
-    {
-        /* collect value */
-        *pInt = pConf->cpSize;
-
-        return TRUE;
-    }
-
-    if( AnscEqualString(ParamName, "NumberOfSubDataCarriers", TRUE) )
-    {
-        /* collect value */
-        *pInt = pConf->numOfDataSubcarr;
-
-        return TRUE;
-    }
-
-    return FALSE;
-}
-#endif
-
-#if defined (_XB6_PRODUCT_REQ_)
-BOOL
-DownstreamOFDMChannel_GetParamUlongValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        ULONG*                      puLong
-    )
-{
-    PCOSA_CM_OFDM_DS_CHANNEL             pConf        = (PCOSA_CM_OFDM_DS_CHANNEL)hInsContext;
-
-    /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "ChannelID", TRUE) )
-    {
-        /* collect value */
-        *puLong = pConf->dcid;
-
-        return TRUE;
-    }
-
-    if( AnscEqualString(ParamName, "rollOff", TRUE) )
-    {
-        /* collect value */
-        *puLong = pConf->rollOff;
-
-        return TRUE;
-    }
-
-    if( AnscEqualString(ParamName, "TimeInterleavingDepth", TRUE) )
-    {
-        /* collect value */
-        *puLong = pConf->timeInterleavingDepth;
-
-        return TRUE;
-    }
-
-    return FALSE;
-}
-#endif
 
 /**********************************************************************  
 
@@ -2595,102 +2391,6 @@ DownstreamChannel_GetParamStringValue
     /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return -1;
 }
-
-#if defined (_XB6_PRODUCT_REQ_)
-ULONG
-DownstreamOFDMChannel_GetParamStringValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        char*                       pValue,
-        ULONG*                      pUlSize
-    )
-{
-    PCOSA_CM_OFDM_DS_CHANNEL             pConf        = (PCOSA_CM_OFDM_DS_CHANNEL)hInsContext;
-
-    /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "Frequency", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->OFDMFrequency) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->OFDMFrequency);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->OFDMFrequency);
-        return 0;
-    }
-
-    if( AnscEqualString(ParamName, "TunerFrequency", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->tunerFrequency) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->tunerFrequency);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->tunerFrequency);
-        return 0;
-    }
-
-    if( AnscEqualString(ParamName, "PlcCenterFrequency", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->plcCenterFrequency) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->plcCenterFrequency);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->plcCenterFrequency);
-        return 0;
-    }
-
-    if( AnscEqualString(ParamName, "PowerLevel", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->rxPower) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->rxPower);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->rxPower);
-        return 0;
-    }
-
-    if( AnscEqualString(ParamName, "Modulation", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->Modulation) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->Modulation);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->Modulation);
-        return 0;
-    }
-
-    if( AnscEqualString(ParamName, "LockStatus", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pConf->LockStatus) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pConf->LockStatus);
-            return 1;
-        }
-
-        AnscCopyString(pValue, pConf->LockStatus);
-        return 0;
-    }
-
-    /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
-    return -1;
-}
-#endif
 
 /***********************************************************************
 
