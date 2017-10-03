@@ -92,7 +92,9 @@
     PCOSA_DML_DOCSISLOG_FULL        pDocsisLog;                                          \
     ULONG                           DownstreamChannelNumber;                             \
     PCOSA_CM_DS_CHANNEL             pDownstreamChannel;                                  \
+    PCOSA_CM_OFDM_DS_CHANNEL        pDownstreamOfdmChannel;                              \
     ULONG                           DownstreamChannelUpdateTime;                         \
+    ULONG                           DownstreamOFDMChannelUpdateTime;                         \
     ULONG                           UpstreamChannelNumber;                               \
     PCOSA_CM_US_CHANNEL             pUpstreamChannel;                                    \
     ULONG                           UpstreamChannelUpdateTime;                           \

@@ -114,60 +114,64 @@ CosaDmlRDKCentralCmGetDownstreamChannel
     )    
 {
 //	PDOCSIF31_CM_DS_OFDM_CHAN *ppinfo 				   = NULL;
-    u_long output_NumberOfEntries  = 0;
+	int 					   output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
-    {
-        AnscTraceWarning(("Input parameter is NULL %s, %d\n", __FUNCTION__, __LINE__));
-        return ANSC_STATUS_FAILURE;
-    }
+	{
+		AnscTraceWarning(("Input parameter is NULL %s, %d\n", __FUNCTION__, __LINE__));
+		return ANSC_STATUS_FAILURE;
+	}
 
-    //Free previously allocated memory
-    if( NULL != *ppDsOfdmChannel )
-    {
-        AnscFreeMemory(  *ppDsOfdmChannel );
-        *ppDsOfdmChannel = NULL;
-    }
+	//Free previously allocated memory
+	if( NULL != *ppDsOfdmChannel )
+	{
+		AnscFreeMemory(  *ppDsOfdmChannel );
+		*ppDsOfdmChannel = NULL;
+	}
 
-    *pulCount = 0;
+	*pulCount = 0;
 
-    //Call CM HAL API to get Number of OFDM locked to allocate memory accordingly
-    docsis_GetNumOfActiveRxOfdmChannels(&output_NumberOfEntries );
+//	Call CM HAL API to get DownStream channel tables information
+//	docsis_GetDsOfdmChanTable((PDOCSIF31_CM_DS_OFDM_CHAN*)ppinfo, &output_NumberOfEntries );
 
-    if( output_NumberOfEntries > 0 )
-    {
+	if( output_NumberOfEntries > 0 )
+	{
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN pDsOfdmChannel = NULL;         
-        int iLoopCount = 0;
 
-        //Fill the required fields from HAL structure to local structure
-        *pulCount = output_NumberOfEntries;
-        *ppDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)
-                            AnscAllocateMemory( sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
-        memset( *ppDsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
-        pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)ppDsOfdmChannel[0];
-        docsis_GetDsOfdmChanTable((PDOCSIF31_CM_DS_OFDM_CHAN*)ppDsOfdmChannel, &output_NumberOfEntries);
+		int iLoopCount = 0;
+	
+		//Fill the required fields from HAL structure to local structure
+		*pulCount			= output_NumberOfEntries;
+		*ppDsOfdmChannel 	= (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)AnscAllocateMemory( sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
 
-        for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
-        {
-            //Copy each and every members from HAL
-            pDsOfdmChannel[ iLoopCount ].ChannelId = (*ppDsOfdmChannel)[ iLoopCount ].ChannelId;
-            pDsOfdmChannel[ iLoopCount ].ChanIndicator = (*ppDsOfdmChannel)[ iLoopCount ].ChanIndicator;
-            pDsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq = (*ppDsOfdmChannel)[ iLoopCount ].SubcarrierZeroFreq;
-            pDsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum = (*ppDsOfdmChannel)[ iLoopCount ].FirstActiveSubcarrierNum;
-            pDsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum =(*ppDsOfdmChannel)[ iLoopCount ].LastActiveSubcarrierNum;
-            pDsOfdmChannel[ iLoopCount ].NumActiveSubcarriers =(*ppDsOfdmChannel)[ iLoopCount ].NumActiveSubcarriers;
-            pDsOfdmChannel[ iLoopCount ].SubcarrierSpacing = (*ppDsOfdmChannel)[ iLoopCount ].SubcarrierSpacing;
-            pDsOfdmChannel[ iLoopCount ].CyclicPrefix = (*ppDsOfdmChannel)[ iLoopCount ].CyclicPrefix;
-            pDsOfdmChannel[ iLoopCount ].RollOffPeriod = (*ppDsOfdmChannel)[ iLoopCount ].RollOffPeriod;
-            pDsOfdmChannel[ iLoopCount ].PlcFreq = (*ppDsOfdmChannel)[ iLoopCount ].PlcFreq;
-            pDsOfdmChannel[ iLoopCount ].NumPilots= (*ppDsOfdmChannel)[ iLoopCount ].NumPilots;
-            pDsOfdmChannel[ iLoopCount ].TimeInterleaverDepth = (*ppDsOfdmChannel)[ iLoopCount ].TimeInterleaverDepth;
-            pDsOfdmChannel[ iLoopCount ].PlcTotalCodewords= (*ppDsOfdmChannel)[ iLoopCount ].PlcTotalCodewords;
-            pDsOfdmChannel[ iLoopCount ].PlcUnreliableCodewords = (*ppDsOfdmChannel)[ iLoopCount ].PlcUnreliableCodewords;
-            pDsOfdmChannel[ iLoopCount ].NcpTotalFields=(*ppDsOfdmChannel)[ iLoopCount ].NcpTotalFields;
-            pDsOfdmChannel[ iLoopCount ].NcpFieldCrcFailures=(*ppDsOfdmChannel)[ iLoopCount ].NcpFieldCrcFailures;
-        }
-    }
+		memset( *ppDsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
+
+		pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)ppDsOfdmChannel[0];
+
+//After hook HAL we have to copy each member
+#if 0
+		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
+	 	{
+			//Copy each and every members from HAL
+			pDsOfdmChannel[ iLoopCount ].ChannelId = 1; 				   
+			pDsOfdmChannel[ iLoopCount ].ChanIndicator = 2; 			   
+			pDsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq = 3;		   
+			pDsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum = 4;	   
+			pDsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum =5;	   
+			pDsOfdmChannel[ iLoopCount ].NumActiveSubcarriers =6;		   
+			pDsOfdmChannel[ iLoopCount ].SubcarrierSpacing = 7; 		   
+			pDsOfdmChannel[ iLoopCount ].CyclicPrefix = 8;	 
+			pDsOfdmChannel[ iLoopCount ].RollOffPeriod =9;  
+			pDsOfdmChannel[ iLoopCount ].PlcFreq = 10;		 
+			pDsOfdmChannel[ iLoopCount ].NumPilots=11; 	 
+			pDsOfdmChannel[ iLoopCount ].TimeInterleaverDepth=12;
+			pDsOfdmChannel[ iLoopCount ].PlcTotalCodewords=13;
+			pDsOfdmChannel[ iLoopCount ].PlcUnreliableCodewords=14;
+			pDsOfdmChannel[ iLoopCount ].NcpTotalFields=15; 
+			pDsOfdmChannel[ iLoopCount ].NcpFieldCrcFailures=17;
+	 	}
+#endif /* 0 */
+	}
 
     return ANSC_STATUS_SUCCESS;
 }

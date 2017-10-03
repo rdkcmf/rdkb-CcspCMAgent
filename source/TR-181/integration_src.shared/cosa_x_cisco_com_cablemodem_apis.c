@@ -440,6 +440,30 @@ CosaDmlCmGetDownstreamChannel
     return ANSC_STATUS_SUCCESS;
 }
 
+#if defined (_XB6_PRODUCT_REQ_)
+ANSC_STATUS
+CosaDmlCmGetDownstreamOFDMChannel
+    (
+        ANSC_HANDLE                 hContext,
+        PULONG                      pulCount,
+        PCOSA_CM_OFDM_DS_CHANNEL    *ppConf
+    )
+{
+    if((!pulCount) || (!ppConf)){
+        AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+        return ANSC_STATUS_FAILURE;
+    }
+
+    docsis_GetNumOfActiveRxOfdmChannels(pulCount);
+    if(*pulCount) {
+        *ppConf = (PCOSA_CM_OFDM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_OFDM_DS_CHANNEL) * (*pulCount) );
+        docsis_GetDSOfdmChannelInfo((struct PCMMGMT_CM_DOCSIS_OFDM_CHANNELS *)ppConf);
+    }
+
+    return ANSC_STATUS_SUCCESS;
+}
+#endif
+
 ANSC_STATUS
 CosaDmlCmGetUpstreamChannel
     (
