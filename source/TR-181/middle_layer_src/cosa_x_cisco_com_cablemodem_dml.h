@@ -232,7 +232,7 @@ DownstreamChannel_GetEntryCount
         ANSC_HANDLE                 hInsContext
     );
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 ULONG
 DownstreamOFDMChannel_GetEntryCount
     (

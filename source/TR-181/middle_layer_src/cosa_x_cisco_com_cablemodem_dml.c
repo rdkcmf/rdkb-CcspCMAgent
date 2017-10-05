@@ -2040,7 +2040,7 @@ DownstreamChannel_GetEntryCount
     return pMyObject->DownstreamChannelNumber;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 ULONG
 DownstreamOFDMChannel_GetEntryCount
     (
@@ -2103,7 +2103,7 @@ DownstreamChannel_GetEntry
     return NULL; /* return the handle */
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 ANSC_HANDLE
 DownstreamOFDMChannel_GetEntry
     (
@@ -2126,7 +2126,7 @@ DownstreamOFDMChannel_GetEntry
 #endif
 
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 /**********************************************************************
 
     caller:     owner of this object
@@ -2283,7 +2283,7 @@ DownstreamChannel_Synchronize
     return 0;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 ULONG
 DownstreamOFDMChannel_Synchronize
     (
@@ -2397,7 +2397,7 @@ DownstreamChannel_GetParamUlongValue
     return FALSE;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 BOOL
 DownstreamOFDMChannel_GetParamIntValue
     (
@@ -2437,7 +2437,7 @@ DownstreamOFDMChannel_GetParamIntValue
 }
 #endif
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 BOOL
 DownstreamOFDMChannel_GetParamUlongValue
     (
@@ -2596,7 +2596,7 @@ DownstreamChannel_GetParamStringValue
     return -1;
 }
 
-#if defined (_XB6_PRODUCT_REQ_)
+#if defined (INTEL_PUMA7)
 ULONG
 DownstreamOFDMChannel_GetParamStringValue
     (
