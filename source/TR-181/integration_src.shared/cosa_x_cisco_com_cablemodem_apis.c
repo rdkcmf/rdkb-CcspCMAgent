@@ -449,6 +449,11 @@ CosaDmlCmGetDownstreamOFDMChannel
         PCOSA_CM_OFDM_DS_CHANNEL    *ppConf
     )
 {
+//VENU: TODO this entire API need to be removed once RDKB team adds changes as part of RDKB-11139
+#if 1
+
+     return ANSC_STATUS_FAILURE;
+#else
     if((!pulCount) || (!ppConf)){
         AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
         return ANSC_STATUS_FAILURE;
@@ -459,7 +464,7 @@ CosaDmlCmGetDownstreamOFDMChannel
         *ppConf = (PCOSA_CM_OFDM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_OFDM_DS_CHANNEL) * (*pulCount) );
         docsis_GetDSOfdmChannelInfo((struct PCMMGMT_CM_DOCSIS_OFDM_CHANNELS *)ppConf);
     }
-
+#endif
     return ANSC_STATUS_SUCCESS;
 }
 #endif
