@@ -113,7 +113,9 @@ CosaDmlRDKCentralCmGetDownstreamChannel
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN *ppDsOfdmChannel        
     )    
 {
-//	PDOCSIF31_CM_DS_OFDM_CHAN *ppinfo 				   = NULL;
+#ifdef INTEL_PUMA7
+	PDOCSIF31_CM_DS_OFDM_CHAN *ppinfo 				   = NULL;
+#endif /* INTEL_PUMA7 */
 	int 					   output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -131,14 +133,20 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 
 	*pulCount = 0;
 
+#ifdef INTEL_PUMA7
 //	Call CM HAL API to get DownStream channel tables information
-//	docsis_GetDsOfdmChanTable((PDOCSIF31_CM_DS_OFDM_CHAN*)ppinfo, &output_NumberOfEntries );
-
-	if( output_NumberOfEntries > 0 )
+	if ( ANSC_STATUS_SUCCESS != docsis_GetDsOfdmChanTable( ppinfo, &output_NumberOfEntries ) )
+	{
+		return ANSC_STATUS_FAILURE;
+	}
+		
+	if( ( output_NumberOfEntries > 0 ) && \
+		( NULL != ppinfo ) 
+	  )
 	{
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN pDsOfdmChannel = NULL;         
-
-		int iLoopCount = 0;
+		PDOCSIF31_CM_DS_OFDM_CHAN			   pinfo		  = NULL;
+		int 								   iLoopCount 	  = 0;
 	
 		//Fill the required fields from HAL structure to local structure
 		*pulCount			= output_NumberOfEntries;
@@ -147,31 +155,37 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 		memset( *ppDsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
 
 		pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)ppDsOfdmChannel[0];
+		pinfo		   = (PDOCSIF31_CM_DS_OFDM_CHAN)ppinfo[0];
 
-//After hook HAL we have to copy each member
-#if 0
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
 			//Copy each and every members from HAL
-			pDsOfdmChannel[ iLoopCount ].ChannelId = 1; 				   
-			pDsOfdmChannel[ iLoopCount ].ChanIndicator = 2; 			   
-			pDsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq = 3;		   
-			pDsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum = 4;	   
-			pDsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum =5;	   
-			pDsOfdmChannel[ iLoopCount ].NumActiveSubcarriers =6;		   
-			pDsOfdmChannel[ iLoopCount ].SubcarrierSpacing = 7; 		   
-			pDsOfdmChannel[ iLoopCount ].CyclicPrefix = 8;	 
-			pDsOfdmChannel[ iLoopCount ].RollOffPeriod =9;  
-			pDsOfdmChannel[ iLoopCount ].PlcFreq = 10;		 
-			pDsOfdmChannel[ iLoopCount ].NumPilots=11; 	 
-			pDsOfdmChannel[ iLoopCount ].TimeInterleaverDepth=12;
-			pDsOfdmChannel[ iLoopCount ].PlcTotalCodewords=13;
-			pDsOfdmChannel[ iLoopCount ].PlcUnreliableCodewords=14;
-			pDsOfdmChannel[ iLoopCount ].NcpTotalFields=15; 
-			pDsOfdmChannel[ iLoopCount ].NcpFieldCrcFailures=17;
+			pDsOfdmChannel[ iLoopCount ].ChannelId 					= pinfo[iLoopCount].ChannelId; 				   
+			pDsOfdmChannel[ iLoopCount ].ChanIndicator 				= pinfo[iLoopCount].ChanIndicator; 			   
+			pDsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq 		= pinfo[iLoopCount].SubcarrierZeroFreq;		   
+			pDsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum 	= pinfo[iLoopCount].FirstActiveSubcarrierNum;	   
+			pDsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum	= pinfo[iLoopCount].LastActiveSubcarrierNum;	   
+			pDsOfdmChannel[ iLoopCount ].NumActiveSubcarriers		= pinfo[iLoopCount].NumActiveSubcarriers;		   
+			pDsOfdmChannel[ iLoopCount ].SubcarrierSpacing 			= pinfo[iLoopCount].SubcarrierSpacing; 		   
+			pDsOfdmChannel[ iLoopCount ].CyclicPrefix 				= pinfo[iLoopCount].CyclicPrefix;	 
+			pDsOfdmChannel[ iLoopCount ].RollOffPeriod 				= pinfo[iLoopCount].RollOffPeriod;  
+			pDsOfdmChannel[ iLoopCount ].PlcFreq 					= pinfo[iLoopCount].PlcFreq;		 
+			pDsOfdmChannel[ iLoopCount ].NumPilots					= pinfo[iLoopCount].NumPilots; 	 
+			pDsOfdmChannel[ iLoopCount ].TimeInterleaverDepth		= pinfo[iLoopCount].TimeInterleaverDepth;
+			pDsOfdmChannel[ iLoopCount ].PlcTotalCodewords			= pinfo[iLoopCount].PlcTotalCodewords;
+			pDsOfdmChannel[ iLoopCount ].PlcUnreliableCodewords		= pinfo[iLoopCount].PlcUnreliableCodewords;
+			pDsOfdmChannel[ iLoopCount ].NcpTotalFields				= pinfo[iLoopCount].NcpTotalFields; 
+			pDsOfdmChannel[ iLoopCount ].NcpFieldCrcFailures		= pinfo[iLoopCount].NcpFieldCrcFailures;
 	 	}
-#endif /* 0 */
+		
+		//Free ppinfo allocated HAL structure 
+		if( NULL != ppinfo )
+		{
+			AnscFreeMemory(  ppinfo );
+			ppinfo = NULL;
+		}
 	}
+#endif /* INTEL_PUMA7 */
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -184,7 +198,9 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN *ppUsOfdmChannel 	   
     )
 {
-//	PDOCSIF31_CM_US_OFDMA_CHAN *ppinfo 				     	   = NULL;
+#ifdef INTEL_PUMA7
+	PDOCSIF31_CM_US_OFDMA_CHAN *ppinfo 				     	   = NULL;
+#endif /* INTEL_PUMA7 */
 	int 					   	  output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -202,12 +218,19 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 
 	*pulCount = 0;
 
+#ifdef INTEL_PUMA7
 //	Call CM HAL API to get UpStream channel tables information
-//   docsis_GetUsOfdmaChanTable(PDOCSIF31_CM_US_OFDMA_CHAN *ppinfo, int *output_NumberOfEntries);
+   	if( ANSC_STATUS_SUCCESS != docsis_GetUsOfdmaChanTable( ppinfo, &output_NumberOfEntries ))
+	{
+		return ANSC_STATUS_FAILURE;
+	}
 
-	if( output_NumberOfEntries > 0 )
+	if( ( output_NumberOfEntries > 0 ) && \
+		( NULL != ppinfo ) 
+	   )
 	{
         PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN pUsOfdmChannel = NULL;         
+		PDOCSIF31_CM_US_OFDMA_CHAN 				pinfo		   = NULL;
 		int 									iLoopCount 	   = 0;
 	
 		//Fill the required fields from HAL structure to local structure
@@ -217,27 +240,33 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		memset( *ppUsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries );
 
 		pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)ppUsOfdmChannel[0];
+		pinfo		   = (PDOCSIF31_CM_US_OFDMA_CHAN)ppinfo[0];
 
-//After hook HAL we have to copy each member
-#if 0
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
 			//Copy each and every members from HAL
-			pUsOfdmChannel[ iLoopCount ].ChannelId = 1; 				   
-			pUsOfdmChannel[ iLoopCount ].ConfigChangeCt = 2; 			   
-			pUsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq = 3;		   
-			pUsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum = 4;	   
-			pUsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum =5;	   
-			pUsOfdmChannel[ iLoopCount ].NumActiveSubcarriers =6;		   
-			pUsOfdmChannel[ iLoopCount ].SubcarrierSpacing = 7; 		   
-			pUsOfdmChannel[ iLoopCount ].CyclicPrefix = 8;	 
-			pUsOfdmChannel[ iLoopCount ].RollOffPeriod =9;  
-			pUsOfdmChannel[ iLoopCount ].NumSymbolsPerFrame = 10;		 
-			pUsOfdmChannel[ iLoopCount ].TxPower=11; 	 
-			pUsOfdmChannel[ iLoopCount ].PreEqEnabled=1;
+			pUsOfdmChannel[ iLoopCount ].ChannelId 					= pinfo[ iLoopCount ].ChannelId; 				   
+			pUsOfdmChannel[ iLoopCount ].ConfigChangeCt 			= pinfo[ iLoopCount ].ConfigChangeCt; 			   
+			pUsOfdmChannel[ iLoopCount ].SubcarrierZeroFreq 		= pinfo[ iLoopCount ].SubcarrierZeroFreq;		   
+			pUsOfdmChannel[ iLoopCount ].FirstActiveSubcarrierNum   = pinfo[ iLoopCount ].FirstActiveSubcarrierNum;	   
+			pUsOfdmChannel[ iLoopCount ].LastActiveSubcarrierNum 	= pinfo[ iLoopCount ].LastActiveSubcarrierNum;	   
+			pUsOfdmChannel[ iLoopCount ].NumActiveSubcarriers 		= pinfo[ iLoopCount ].NumActiveSubcarriers;		   
+			pUsOfdmChannel[ iLoopCount ].SubcarrierSpacing 			= pinfo[ iLoopCount ].SubcarrierSpacing; 		   
+			pUsOfdmChannel[ iLoopCount ].CyclicPrefix 				= pinfo[ iLoopCount ].CyclicPrefix;	 
+			pUsOfdmChannel[ iLoopCount ].RollOffPeriod				= pinfo[ iLoopCount ].RollOffPeriod;  
+			pUsOfdmChannel[ iLoopCount ].NumSymbolsPerFrame 		= pinfo[ iLoopCount ].NumSymbolsPerFrame;		 
+			pUsOfdmChannel[ iLoopCount ].TxPower					= pinfo[ iLoopCount ].TxPower; 	 
+			pUsOfdmChannel[ iLoopCount ].PreEqEnabled				= pinfo[ iLoopCount ].PreEqEnabled;
 	 	}
-#endif /* 0 */
+
+		//Free ppinfo allocated HAL structure 
+		if( NULL != ppinfo )
+		{
+			AnscFreeMemory(  ppinfo );
+			ppinfo = NULL;
+		}
 	}
+#endif /* INTEL_PUMA7 */
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -250,7 +279,9 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     )
 {
-//	PDOCSIF31_CMSTATUSOFDMA_US *ppinfo 				     	   = NULL;
+#ifdef INTEL_PUMA7
+	PDOCSIF31_CMSTATUSOFDMA_US *ppinfo 				     	   = NULL;
+#endif /* INTEL_PUMA7 */
 	int 					   	  output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -268,12 +299,19 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 
 	*pulCount = 0;
 
+#ifdef INTEL_PUMA7
 //	Call CM HAL API to get status of UpStream channel tables information
-//INT docsis_GetStatusOfdmaUsTable(PDOCSIF31_CMSTATUSOFDMA_US *ppinfo, int *output_NumberOfEntries);
+	if ( ANSC_STATUS_SUCCESS != docsis_GetStatusOfdmaUsTable( ppinfo, &output_NumberOfEntries ) )
+	{
+		return ANSC_STATUS_FAILURE;
+	}
 
-	if( output_NumberOfEntries > 0 )
+	if( ( output_NumberOfEntries > 0 ) && \
+		( NULL != ppinfo ) 
+	  )
 	{
         PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US pCMStatusofUsChannel = NULL;         
+		PDOCSIF31_CMSTATUSOFDMA_US 				pinfo				 = NULL;
 		int 									iLoopCount 	  		 = 0;
 	
 		//Fill the required fields from HAL structure to local structure
@@ -283,22 +321,28 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		memset( *ppCMStatusofUsChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries );
 
 		pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)ppCMStatusofUsChannel[0];
+		pinfo				 = (PDOCSIF31_CMSTATUSOFDMA_US)ppinfo[0];
 
-//After hook HAL we have to copy each member
-#if 0
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
 			//Copy each and every members from HAL
-			pCMStatusofUsChannel[ iLoopCount ].ChannelId = 1; 				   
-			pCMStatusofUsChannel[ iLoopCount ].T3Timeouts = 2; 			   
-			pCMStatusofUsChannel[ iLoopCount ].T4Timeouts = 3;		   
-			pCMStatusofUsChannel[ iLoopCount ].RangingAborteds = 4;	   
-			pCMStatusofUsChannel[ iLoopCount ].T3Exceededs =5;	   
-			pCMStatusofUsChannel[ iLoopCount ].IsMuted = FALSE;		   
-			pCMStatusofUsChannel[ iLoopCount ].RangingStatus = 4; 		   
+			pCMStatusofUsChannel[ iLoopCount ].ChannelId 		= pinfo[iLoopCount].ChannelId; 				   
+			pCMStatusofUsChannel[ iLoopCount ].T3Timeouts 		= pinfo[iLoopCount].T3Timeouts; 			   
+			pCMStatusofUsChannel[ iLoopCount ].T4Timeouts 		= pinfo[iLoopCount].T4Timeouts;		   
+			pCMStatusofUsChannel[ iLoopCount ].RangingAborteds  = pinfo[iLoopCount].RangingAborteds;	   
+			pCMStatusofUsChannel[ iLoopCount ].T3Exceededs 		= pinfo[iLoopCount].T3Exceededs;	   
+			pCMStatusofUsChannel[ iLoopCount ].IsMuted 			= pinfo[iLoopCount].IsMuted;		   
+			pCMStatusofUsChannel[ iLoopCount ].RangingStatus 	= pinfo[iLoopCount].RangingStatus; 		   
 	 	}
-#endif /* 0 */
+
+		//Free ppinfo allocated HAL structure 
+		if( NULL != ppinfo )
+		{
+			AnscFreeMemory(  ppinfo );
+			ppinfo = NULL;
+		}
 	}
+#endif /* INTEL_PUMA7 */
 
     return ANSC_STATUS_SUCCESS;
 }
