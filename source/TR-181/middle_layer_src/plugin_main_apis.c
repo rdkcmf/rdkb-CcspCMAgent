@@ -186,6 +186,12 @@ CosaBackEndManagerInitialize
     ANSC_STATUS                     returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_BACKEND_MANAGER_OBJECT  pMyObject    = (PCOSA_BACKEND_MANAGER_OBJECT)hThisObject;
 
+    if (pMyObject == NULL)
+    {
+        AnscTraceError(("%s:%d:: Pointer is null!!\n", __FUNCTION__, __LINE__));
+        return ANSC_STATUS_FAILURE;
+    }
+
 #ifdef _COSA_SIM_
         pMyObject->has_moca_slap  = 0;
         pMyObject->has_wifi_slap  = 0;    
@@ -248,6 +254,11 @@ CosaBackEndManagerRemove
     ANSC_STATUS                     returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_BACKEND_MANAGER_OBJECT  pMyObject    = (PCOSA_BACKEND_MANAGER_OBJECT)hThisObject;
 
+    if (pMyObject == NULL)
+    {
+        AnscTraceError(("%s:%d:: Pointer is null!!\n", __FUNCTION__, __LINE__));
+        return ANSC_STATUS_FAILURE;
+    }
 
     if ( pMyObject->hCM )
     {
