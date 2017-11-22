@@ -114,7 +114,7 @@ CosaDmlRDKCentralCmGetDownstreamChannel
     )    
 {
 #ifdef INTEL_PUMA7
-	PDOCSIF31_CM_DS_OFDM_CHAN *ppinfo 				   = NULL;
+	PDOCSIF31_CM_DS_OFDM_CHAN  pinfo 				   = NULL;
 #endif /* INTEL_PUMA7 */
 	int 					   output_NumberOfEntries  = 0;	
 
@@ -135,17 +135,16 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 
 #ifdef INTEL_PUMA7
 //	Call CM HAL API to get DownStream channel tables information
-	if ( ANSC_STATUS_SUCCESS != docsis_GetDsOfdmChanTable( ppinfo, &output_NumberOfEntries ) )
+	if ( ANSC_STATUS_SUCCESS != docsis_GetDsOfdmChanTable( &pinfo, &output_NumberOfEntries ) )
 	{
 		return ANSC_STATUS_FAILURE;
 	}
 		
 	if( ( output_NumberOfEntries > 0 ) && \
-		( NULL != ppinfo ) 
+		( NULL != pinfo ) 
 	  )
 	{
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN pDsOfdmChannel = NULL;         
-		PDOCSIF31_CM_DS_OFDM_CHAN			   pinfo		  = NULL;
 		int 								   iLoopCount 	  = 0;
 	
 		//Fill the required fields from HAL structure to local structure
@@ -155,7 +154,6 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 		memset( *ppDsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
 
 		pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)ppDsOfdmChannel[0];
-		pinfo		   = (PDOCSIF31_CM_DS_OFDM_CHAN)ppinfo[0];
 
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
@@ -179,10 +177,10 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 	 	}
 		
 		//Free ppinfo allocated HAL structure 
-		if( NULL != ppinfo )
+		if( NULL != pinfo )
 		{
-			AnscFreeMemory(  ppinfo );
-			ppinfo = NULL;
+			free( pinfo );
+			pinfo = NULL;
 		}
 	}
 #endif /* INTEL_PUMA7 */
@@ -199,7 +197,7 @@ CosaDmlRDKCentralCmGetUpstreamChannel
     )
 {
 #ifdef INTEL_PUMA7
-	PDOCSIF31_CM_US_OFDMA_CHAN *ppinfo 				     	   = NULL;
+	PDOCSIF31_CM_US_OFDMA_CHAN pinfo 				     	   = NULL;
 #endif /* INTEL_PUMA7 */
 	int 					   	  output_NumberOfEntries  = 0;	
 
@@ -220,17 +218,16 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 
 #ifdef INTEL_PUMA7
 //	Call CM HAL API to get UpStream channel tables information
-   	if( ANSC_STATUS_SUCCESS != docsis_GetUsOfdmaChanTable( ppinfo, &output_NumberOfEntries ))
+   	if( ANSC_STATUS_SUCCESS != docsis_GetUsOfdmaChanTable( &pinfo, &output_NumberOfEntries ))
 	{
 		return ANSC_STATUS_FAILURE;
 	}
 
 	if( ( output_NumberOfEntries > 0 ) && \
-		( NULL != ppinfo ) 
+		( NULL != pinfo ) 
 	   )
 	{
         PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN pUsOfdmChannel = NULL;         
-		PDOCSIF31_CM_US_OFDMA_CHAN 				pinfo		   = NULL;
 		int 									iLoopCount 	   = 0;
 	
 		//Fill the required fields from HAL structure to local structure
@@ -240,7 +237,6 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		memset( *ppUsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries );
 
 		pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)ppUsOfdmChannel[0];
-		pinfo		   = (PDOCSIF31_CM_US_OFDMA_CHAN)ppinfo[0];
 
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
@@ -260,10 +256,10 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 	 	}
 
 		//Free ppinfo allocated HAL structure 
-		if( NULL != ppinfo )
+		if( NULL != pinfo )
 		{
-			AnscFreeMemory(  ppinfo );
-			ppinfo = NULL;
+			free(  pinfo );
+			pinfo = NULL;
 		}
 	}
 #endif /* INTEL_PUMA7 */
@@ -280,7 +276,7 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
     )
 {
 #ifdef INTEL_PUMA7
-	PDOCSIF31_CMSTATUSOFDMA_US *ppinfo 				     	   = NULL;
+	PDOCSIF31_CMSTATUSOFDMA_US 	 pinfo 				      = NULL;
 #endif /* INTEL_PUMA7 */
 	int 					   	  output_NumberOfEntries  = 0;	
 
@@ -301,17 +297,16 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 
 #ifdef INTEL_PUMA7
 //	Call CM HAL API to get status of UpStream channel tables information
-	if ( ANSC_STATUS_SUCCESS != docsis_GetStatusOfdmaUsTable( ppinfo, &output_NumberOfEntries ) )
+	if ( ANSC_STATUS_SUCCESS != docsis_GetStatusOfdmaUsTable( &pinfo, &output_NumberOfEntries ) )
 	{
 		return ANSC_STATUS_FAILURE;
 	}
 
 	if( ( output_NumberOfEntries > 0 ) && \
-		( NULL != ppinfo ) 
+		( NULL != pinfo ) 
 	  )
 	{
         PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US pCMStatusofUsChannel = NULL;         
-		PDOCSIF31_CMSTATUSOFDMA_US 				pinfo				 = NULL;
 		int 									iLoopCount 	  		 = 0;
 	
 		//Fill the required fields from HAL structure to local structure
@@ -321,7 +316,6 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		memset( *ppCMStatusofUsChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries );
 
 		pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)ppCMStatusofUsChannel[0];
-		pinfo				 = (PDOCSIF31_CMSTATUSOFDMA_US)ppinfo[0];
 
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )
 	 	{
@@ -336,10 +330,10 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 	 	}
 
 		//Free ppinfo allocated HAL structure 
-		if( NULL != ppinfo )
+		if( NULL != pinfo )
 		{
-			AnscFreeMemory(  ppinfo );
-			ppinfo = NULL;
+			free( pinfo );
+			pinfo = NULL;
 		}
 	}
 #endif /* INTEL_PUMA7 */
