@@ -113,9 +113,9 @@ CosaDmlRDKCentralCmGetDownstreamChannel
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN *ppDsOfdmChannel        
     )    
 {
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_DS_OFDM_CHAN  pinfo 				   = NULL;
-#endif /* INTEL_PUMA7 */
+#endif
 	int 					   output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -133,7 +133,7 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 
 	*pulCount = 0;
 
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get DownStream channel tables information
 	if ( ANSC_STATUS_SUCCESS != docsis_GetDsOfdmChanTable( &pinfo, &output_NumberOfEntries ) )
 	{
@@ -183,7 +183,7 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 			pinfo = NULL;
 		}
 	}
-#endif /* INTEL_PUMA7 */
+#endif
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -196,9 +196,9 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN *ppUsOfdmChannel 	   
     )
 {
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_US_OFDMA_CHAN pinfo 				     	   = NULL;
-#endif /* INTEL_PUMA7 */
+#endif
 	int 					   	  output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -216,7 +216,7 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 
 	*pulCount = 0;
 
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get UpStream channel tables information
    	if( ANSC_STATUS_SUCCESS != docsis_GetUsOfdmaChanTable( &pinfo, &output_NumberOfEntries ))
 	{
@@ -262,7 +262,7 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 			pinfo = NULL;
 		}
 	}
-#endif /* INTEL_PUMA7 */
+#endif
 
     return ANSC_STATUS_SUCCESS;
 }
@@ -275,9 +275,9 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     )
 {
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CMSTATUSOFDMA_US 	 pinfo 				      = NULL;
-#endif /* INTEL_PUMA7 */
+#endif
 	int 					   	  output_NumberOfEntries  = 0;	
 
     if( NULL == pulCount )
@@ -295,7 +295,7 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 
 	*pulCount = 0;
 
-#ifdef INTEL_PUMA7
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get status of UpStream channel tables information
 	if ( ANSC_STATUS_SUCCESS != docsis_GetStatusOfdmaUsTable( &pinfo, &output_NumberOfEntries ) )
 	{
@@ -336,7 +336,7 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 			pinfo = NULL;
 		}
 	}
-#endif /* INTEL_PUMA7 */
+#endif
 
     return ANSC_STATUS_SUCCESS;
 }

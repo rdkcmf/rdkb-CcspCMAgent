@@ -440,7 +440,7 @@ CosaDmlCmGetDownstreamChannel
     return ANSC_STATUS_SUCCESS;
 }
 
-#if defined (INTEL_PUMA7)
+#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 ANSC_STATUS
 CosaDmlCmGetDownstreamOFDMChannel
     (
