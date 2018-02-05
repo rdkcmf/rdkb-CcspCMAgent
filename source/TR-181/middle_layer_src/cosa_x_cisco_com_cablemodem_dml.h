@@ -232,59 +232,6 @@ DownstreamChannel_GetEntryCount
         ANSC_HANDLE                 hInsContext
     );
 
-#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
-ULONG
-DownstreamOFDMChannel_GetEntryCount
-    (
-        ANSC_HANDLE                 hInsContext
-    );
-
-BOOL
-DownstreamOFDMChannel_IsUpdated
-    (
-        ANSC_HANDLE                 hInsContext
-    );
-
-ANSC_HANDLE
-DownstreamOFDMChannel_GetEntry
-    (
-        ANSC_HANDLE                 hInsContext,
-        ULONG                       nIndex,
-        ULONG*                      pInsNumber
-    );
-
-ULONG
-DownstreamOFDMChannel_Synchronize
-    (
-        ANSC_HANDLE                 hInsContext
-    );
-
-BOOL
-DownstreamOFDMChannel_GetParamIntValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        int*                        pInt
-    );
-
-BOOL
-DownstreamOFDMChannel_GetParamUlongValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        ULONG*                      puLong
-    );
-
-ULONG
-DownstreamOFDMChannel_GetParamStringValue
-    (
-        ANSC_HANDLE                 hInsContext,
-        char*                       ParamName,
-        char*                       pValue,
-        ULONG*                      pUlSize
-    );
-#endif
-
 ANSC_HANDLE
 DownstreamChannel_GetEntry
     (

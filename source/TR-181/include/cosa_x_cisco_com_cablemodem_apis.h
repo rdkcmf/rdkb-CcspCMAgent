@@ -110,29 +110,6 @@ _COSA_CM_DS_CHANNEL
 }
 COSA_CM_DS_CHANNEL, *PCOSA_CM_DS_CHANNEL;
 
-#define MAX_FREQ_SZ       64
-#define MAX_LOCKSTATUS_SZ 64
-#define MAX_MOD_OFDM_SZ   64
-#define MAX_RXPOWER_SZ    16
-
-typedef  struct
-_COSA_CM_OFDM_DS_CHANNEL
-{
-   unsigned int dcid;
-   char OFDMFrequency[MAX_FREQ_SZ];
-   char tunerFrequency[MAX_FREQ_SZ];
-   char plcCenterFrequency[MAX_FREQ_SZ];
-   char LockStatus[MAX_LOCKSTATUS_SZ];
-   char Modulation[MAX_MOD_OFDM_SZ];
-   unsigned int timeInterleavingDepth;
-   int fftType;
-   int cpSize;
-   int numOfDataSubcarr;
-   unsigned int rollOff;
-   char rxPower[MAX_RXPOWER_SZ];
-}
-COSA_CM_OFDM_DS_CHANNEL, *PCOSA_CM_OFDM_DS_CHANNEL;
-
 typedef  struct
 _COSA_CM_US_CHANNEL
 {
@@ -349,16 +326,6 @@ CosaDmlCmGetDownstreamChannel
         PULONG                      pulCount,
         PCOSA_CM_DS_CHANNEL         *ppConf        
     );    
-
-#if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
-ANSC_STATUS
-CosaDmlCmGetDownstreamOFDMChannel
-    (
-        ANSC_HANDLE                 hContext,
-        PULONG                      pulCount,
-        PCOSA_CM_OFDM_DS_CHANNEL    *ppConf
-    );
-#endif
 
 ANSC_STATUS
 CosaDmlCmGetUpstreamChannel
