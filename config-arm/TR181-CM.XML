@@ -1083,8 +1083,16 @@
 	<object>
 	<name>X_RDKCENTRAL-COM_CableModem</name>
 	<objectType>object</objectType>
-		<functions></functions>
-		<parameters></parameters>
+		<functions>
+                <func_GetParamUlongValue>X_RDKCENTRAL_COM_CableModem_GetParamUlongValue</func_GetParamUlongValue>
+		</functions>
+		<parameters>
+			<parameter>
+			<name>MaxMTU</name>
+			<type>unsignedInt</type>
+			<syntax>uint32</syntax>
+			</parameter>
+		</parameters>
 		<objects>
 			<object>
 			<name>DsOfdmChan</name>

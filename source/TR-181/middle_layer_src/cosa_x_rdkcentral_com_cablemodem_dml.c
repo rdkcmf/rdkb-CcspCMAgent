@@ -109,6 +109,77 @@
 
  APIs for Object:
 
+    X_RDKCENTRAL-COM_CableModem
+
+    *  X_RDKCENTRAL_COM_CableModem_GetParamUlongValue
+
+***********************************************************************/
+
+/**********************************************************************  
+
+    caller:     owner of this object 
+
+    prototype: 
+
+        BOOL
+        X_RDKCENTRAL_COM_CableModem_GetParamUlongValue
+            (
+                ANSC_HANDLE                 hInsContext,
+                char*                       ParamName,
+                ULONG*                      puLong
+            );
+
+    description:
+
+        This function is called to retrieve ULONG parameter value; 
+
+    argument:   ANSC_HANDLE                 hInsContext,
+                The instance handle;
+
+                char*                       ParamName,
+                The parameter name;
+
+                ULONG*                      puLong
+                The buffer of returned ULONG value;
+
+    return:     TRUE if succeeded.
+
+**********************************************************************/
+BOOL
+X_RDKCENTRAL_COM_CableModem_GetParamUlongValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        ULONG*                      puLong
+    )
+{
+    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
+
+    /* check the parameter name and return the corresponding value */
+    AnscTraceWarning(("%s %d Entry '%s'\n",__FUNCTION__,__LINE__, ParamName));
+
+    if( AnscEqualString(ParamName, "MaxMTU", TRUE) )
+    {
+        //Get MTU settings
+        if ( CosaDmlRDKCentralCmGetMTUSettings( NULL, &pMyObject->MaxMTU ) != ANSC_STATUS_SUCCESS )
+        {
+            AnscTraceWarning(("CosaDmlRDKCentralCmGetMTUSettings failed!\n"));
+            return FALSE;
+        }
+        /* collect value */
+        *puLong = pMyObject->MaxMTU;
+
+        return TRUE;
+    }
+
+    /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
+    return FALSE;
+}
+
+/***********************************************************************
+
+ APIs for Object:
+
     X_RDKCENTRAL-COM_CableModem.DsOfdmChan
 
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_IsUpdated
