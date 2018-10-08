@@ -261,6 +261,16 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 }
 
 ANSC_STATUS
+CosaDmlRDKCentralCmGetMTUSettings
+    (
+        ANSC_HANDLE                 hContext,
+        PULONG                      MaxMTU
+    )
+{
+	return docsis_GetMaxMTU(MaxMTU);
+}
+
+ANSC_STATUS
 CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
     (
         ANSC_HANDLE                 hContext,
