@@ -152,4 +152,11 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     );
 
+ANSC_STATUS
+CosaDmlRDKCentralCmGetMTUSettings
+    (
+        ANSC_HANDLE                 hContext,
+        PULONG                      MaxMTU
+    );
+
 #endif /* _COSA_RDKCENTRAL_CM_APIS_H */

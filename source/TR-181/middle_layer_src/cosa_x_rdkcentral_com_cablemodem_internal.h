@@ -83,7 +83,9 @@
     PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN 	pUsOfdmChannel;                                   \
     ULONG										CMStatusofUsChannelUpdateTime;						 \
     ULONG                           			CMStatusofUsChannelTotalNumbers;                         \
-    PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US 	pCMStatusofUsChannel                                   \
+    PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US 	pCMStatusofUsChannel;                                   \
+    ULONG										CMUpdateTime;						\
+    ULONG										MaxMTU							\
 
 typedef  struct
 _COSA_DATAMODEL_RDKCENTRAL_CABLDMODEM_CLASS_CONTENT
