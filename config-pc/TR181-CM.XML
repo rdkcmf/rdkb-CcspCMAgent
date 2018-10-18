@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+   Copyright [2014] [Cisco Systems, Inc.]
+
+   Licensed under the Apache License, Version 2.0 (the \"License\");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an \"AS IS\" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+
+<dataModelInfo>
+
+  <version>1</version>
+
+  <moduleName>COSA_TR181_USGv2</moduleName>
+
+  <author></author>
+
+  <description>COSA TR181 and extension for USGv2.</description>
+
+  <library>
+
+    <path>libcm_tr181</path>
+
+    <func_Init>COSA_Init</func_Init>
+	
+	<func_Async_Init>COSA_Async_Init</func_Async_Init>
+
+    <func_Unload>COSA_Unload</func_Unload>
+    
+    <func_MemoryCheck>COSA_MemoryCheck</func_MemoryCheck>
+
+    <func_MemoryUsage>COSA_MemoryUsage</func_MemoryUsage>
+
+    <func_MemoryTable>COSA_MemoryTable</func_MemoryTable>
+
+  </library>
+  <objects>
+     <object>
+
+      <name>X_CISCO_COM_CableModem</name>
+
+      <objectType>object</objectType>
+
+      <functions>
+
+        <func_GetParamBoolValue>X_CISCO_COM_CableModem_GetParamBoolValue</func_GetParamBoolValue>
+
+        <func_GetParamIntValue>X_CISCO_COM_CableModem_GetParamIntValue</func_GetParamIntValue>
+
+        <func_GetParamUlongValue>X_CISCO_COM_CableModem_GetParamUlongValue</func_GetParamUlongValue>
+
+        <func_GetParamStringValue>X_CISCO_COM_CableModem_GetParamStringValue</func_GetParamStringValue>
+
+        <func_SetParamBoolValue>X_CISCO_COM_CableModem_SetParamBoolValue</func_SetParamBoolValue>
+
+        <func_SetParamIntValue>X_CISCO_COM_CableModem_SetParamIntValue</func_SetParamIntValue>
+
+        <func_SetParamUlongValue>X_CISCO_COM_CableModem_SetParamUlongValue</func_SetParamUlongValue>
+
+        <func_SetParamStringValue>X_CISCO_COM_CableModem_SetParamStringValue</func_SetParamStringValue>
+
+        <func_Validate>X_CISCO_COM_CableModem_Validate</func_Validate>
+
+        <func_Commit>X_CISCO_COM_CableModem_Commit</func_Commit>
+
+        <func_Rollback>X_CISCO_COM_CableModem_Rollback</func_Rollback>
+
+      </functions>
+
+      <parameters>
+
+        <parameter>
+
+          <name>TelephonyDHCPStatus</name>
+
+          <type>string(32)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>TelephonyTftpStatus</name>
+
+          <type>string(32)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>TelephonyRegistrationStatus</name>
+
+          <type>string(32)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+	
+		<parameter>
+
+          <name>DOCSISDHCPAttempts</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>DOCSISTftpAttempts</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+
+          <name>MaxCpeAllowed</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+		<parameter>
+    
+          <name>DOCSISConfigFileName</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>ToDStatus</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>UpstreamServiceFlowParams</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>DownstreamServiceFlowParams</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>DOCSISDownstreamDataRate</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>DOCSISUpstreamDataRate</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+    
+          <name>MACAddress</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+		<parameter>
+
+		  <name>BPIState</name>
+		  
+		  <type>boolean</type>
+		  
+		  <syntax>bool</syntax>
+
+		</parameter>
+
+		<parameter>
+
+		  <name>NetworkAccess</name>
+		  
+		  <type>boolean</type>
+		  
+		  <syntax>bool</syntax>
+
+		</parameter>
+
+		<parameter>
+
+          <name>UpgradeServerIP</name>
+
+          <type>string</type>
+
+          <syntax>uint32/ip4_addr</syntax>
+
+        </parameter>
+
+        <parameter>
+    
+          <name>Market</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                 
+        </parameter>
+
+        <parameter>
+    
+          <name>MDDIPOverride</name>
+                   
+          <type>string(64)</type>
+                                  
+          <syntax>string</syntax>
+                                                
+        </parameter>
+
+        <parameter>
+
+          <name>IPAddress</name>
+
+          <type>string</type>
+
+          <syntax>uint32/ip4_addr</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>BootFileName</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>SubnetMask</name>
+
+          <type>string</type>
+
+          <syntax>uint32/ip4_addr</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>Gateway</name>
+
+          <type>string</type>
+
+          <syntax>uint32/ip4_addr</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>TFTPServer</name>
+
+          <type>string</type>
+
+          <syntax>uint32/ip4_addr</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>TimeServer</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>TimeOffset</name>
+
+          <type>int</type>
+
+          <syntax>int</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>LeaseTimeRemaining</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>RebindTimeRemaining</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>RenewTimeRemaining</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6Address</name>
+
+          <type>string(40)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6BootFileName</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6Prefix</name>
+
+          <type>string(40)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6Router</name>
+
+          <type>string(40)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6TFTPServer</name>
+
+          <type>string(40)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6TimeServer</name>
+
+          <type>string(40)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6LeaseTimeRemaining</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6RebindTimeRemaining</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>IPv6RenewTimeRemaining</name>
+
+          <type>unsignedInt</type>
+
+          <syntax>uint32</syntax>
+
+        </parameter>
+
+        <parameter>
+
+          <name>DOCSISVersion</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>CMStatus</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISDownstreamScanning</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISDownstreamRanging</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISUpstreamScanning</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISUpstreamRanging</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISTftpStatus</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISDataRegComplete</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>LoopDiagnosticsDetails</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>LoopDiagnosticsStart</name>
+
+          <type>boolean</type>
+
+          <syntax>bool</syntax>
+          
+          <writable>true</writable>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>CoreVersion</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+        <parameter>
+
+          <name>DOCSISDHCPStatus</name>
+
+          <type>string(64)</type>
+
+          <syntax>string</syntax>
+
+        </parameter>
+        
+		<parameter>
+
+		  <name>EnableLog</name>
+		  
+		  <type>boolean</type>
+		  
+		  <syntax>bool</syntax>
+
+		  <writable>true</writable>
+
+		</parameter>
+
+		<parameter>
+
+		  <name>LockedUpstreamChID</name>
+
+		  <type>unsignedInt</type>
+
+		  <syntax>uint32</syntax>
+
+		  <writable>true</writable>
+
+		</parameter>
+
+		<parameter>
+
+		  <name>StartDSFrequency</name>
+
+		  <type>unsignedInt</type>
+
+		  <syntax>uint32</syntax>
+
+		  <writable>true</writable>
+
+		</parameter>
+
+      </parameters>
+
+
+        <objects>
+	    
+            <object>
+                
+             <name>CMErrorCodewords</name>
+             
+             <objectType>dynamicTable</objectType>
+             
+             <maxInstance>128</maxInstance>
+                
+             <functions>
+  
+                <func_GetEntryCount>CMErrorCodewords_GetEntryCount</func_GetEntryCount>
+  
+                <func_GetEntry>CMErrorCodewords_GetEntry</func_GetEntry>
+                  
+                <func_IsUpdated>CMErrorCodewords_IsUpdated</func_IsUpdated>
+  
+                <func_Synchronize>CMErrorCodewords_Synchronize</func_Synchronize>
+      
+                <func_GetParamUlongValue>CMErrorCodewords_GetParamUlongValue</func_GetParamUlongValue>
+  
+                <func_GetParamStringValue>CMErrorCodewords_GetParamStringValue</func_GetParamStringValue>
+  
+             </functions>
+            
+             <parameters>
+ 
+              <parameter>
+  
+                <name>UnerroredCodewords</name>
+  
+                <type>unsignedInt</type>
+                
+                <syntax>uint32</syntax>
+  
+              </parameter>
+              
+              <parameter>
+  
+                <name>CorrectableCodewords</name>
+  
+                <type>unsignedInt</type>
+                
+                <syntax>uint32</syntax>
+  
+              </parameter>
+  
+              <parameter>
+  
+                <name>UncorrectableCodewords</name>
+  
+                <type>unsignedInt</type>
+                  
+                <syntax>uint32</syntax>                      
+  
+              </parameter>
+                
+             </parameters>
+                         
+            </object>			
+			
+	    
+            <object>
+                
+             <name>DocsisLog</name>
+             
+             <objectType>dynamicTable</objectType>
+             
+             <maxInstance>128</maxInstance>
+                
+             <functions>
+  
+                <func_GetEntryCount>DocsisLog_GetEntryCount</func_GetEntryCount>
+  
+                <func_GetEntry>DocsisLog_GetEntry</func_GetEntry>
+                  
+                <func_IsUpdated>DocsisLog_IsUpdated</func_IsUpdated>
+  
+                <func_Synchronize>DocsisLog_Synchronize</func_Synchronize>
+      
+                <func_GetParamUlongValue>DocsisLog_GetParamUlongValue</func_GetParamUlongValue>
+  
+                <func_GetParamStringValue>DocsisLog_GetParamStringValue</func_GetParamStringValue>
+  
+             </functions>
+            
+             <parameters>
+            
+              <parameter>
+  
+                <name>Time</name>
+  
+                <type>string</type>
+  
+                <syntax>string</syntax>
+  
+              </parameter>
+  
+              <parameter>
+  
+                <name>EventID</name>
+  
+                <type>unsignedInt</type>
+                
+                <syntax>uint32</syntax>
+  
+              </parameter>
+              
+              <parameter>
+  
+                <name>EventLevel</name>
+  
+                <type>unsignedInt</type>
+                
+                <syntax>uint32</syntax>
+  
+              </parameter>
+  
+              <parameter>
+  
+                <name>Description</name>
+  
+                <type>string</type>
+                  
+                <syntax>string</syntax>                      
+  
+              </parameter>
+                
+             </parameters>
+                         
+            </object>
+
+            <object>
+                
+             <name>DownstreamChannel</name>
+             
+             <objectType>dynamicTable</objectType>
+             
+             <maxInstance>128</maxInstance>
+                
+             <functions>
+  
+                <func_GetEntryCount>DownstreamChannel_GetEntryCount</func_GetEntryCount>
+  
+                <func_GetEntry>DownstreamChannel_GetEntry</func_GetEntry>
+                  
+                <func_IsUpdated>DownstreamChannel_IsUpdated</func_IsUpdated>
+  
+                <func_Synchronize>DownstreamChannel_Synchronize</func_Synchronize>
+      
+                <func_GetParamUlongValue>DownstreamChannel_GetParamUlongValue</func_GetParamUlongValue>
+  
+                <func_GetParamStringValue>DownstreamChannel_GetParamStringValue</func_GetParamStringValue>
+  
+             </functions>
+            
+             <parameters>
+
+			 <parameter>
+
+			   <name>ChannelID</name>
+
+			   <type>unsignedInt</type>
+
+			   <syntax>uint32</syntax>
+
+			 </parameter>
+			 <parameter>
+
+			   <name>Frequency</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>PowerLevel</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>SNRLevel</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>Modulation</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>Octets</name>
+
+			   <type>unsignedInt</type>
+
+               <syntax>uint32</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>Correcteds</name>
+
+			   <type>unsignedInt</type>
+
+               <syntax>uint32</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>Uncorrectables</name>
+
+			   <type>unsignedInt</type>
+
+               <syntax>uint32</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>LockStatus</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+            
+             </parameters>
+                         
+            </object>
+
+
+            <object>
+                
+             <name>UpstreamChannel</name>
+             
+             <objectType>dynamicTable</objectType>
+             
+             <maxInstance>128</maxInstance>
+                
+             <functions>
+  
+                <func_GetEntryCount>UpstreamChannel_GetEntryCount</func_GetEntryCount>
+  
+                <func_GetEntry>UpstreamChannel_GetEntry</func_GetEntry>
+                  
+                <func_IsUpdated>UpstreamChannel_IsUpdated</func_IsUpdated>
+  
+                <func_Synchronize>UpstreamChannel_Synchronize</func_Synchronize>
+      
+                <func_GetParamUlongValue>UpstreamChannel_GetParamUlongValue</func_GetParamUlongValue>
+  
+                <func_GetParamStringValue>UpstreamChannel_GetParamStringValue</func_GetParamStringValue>
+  
+             </functions>
+            
+             <parameters>
+
+			 <parameter>
+
+			   <name>ChannelID</name>
+
+			   <type>unsignedInt</type>
+
+			   <syntax>uint32</syntax>
+
+			 </parameter>
+			 <parameter>
+
+			   <name>Frequency</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>PowerLevel</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>ChannelType</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>SymbolRate</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>Modulation</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+			 <parameter>
+
+			   <name>LockStatus</name>
+
+			   <type>string(64)</type>
+
+               <syntax>string</syntax>
+
+             </parameter>
+            
+             </parameters>
+                         
+            </object>
+
+        </objects>
+		
+    </object>
+  </objects>
+
+</dataModelInfo>
+
