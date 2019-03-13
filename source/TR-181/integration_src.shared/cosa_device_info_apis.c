@@ -256,7 +256,7 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 		CcspTraceError((" Failed to set Interface, Ignoring request \n"));
 		return ANSC_STATUS_FAILURE;
 	}
-	ret = RETURN_ERR;
+/*	ret = RETURN_ERR;
 	ret = cm_hal_HTTP_Download ();
 
 	if( ret == RETURN_ERR)
@@ -266,7 +266,7 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 	}
 	else
 	{
-		CcspTraceInfo(("Image downloading triggered successfully \n"));
+		CcspTraceInfo(("Image downloading triggered successfully \n")); 
 		pthread_t FWDL_Thread;
 		res = pthread_create(&FWDL_Thread, NULL, FWDL_ThreadFunc, "FWDL_ThreadFunc"); 
 		if(res != 0)
@@ -274,6 +274,12 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 			CcspTraceError(("Create FWDL_Thread error %d\n", res));
 		}	
 
+	}   */
+	pthread_t FWDL_Thread;
+	res = pthread_create(&FWDL_Thread, NULL, FWDL_ThreadFunc, "FWDL_ThreadFunc"); 
+	if(res != 0)
+	{
+		CcspTraceError(("Create FWDL_Thread error %d\n", res));
 	}	
 	
 	return ANSC_STATUS_SUCCESS;
@@ -306,67 +312,78 @@ void FWDL_ThreadFunc()
 	    
 	pthread_detach(pthread_self());
 
-	/* Sleeping since the status returned is 500 on immediate status query */
-	CcspTraceInfo((" Sleeping to prevent 500 error \n")); 
-	sleep(10);
-
-	/* Check if the /tmp/wget.log file was created, if not wait an adidtional time */
-	log_wget= fopen("/tmp/wget.log", "r");
-
-	if (log_wget == NULL) 
-	{
-		CcspTraceInfo(("/tmp/wget.log doesn't exist. Sleeping an additional 10 seconds \n"));
+	ret = cm_hal_HTTP_Download ();
+        if( ret == RETURN_ERR)
+        {
+                CcspTraceError((" Failed to start download \n"));
+          	return;
+        }
+        else
+        {
+		CcspTraceInfo(("Image downloading triggered successfully \n"));
+		ret = RETURN_ERR;
+		/* Sleeping since the status returned is 500 on immediate status query */
+		CcspTraceInfo((" Sleeping to prevent 500 error \n")); 
 		sleep(10);
-	}
-	else 
-	{
-		fclose(log_wget);
-		CcspTraceInfo(("/tmp/wget.log created . Continue ...\n"));
-	}
 
-	CcspTraceInfo((" Waiting for FW DL ... \n"));
-	while(1)
-	{
-		dl_status = cm_hal_Get_HTTP_Download_Status();
-
-		if(dl_status >= 0 && dl_status <= 100)
-			sleep(2);
-		else if(dl_status == 200)
-			break;
-		else if(dl_status >= 400)
+		/* Check if the /tmp/wget.log file was created, if not wait an adidtional time */
+		log_wget= fopen("/tmp/wget.log", "r");
+	
+		if (log_wget == NULL) 
 		{
-			CcspTraceError((" FW DL is failed with status %d \n", dl_status));
-			return;
+			CcspTraceInfo(("/tmp/wget.log doesn't exist. Sleeping an additional 10 seconds \n"));
+			sleep(10);
 		}
-	}
+		else 
+		{
+			fclose(log_wget);
+			CcspTraceInfo(("/tmp/wget.log created . Continue ...\n"));
+		}
 
-	CcspTraceInfo((" FW DL is over \n"));
+		CcspTraceInfo((" Waiting for FW DL ... \n"));
+		while(1)
+		{
+			dl_status = cm_hal_Get_HTTP_Download_Status();
 
-	CcspTraceInfo((" Waiting for reboot ready ... \n"));
-	while(1)
-	{
-		ret = cm_hal_Reboot_Ready(&reboot_ready_status);
+			if(dl_status >= 0 && dl_status <= 100)
+				sleep(2);
+			else if(dl_status == 200)
+				break;
+			else if(dl_status >= 400)
+			{
+				CcspTraceError((" FW DL is failed with status %d \n", dl_status));
+				return;
+			}
+		}
 
-		if(ret == RETURN_OK && reboot_ready_status == 1)
-			break;
+		CcspTraceInfo((" FW DL is over \n"));
+
+		CcspTraceInfo((" Waiting for reboot ready ... \n"));
+		while(1)
+		{
+			ret = cm_hal_Reboot_Ready(&reboot_ready_status);
+
+			if(ret == RETURN_OK && reboot_ready_status == 1)
+				break;
+			else
+				sleep(5);
+		}
+		CcspTraceInfo((" Waiting for reboot ready over, setting last reboot reason \n"));
+
+		system("dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason string Forced_Software_upgrade");
+
+		ret = RETURN_ERR;
+		ret = cm_hal_HTTP_Download_Reboot_Now();
+
+		if(ret == RETURN_OK)
+		{
+			CcspTraceInfo((" Rebooting the device now!\n"));
+		}
 		else
-			sleep(5);
+		{
+			CcspTraceError((" Reboot Already in progress!\n"));
+		}	
 	}
-	CcspTraceInfo((" Waiting for reboot ready over, setting last reboot reason \n"));
-
-	system("dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason string Forced_Software_upgrade");
-
-	ret = RETURN_ERR;
-	ret = cm_hal_HTTP_Download_Reboot_Now();
-
-	if(ret == RETURN_OK)
-	{
-		CcspTraceInfo((" Rebooting the device now!\n"));
-	}
-	else
-	{
-		CcspTraceError((" Reboot Already in progress!\n"));
-	}	
 }
 
 convert_to_validFW(char *fw,char *valid_fw)
