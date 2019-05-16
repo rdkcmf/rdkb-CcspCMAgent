@@ -74,7 +74,7 @@ typedef  struct
 _COSA_CM_DHCP_INFO
 {
     ANSC_IPV4_ADDRESS               IPAddress;
-    char                            BootFileName[64];
+    char                            BootFileName[256];
     ANSC_IPV4_ADDRESS               SubnetMask;
     ANSC_IPV4_ADDRESS               Gateway;
     ANSC_IPV4_ADDRESS               TFTPServer;
@@ -146,7 +146,7 @@ typedef  struct
 _COSA_CM_IPV6DHCP_INFO
 {
     char                            IPv6Address[40];
-    char                            IPv6BootFileName[64];
+    char                            IPv6BootFileName[256];
     char                            IPv6Prefix[40];
     char                            IPv6Router[40];
     char                            IPv6TFTPServer[40];
