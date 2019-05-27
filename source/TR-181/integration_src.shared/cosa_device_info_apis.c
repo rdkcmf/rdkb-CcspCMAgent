@@ -110,7 +110,8 @@ ANSC_STATUS CosaDmlDIGetDLFlag(ANSC_HANDLE hContext)
 	{
 		if(strstr(buff, "BUILD_TYPE") != NULL) 
 		{
-			if((strstr(buff, "dev") != NULL) || (strstr(buff, "vbn") != NULL) || (strstr(buff, "DEV") != NULL) || (strstr(buff, "VBN") != NULL))
+		//RDKB-22703: Enabled support to allow TR-181 firmware download on PROD builds.
+			if((strcasestr(buff, "dev") != NULL) || (strcasestr(buff, "vbn") != NULL) || (strcasestr(buff, "prod") != NULL))
 			{
 				pMyObject->Download_Control_Flag = TRUE;
 				break;
