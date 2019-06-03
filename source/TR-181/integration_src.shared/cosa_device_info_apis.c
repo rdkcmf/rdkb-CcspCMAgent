@@ -198,6 +198,23 @@ ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol)
 	return ANSC_STATUS_SUCCESS;	
 }
 
+#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PRODUCT_REQ_)
+ANSC_STATUS CosaDmlDIGetRfSignalStatus(BOOLEAN *pRfSignalStatus) {
+	int ret = RETURN_ERR;
+	
+	ret = docsis_IsEnergyDetected(pRfSignalStatus);
+
+	if( ret == RETURN_ERR )
+	{
+		CcspTraceError((" Failed to get RfSignalStatus \n"));
+		return ANSC_STATUS_FAILURE;
+	}
+	
+	return ANSC_STATUS_SUCCESS;	
+}
+#endif
+
+
 ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;

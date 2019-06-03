@@ -1076,7 +1076,19 @@
 
 		  <writable>true</writable>
 		  
-        </parameter>		
+        </parameter>
+
+        <parameter>
+
+          <name>X_RDKCENTRAL-COM_CableRfSignalStatus</name>
+
+          <type>boolean</type>
+
+          <syntax>bool</syntax>
+
+          <writable>false</writable>
+
+        </parameter>
 	  </parameters>	
 	</object>
 
