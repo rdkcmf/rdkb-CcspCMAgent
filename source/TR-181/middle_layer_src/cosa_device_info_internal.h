@@ -73,6 +73,7 @@
 	char		Current_Firmware[128];					\
 	char		Firmware_To_Download[128];				\
 	char		DownloadURL[128];						\
+	BOOLEAN		RfSignalStatus;							\
 
 typedef  struct
 _COSA_DATAMODEL_DEVICEINFO_CLASS_CONTENT

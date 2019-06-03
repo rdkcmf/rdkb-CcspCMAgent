@@ -134,6 +134,25 @@ DeviceInfo_GetParamBoolValue
         return TRUE;
     }
 
+#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PRODUCT_REQ_)
+    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_CableRfSignalStatus", TRUE) )
+    {
+        BOOLEAN rfSignalStatus = TRUE; // default is TRUE.
+        CosaDmlDIGetRfSignalStatus(&rfSignalStatus);
+        if(rfSignalStatus) {
+            pMyObject->RfSignalStatus = TRUE;
+            *pBool = TRUE;
+            AnscTraceWarning(("Cable RF Signal Detected\n"));
+        } else {
+            pMyObject->RfSignalStatus = FALSE;
+            *pBool = FALSE;
+            AnscTraceWarning(("Cable RF Signal Not Detected\n"));
+        }
+
+        return TRUE;
+    }
+#endif
+
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
 }

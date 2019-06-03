@@ -81,6 +81,9 @@ ANSC_STATUS CosaDmlDIGetDLFlag(ANSC_HANDLE hContext);
 ANSC_STATUS CosaDmlDIGetFWVersion(ANSC_HANDLE hContext);
 ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status);
 ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol);
+#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PROD_REQ_)
+ANSC_STATUS CosaDmlDIGetRfSignalStatus(BOOLEAN *pRfSignalStatus);
+#endif
 ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext);
 ANSC_STATUS CosaDmlDISetURL(ANSC_HANDLE hContext, char *URL);
 ANSC_STATUS CosaDmlDISetImage(ANSC_HANDLE hContext, char *Image);
