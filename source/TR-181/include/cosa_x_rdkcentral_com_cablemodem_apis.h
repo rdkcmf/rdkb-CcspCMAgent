@@ -89,6 +89,8 @@ typedef struct COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN {
     unsigned int PlcFreq;        
     unsigned int NumPilots;      
     unsigned int TimeInterleaverDepth;
+    char          averageSNR[64];                    //The averageSNR value of this downstream channel
+    char          PowerLevel[64];                           //The power level of this downstream channel
     unsigned long long PlcTotalCodewords;
     unsigned long long PlcUnreliableCodewords;
     unsigned long long NcpTotalFields; 

@@ -80,6 +80,7 @@
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntryCount    
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntry        
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
+    *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
 
 ***********************************************************************/
 /**
@@ -156,6 +157,16 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         char*                       ParamName,
         ULONG*                      pUlong
     );
+
+ULONG
+X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        char*                       pValue,
+        ULONG*                      pUlSize
+    );
+
 
 /***********************************************************************
 

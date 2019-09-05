@@ -1108,6 +1108,7 @@
 				<func_GetEntryCount>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntryCount</func_GetEntryCount>
 				<func_GetEntry>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntry</func_GetEntry>
 				<func_GetParamUlongValue>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue</func_GetParamUlongValue>
+                                <func_GetParamStringValue>X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue</func_GetParamStringValue>
 				</functions>
 				<parameters>
 					<parameter>
@@ -1180,6 +1181,18 @@
 					<name>TimeInterleaverDepth</name>
 					<type>unsignedInt</type>
 					<syntax>uint32</syntax>
+					</parameter>
+
+					<parameter>
+					<name>SNRLevel</name>
+					<type>string(64)</type>
+					<syntax>string</syntax>
+					</parameter>
+
+					<parameter>
+					<name>PowerLevel</name>
+					<type>string(64)</type>
+					<syntax>string</syntax>
 					</parameter>
 					
 					<parameter>
