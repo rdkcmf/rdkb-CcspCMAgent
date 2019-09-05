@@ -117,7 +117,7 @@
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntryCount    
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntry        
     *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
-
+    *  X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue 
 ***********************************************************************/
 /**********************************************************************  
 
@@ -502,6 +502,84 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
 
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
+}
+/**********************************************************************  
+
+    caller:     owner of this object 
+
+    prototype: 
+
+        ULONG
+        X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
+            (
+                ANSC_HANDLE                 hInsContext,
+                char*                       ParamName,
+                char*                       pValue,
+                ULONG*                      pUlSize
+            );
+
+    description:
+
+        This function is called to retrieve string parameter value; 
+
+    argument:   ANSC_HANDLE                 hInsContext,
+                The instance handle;
+
+                char*                       ParamName,
+                The parameter name;
+
+                char*                       pValue,
+                The string value buffer;
+
+                ULONG*                      pUlSize
+                The buffer of length of string value;
+                Usually size of 4095 will be used.
+                If it's not big enough, put required size here and return 1;
+
+    return:     0 if succeeded;
+                1 if short of buffer size; (*pUlSize = required size)
+                -1 if not supported.
+
+**********************************************************************/
+ULONG
+X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        char*                       pValue,
+        ULONG*                      pUlSize
+    )
+{
+
+    PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN     pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)hInsContext;
+    /* check the parameter name and return the corresponding value */
+    if( AnscEqualString(ParamName, "PowerLevel", TRUE))
+    {
+        /* collect value */
+        if ( _ansc_strlen(pDsOfdmChannel->PowerLevel) >= *pUlSize )
+        {
+            *pUlSize = _ansc_strlen(pDsOfdmChannel->PowerLevel);
+            return 1;
+        }
+
+        AnscCopyString(pValue, pDsOfdmChannel->PowerLevel);
+        return 0;
+    }
+
+    if( AnscEqualString(ParamName, "SNRLevel", TRUE))
+    {
+        /* collect value */
+        if ( _ansc_strlen(pDsOfdmChannel->averageSNR) >= *pUlSize )
+        {
+            *pUlSize = _ansc_strlen(pDsOfdmChannel->averageSNR);
+            return 1;
+        }
+
+        AnscCopyString(pValue, pDsOfdmChannel->averageSNR);
+        return 0;
+    }
+    /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
+    return -1;
 }
 
 /***********************************************************************

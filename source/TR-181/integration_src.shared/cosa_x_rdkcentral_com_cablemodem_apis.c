@@ -172,6 +172,10 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 			pDsOfdmChannel[ iLoopCount ].PlcFreq 					= pinfo[iLoopCount].PlcFreq;		 
 			pDsOfdmChannel[ iLoopCount ].NumPilots					= pinfo[iLoopCount].NumPilots; 	 
 			pDsOfdmChannel[ iLoopCount ].TimeInterleaverDepth		= pinfo[iLoopCount].TimeInterleaverDepth;
+			if(_ansc_strlen(pinfo[iLoopCount].averageSNR))
+				AnscCopyString(pDsOfdmChannel[ iLoopCount ].averageSNR, pinfo[iLoopCount].averageSNR);
+			if(_ansc_strlen(pinfo[iLoopCount].PowerLevel))
+				AnscCopyString(pDsOfdmChannel[ iLoopCount ].PowerLevel, pinfo[iLoopCount].PowerLevel);
 			pDsOfdmChannel[ iLoopCount ].PlcTotalCodewords			= pinfo[iLoopCount].PlcTotalCodewords;
 			pDsOfdmChannel[ iLoopCount ].PlcUnreliableCodewords		= pinfo[iLoopCount].PlcUnreliableCodewords;
 			pDsOfdmChannel[ iLoopCount ].NcpTotalFields				= pinfo[iLoopCount].NcpTotalFields; 
