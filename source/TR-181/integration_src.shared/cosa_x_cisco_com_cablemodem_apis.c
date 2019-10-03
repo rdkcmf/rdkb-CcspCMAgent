@@ -107,7 +107,7 @@ void PollDocsisInformations()
 	   }
 	   else
 	   {
-           	retValue = fscanf(fp, "%s", buff);
+           	retValue = fscanf(fp, "%29s", buff);
            	if( (retValue != -1) && (buff != NULL ) )
            	{
         		pollinterval = atoi(buff);
