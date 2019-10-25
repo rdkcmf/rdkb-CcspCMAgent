@@ -28,5 +28,5 @@ hardware_platform = i686-linux-gnu
 bin_PROGRAMS = CcspCMAgentSsp
 CcspCMAgentSsp_CPPFLAGS = -I/var/tmp/pc-rdkb/include/dbus-1.0 -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/custom -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/include -I$(top_srcdir)/../CcspCommonLibrary/source/debug_api/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/include/linux -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/components/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/package/slap/include -I$(top_srcdir)/../hal/include -I$(top_srcdir)/source/TR-181/board_sbapi -I$(top_srcdir)/../CcspCommonLibrary/source/util_api/http/include -I$(top_srcdir)/../CcspCommonLibrary/source/util_api/ansc/include -I$(top_srcdir)/source/TR-181/middle_layer_src -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/components/common/MessageBusHelper/include -I$(top_srcdir)/source/TR-181/include -I$(top_srcdir)/source/Custom $(CPPFLAGS)
 CcspCMAgentSsp_CFLAGS = $(SYSTEMD_CFLAGS)
-CcspCMAgentSsp_SOURCES = ssp_main.c ssp_messagebus_interface.c ssp_action.c
+CcspCMAgentSsp_SOURCES = ssp_main.c ssp_messagebus_interface.c ssp_action.c dm_pack_datamodel.c
 CcspCMAgentSsp_LDFLAGS =  -lccsp_common -lcm_mgnt $(SYSTEMD_LDFLAGS)
