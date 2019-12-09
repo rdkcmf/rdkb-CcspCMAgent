@@ -2073,7 +2073,7 @@ DownstreamChannel_GetEntry
 {
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
-    if (nIndex < pMyObject->DownstreamChannelNumber)
+    if ((nIndex < pMyObject->DownstreamChannelNumber) && (pMyObject->pDownstreamChannel != NULL))
     {
         *pInsNumber  = nIndex + 1;
 
@@ -2472,7 +2472,7 @@ UpstreamChannel_GetEntry
 {
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
-    if (nIndex < pMyObject->UpstreamChannelNumber)
+    if ((nIndex < pMyObject->UpstreamChannelNumber) && (pMyObject->pUpstreamChannel != NULL))
     {
         *pInsNumber  = nIndex + 1;
 
