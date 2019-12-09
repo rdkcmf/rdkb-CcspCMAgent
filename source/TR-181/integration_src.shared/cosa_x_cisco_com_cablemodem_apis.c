@@ -97,6 +97,7 @@ void PollDocsisInformations()
   char buff[30];
   int pollinterval=4*3600;
   int i,retValue;
+
   while(1)
   { 
 	   memset(buff,0,sizeof(buff));
@@ -139,7 +140,6 @@ void PollDocsisInformations()
         Ccsp_cm_clnt_unlock();
 	goto EXIT;
     }
-    docsis_GetNumOfActiveRxChannels(&pMyObject->DownstreamChannelNumber);
     CcspTraceWarning(("Number of Active Rxchannel is %lu\n",pMyObject->DownstreamChannelNumber));
     for (i=0 ; i < pMyObject->DownstreamChannelNumber ; i ++)
     {
@@ -164,8 +164,6 @@ void PollDocsisInformations()
         Ccsp_cm_clnt_unlock();
 	goto EXIT;
     }
-
-    docsis_GetNumOfActiveTxChannels(&pMyObject->UpstreamChannelNumber);
     CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: Number of Active Txchannel is %lu\n",pMyObject->UpstreamChannelNumber));
     for (i=0 ; i < pMyObject->UpstreamChannelNumber ; i ++)
     {
@@ -184,12 +182,14 @@ EXIT:
     Ccsp_cm_clnt_lock();
     if ( pMyObject->pDownstreamChannel )
     {
+	memset(pMyObject->pDownstreamChannel, 0, sizeof(COSA_CM_DS_CHANNEL) * pMyObject->DownstreamChannelNumber);
         AnscFreeMemory(pMyObject->pDownstreamChannel);
         pMyObject->pDownstreamChannel = NULL;
     }
 
     if ( pMyObject->pUpstreamChannel )
     {
+	memset(pMyObject->pUpstreamChannel, 0, sizeof(COSA_CM_US_CHANNEL) * pMyObject->UpstreamChannelNumber);
         AnscFreeMemory(pMyObject->pUpstreamChannel);
         pMyObject->pUpstreamChannel = NULL;
     }
