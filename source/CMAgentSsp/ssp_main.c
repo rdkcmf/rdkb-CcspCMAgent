@@ -326,6 +326,12 @@ void sig_handler(int sig)
     else if ( sig == SIGUSR1 ) {
     	signal(SIGUSR1, sig_handler); /* reset it to this function */
     	CcspTraceInfo(("SIGUSR1 received!\n"));
+	#ifndef DISABLE_LOGAGENT
+		RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
+		RDKLogLevel = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
+		CM_RDKLogLevel = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel");
+		CM_RDKLogEnable = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable");
+		#endif
     }
     else if ( sig == SIGUSR2 ) {
     	CcspTraceInfo(("SIGUSR2 received!\n"));
@@ -351,13 +357,7 @@ void sig_handler(int sig)
 	else if ( sig == SIGALRM ) {
 		printf("~~~~ Got SIGALRM Signal !!! CMAgent~~~\n");
     	signal(SIGALRM, sig_handler); /* reset it to this function */
-    	CcspTraceInfo(("SIGALRM received!\n"));
-		#ifndef DISABLE_LOGAGENT
-		RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
-		RDKLogLevel = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
-		CM_RDKLogLevel = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel");
-		CM_RDKLogEnable = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable");
-		#endif
+    	CcspTraceInfo(("SIGALRM received!\n"));		
     }
     else {
     	/* get stack trace first */
@@ -502,6 +502,7 @@ int main(int argc, char* argv[])
 
 #ifdef INCLUDE_BREAKPAD
     breakpad_ExceptionHandler();
+    signal(SIGUSR1, sig_handler);	
 #else
 
     if (is_core_dump_opened())
