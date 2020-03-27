@@ -69,6 +69,20 @@
 #ifndef  _SSP_MESSAGEBUS_INTERFACE_
 #define  _SSP_MESSAGEBUS_INTERFACE_
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is used to initialize message bus interface and to register the Dbus path.
+ *
+ * @param[in] component_id      Component ID.
+ * @param[in] config_file       Message bus configuration file.
+ * @param[in] path              Dbus path.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 ANSC_STATUS
 ssp_PnmMbi_MessageBusEngage
     (
@@ -77,24 +91,36 @@ ssp_PnmMbi_MessageBusEngage
         char * path
     );
 
+/**
+ * @brief Interface implementation that will only be used by pnm.
+ */
 int
 ssp_PnmMbi_Initialize
     (
         void * user_data
     );
 
+/**
+ * @brief Interface implementation that will only be used by pnm.
+ */
 int
 ssp_PnmMbi_Finalize
     (
         void * user_data
     );
 
+/**
+ * @brief Interface implementation that will only be used by pnm.
+ */
 int
 ssp_PnmMbi_Buscheck
     (
         void * user_data
     );
 
+/**
+ * @brief Interface implementation that will only be used by pnm.
+ */
 int
 ssp_PnmMbi_FreeResources
     (
@@ -117,6 +143,15 @@ ssp_PnmMbi_SendTransferCompleteSignal
         void
     );
 
+/**
+ * @brief Callback function received by registering Dbus path.
+ *
+ * @param[in] conn          Dbus connection.
+ * @param[in] message       Interface details.
+ * @param[in] user_data     Bus Information.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 DBusHandlerResult
 CcspPandM_path_message_func
     (
@@ -142,5 +177,5 @@ ssp_PnmMbi_RegisterToCR
         name_spaceType_t*               pParameterArray
     );
 
-
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

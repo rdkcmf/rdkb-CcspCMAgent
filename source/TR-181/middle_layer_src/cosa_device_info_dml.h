@@ -77,6 +77,21 @@
     *  DeviceInfo_SetParamStringValue
 
 ***********************************************************************/
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is called to retrieve Boolean parameter value associated with the datamodel
+ * under Device.DeviceInfo. which was invoked.
+ *
+ * @param[in] hInsContext   Object handle.
+ * @param[in] ParamName     Parameter field to get.
+ * @param[out] pBool        Parameter value.
+ *
+ * @return  Returns TRUE once get the value, returns FALSE when receive unsupported parameter to retrieve.
+ */
 BOOL
 DeviceInfo_GetParamBoolValue
     (
@@ -84,7 +99,18 @@ DeviceInfo_GetParamBoolValue
         char*                       ParamName,
         BOOL*                       pBool
     );
-	
+
+/**
+ * @brief This function is called to retrieve String parameter value associated with the datamodel
+ * under Device.DeviceInfo. which was invoked.
+ *
+ * @param[in] hInsContext   Object handle.
+ * @param[in] ParamName     Parameter field to get.
+ * @param[out] pValue       Parameter value.
+ * @param[out] pUlSize      String length.
+ *
+ * @return  Returns 1 once get the value.
+ */
 ULONG
 DeviceInfo_GetParamStringValue
     (
@@ -94,6 +120,16 @@ DeviceInfo_GetParamStringValue
         ULONG*                      pUlSize
     );
 
+/**
+ * @brief This function is called to set Boolean parameter value associated with the datamodel
+ * under Device.DeviceInfo. which was invoked.
+ *
+ * @param[in] hInsContext   Object handle.
+ * @param[in] ParamName     Parameter field to set.
+ * @param[in] bValue        Parameter value to set.
+ *
+ * @return  Returns TRUE once set the value, returns FALSE when receive unsupported parameter to set.
+ */
 BOOL
 DeviceInfo_SetParamBoolValue
     (
@@ -102,6 +138,16 @@ DeviceInfo_SetParamBoolValue
         BOOL                        bValue
     );
 
+/**
+ * @brief This function is called to retrieve String parameter value associated with the datamodel
+ * under Device.DeviceInfo. which was invoked.
+ *
+ * @param[in] hInsContext   Object handle.
+ * @param[in] ParamName     Parameter field to set.
+ * @param[in] pString       Parameter value to set.
+ *
+ * @return  Returns TRUE once set the value, returns FALSE when receive unsupported parameter to set.
+ */
 BOOL
 DeviceInfo_SetParamStringValue
     (
@@ -110,4 +156,5 @@ DeviceInfo_SetParamStringValue
         char*                       pString
     );	
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

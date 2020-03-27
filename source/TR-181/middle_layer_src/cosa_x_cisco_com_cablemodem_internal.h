@@ -67,6 +67,10 @@
 #include "plugin_main_apis.h"
 #include "cosa_x_cisco_com_cablemodem_apis.h"
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 #define COSA_IFSTACK_ALIAS_LENGTH              64
 #define CM_REFRESH_INTERVAL                    20
 #define TIME_NO_NEGATIVE(x) ((long)(x) < 0 ? 0 : (x))
@@ -100,26 +104,52 @@ _COSA_DATAMODEL_CABLDMODEM_CLASS_CONTENT
     COSA_DATAMODEL_CABLEMODEM_CLASS_CONTENT
 }
 COSA_DATAMODEL_CABLEMODEM, *PCOSA_DATAMODEL_CABLEMODEM;
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 
 /*
     Standard function declaration
 */
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is used to create CMAgent object and return handle.
+ *
+ * @return  Returns newly created object handle.
+ */
 ANSC_HANDLE
 CosaCableModemCreate
     (
         VOID
     );
 
+/**
+ * @brief This function is used to Initialize middle layer for created CMAgent object Device.DeviceInfo.
+ *
+ * @param[in] hThisObject  Object handle.
+ *
+ * @return  Returns status of the operation.
+ */
 ANSC_STATUS
 CosaCableModemInitialize
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief This function is used to remove CMAgent object(Device.DeviceInfo).
+ *
+ * @param[in] hThisObject  Object handle to delete.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 ANSC_STATUS
 CosaCableModemRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

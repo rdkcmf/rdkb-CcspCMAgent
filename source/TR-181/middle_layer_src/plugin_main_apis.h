@@ -110,6 +110,10 @@ extern ANSC_HANDLE                        g_MessageBusHandle;
 extern char*                              g_SubsystemPrefix;
 extern COSARegisterCallBackAfterInitDmlProc  g_RegisterCallBackAfterInitDml;
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 /* The OID for all objects s*/
 #define COSA_DATAMODEL_BASE_OID                                 0
 #define COSA_DATAMODEL_CM_OID                                   32
@@ -139,22 +143,49 @@ COSA_BACKEND_MANAGER_OBJECT,  *PCOSA_BACKEND_MANAGER_OBJECT;
 
 extern PCOSA_BACKEND_MANAGER_OBJECT g_pCosaBEManager;
 
+/** @} */  //END OF GROUP CM_AGENT_TYPES
+
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is used to create backend framework.
+ *
+ * @return  Returns newly created object handle.
+ */
 ANSC_HANDLE
 CosaBackEndManagerCreate
     (
         VOID
     );
 
+/**
+ * @brief This function is used to Initialize created backend framework object.
+ *
+ * @param[in] hThisObject  Object handle.
+ *
+ * @return  Returns status of the operation.
+ */
 ANSC_STATUS
 CosaBackEndManagerInitialize
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief This function is used to remove cosa manager object.
+ *
+ * @param[in] hThisObject  Object handle to delete.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaBackEndManagerRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

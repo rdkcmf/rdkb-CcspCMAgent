@@ -36,6 +36,11 @@
 #ifndef  _SSP_INTERNAL_
 #define  _SSP_INTERNAL_
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
+
 #define  CCSP_COMMON_COMPONENT_HEALTH_Red                   1
 #define  CCSP_COMMON_COMPONENT_HEALTH_Yellow                2
 #define  CCSP_COMMON_COMPONENT_HEALTH_Green                 3
@@ -106,23 +111,59 @@ COMPONENT_COMMON_DM,  *PCOMPONENT_COMMON_DM;
             AnscFreeMemory(component_common_dm);                                            \
          }
 
+/** @} */  //END OF GROUP CM_AGENT_TYPES
+
+
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+
+/**
+ * @brief This function is used to load/unload component, to get component memory info.
+ *
+ * @param[in] command  Argument to handle different use cases.
+ *
+ * @return  Returns 0 once executed the case.
+ */
 int  cmd_dispatch(int  command);
 
 void load_data_model();
 
-
+/**
+ * @brief This function is used to create component common data model object and interface, also allocates memory for the context used by data model.
+ *
+ * @param[in] pStartCfg Configuration with component name to create.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, else ANSC_STATUS_RESOURCES on failure.
+ */
 ANSC_STATUS
 ssp_create_pnm
     (
         PCCSP_COMPONENT_CFG         pStartCfg
     );
 
+/**
+ * @brief This function is used to initiaze the whole system by registering ccsp data model.
+ *
+ * @param[in] pStartCfg Component configuration for registering data model.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success, else failure error code from corresponding function call.
+ */
 ANSC_STATUS
 ssp_engage_pnm
     (
         PCCSP_COMPONENT_CFG         pStartCfg
     );
 
+/**
+ * @brief This function is used to Unregister the component.
+ *
+ * @param[in] pStartCfg Component configurations to get component details.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success.
+ */
 ANSC_STATUS
 ssp_cancel_pnm
     (
@@ -135,48 +176,86 @@ ssp_LoadCosaPluginLibrary
 (
 );
 
+
 ANSC_STATUS
 MessageBusTaskSim
     (
         ANSC_HANDLE hThisObject
     );
 
+/**
+ * @brief This function is used to retrive component name.
+ *
+ * @return  Returns Component name.
+ */
 char*
 ssp_PnmCCDmGetComponentName
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to retrive component version.
+ *
+ * @return  Returns Component version.
+ */
 ULONG
 ssp_PnmCCDmGetComponentVersion
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to retrive component author.
+ *
+ * @return  Returns Component author.
+ */
 char*
 ssp_PnmCCDmGetComponentAuthor
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to retrive component Health.
+ *
+ * @return  Returns Component health such as CCSP_COMMON_COMPONENT_HEALTH_Red/CCSP_COMMON_COMPONENT_HEALTH_Yellow/CCSP_COMMON_COMPONENT_HEALTH_Green.
+ */
 ULONG
 ssp_PnmCCDmGetComponentHealth
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to retrive component state.
+ *
+ * @return  Returns Component state such as CCSP_COMMON_COMPONENT_STATE_Initializing/CCSP_COMMON_COMPONENT_STATE_Running/CCSP_COMMON_COMPONENT_STATE_Blocked/CCSP_COMMON_COMPONENT_STATE_Paused.
+ */
 ULONG
 ssp_PnmCCDmGetComponentState
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to get the logging enabled status.
+ *
+ * @return  Returns TRUE on enabled case.
+ */
 BOOL
 ssp_PnmCCDmGetLoggingEnabled
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to enable logging.
+ *
+ * @param[in] bEnabled  Argument to enable tracing.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 ANSC_STATUS
 ssp_PnmCCDmSetLoggingEnabled
     (
@@ -184,12 +263,24 @@ ssp_PnmCCDmSetLoggingEnabled
         BOOL                            bEnabled
     );
 
+/**
+ * @brief This function is used to get trace level.
+ *
+ * @return  Returns trace level.
+ */
 ULONG
 ssp_PnmCCDmGetLoggingLevel
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to configure trace level.
+ *
+ * @param[in] LogLevel  Argument to set log level.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success.
+ */
 ANSC_STATUS
 ssp_PnmCCDmSetLoggingLevel
     (
@@ -197,28 +288,49 @@ ssp_PnmCCDmSetLoggingLevel
         ULONG                           LogLevel
     );
 
+/**
+ * @brief This function is used to get used peak memory info.
+ *
+ * @return  Returns Maximun memory used.
+ */
 ULONG
 ssp_PnmCCDmGetMemMaxUsage
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to get used minumum memory info.
+ *
+ * @return  Returns Minimum memory used.
+ */
 ULONG
 ssp_PnmCCDmGetMemMinUsage
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to get total memory consumed by the component.
+ *
+ * @return  Returns total memory consumed.
+ */
 ULONG
 ssp_PnmCCDmGetMemConsumed
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/**
+ * @brief This function is used to commit the parameter settings immediately.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success.
+ */
 ANSC_STATUS
 ssp_PnmCCDmApplyChanges
     (
         ANSC_HANDLE                     hThisObject
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

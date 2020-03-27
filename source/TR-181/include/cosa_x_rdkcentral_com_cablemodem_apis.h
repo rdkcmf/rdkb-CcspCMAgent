@@ -71,6 +71,11 @@
                 STRUCTURE AND CONSTANT DEFINITIONS
 **********************************************************************/
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
+
 typedef struct COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN {
     unsigned int ChannelId;                    
     unsigned int ChanIndicator;                
@@ -116,11 +121,23 @@ typedef struct COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US {
     unsigned int RangingStatus;         
 } COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US, *PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US;
 
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 
 /**********************************************************************
                 FUNCTION PROTOTYPES
 **********************************************************************/
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
 
+/**
+ * @brief This function is used to Initialize middle layer for Device.X_RDKCENTRAL-COM_CableModem.
+ * Device.X_RDKCENTRAL-COM_CableModem is a CMAgent object in its DML layer.
+ *
+ * @param[in] hDml       Handle of Data Model Layer.
+ * @param[out] phContext  DM Object.
+ */
 ANSC_STATUS
 CosaDmlRDKCentralCMInit
     (
@@ -128,6 +145,15 @@ CosaDmlRDKCentralCMInit
         PANSC_HANDLE                phContext
     );
 
+/**
+ * @brief This function is used to retrive DownStream channel tables information from CM HAL API.
+ *
+ * @param[in] hContext         Handle of Data Model Layer.
+ * @param[in] pulCount         Total number of DS channel entries.
+ * @param[in] ppDsOfdmChannel  Downstream channel information.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS when successfully gets the DS channel info, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlRDKCentralCmGetDownstreamChannel
     (
@@ -136,6 +162,15 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN *ppDsOfdmChannel 	   
     );
 
+/**
+ * @brief This function is used to retrive Upstream channel tables information from CM HAL API.
+ *
+ * @param[in] hContext         Handle of Data Model Layer.
+ * @param[in] pulCount         Total number of US channel entries.
+ * @param[in] ppUsOfdmChannel  Upstream channel information.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS when successfully gets the US channel info, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlRDKCentralCmGetUpstreamChannel
     (
@@ -144,6 +179,15 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN *ppUsOfdmChannel 	   
     );
 
+/**
+ * @brief This function is used to get status of Upstream channel table information from CM HAL API.
+ *
+ * @param[in] hContext                 Handle of Data Model Layer.
+ * @param[in] pulCount                 Total number of US channel entries.
+ * @param[in] ppCMStatusofUsChannel    Buffer to receive status of Upstream channel information.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS when successfully gets the status of US channel info, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
     (
@@ -152,4 +196,5 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif /* _COSA_RDKCENTRAL_CM_APIS_H */

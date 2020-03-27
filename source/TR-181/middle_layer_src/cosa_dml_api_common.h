@@ -106,6 +106,10 @@
 /**********************************************************************
                 STRUCTURE AND CONSTANT DEFINITIONS
 **********************************************************************/
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 
 #define  COSA_DML_LOWERLAYER_NAME_LENGTH            256
 #define  COSA_DML_IF_NAME_LENGTH                    512
@@ -159,6 +163,6 @@ _COSA_DML_STATUS
 }
 COSA_DML_STATUS, *PCOSA_DML_STATUS;
 
-
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 #endif
 
