@@ -67,9 +67,14 @@
 /**********************************************************************
                       GLOBAL CUSTOM DEFINITIONS
 **********************************************************************/
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 
 #define  MESSAGE_BUS_CONFIG_FILE                    "msg_daemon.cfg"
 
 #define  CCSP_PNM_START_CFG_FILE                    "CcspCM.cfg"
 
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 #endif   /*_PNM_CUSTOM_H_*/

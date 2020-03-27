@@ -70,6 +70,11 @@
 /**********************************************************************
                 STRUCTURE AND CONSTANT DEFINITIONS
 **********************************************************************/
+
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 typedef  struct
 _COSA_CM_DHCP_INFO
 {
@@ -202,10 +207,25 @@ typedef enum _CM_RESET_TYPE
 	EROUTER_RESET
 }CM_RESET_TYPE;
 
+/** @} */  //END OF GROUP CM_AGENT_TYPES
+
 /**********************************************************************
                 FUNCTION PROTOTYPES
 **********************************************************************/
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is used to Initialize middle layer for cosa device info object Device.DeviceInfo.
+ *
+ * @param[in] hDml       Data Model Layer Handle.
+ * @param[in] phContext  Data Model CM Object.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on successfully initialize middle layer for cosa device.
+ */
 ANSC_STATUS
 CosaDmlCMInit
     (
@@ -213,6 +233,14 @@ CosaDmlCMInit
         PANSC_HANDLE                phContext
     );
 
+/**
+ * @brief This function is used to retrieve Cable Modem DOCSIS status.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pValue      Output buffer to get status.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetStatus
     (
@@ -220,6 +248,14 @@ CosaDmlCMGetStatus
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to get loop diagnosticsstart.
+ *
+ * @param[in] hContext    	Data Model CM Object.
+ * @param[out] pBool        Output buffer to get start loop.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetLoopDiagnosticsStart
     (
@@ -227,6 +263,14 @@ CosaDmlCMGetLoopDiagnosticsStart
         BOOL*                       pBool
     );
 
+/**
+ * @brief This function is used to set loop diagnosticsstart.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[in] pBool        boolean value to set loop start.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMSetLoopDiagnosticsStart
     (
@@ -234,6 +278,14 @@ CosaDmlCMSetLoopDiagnosticsStart
         BOOL                        pBool
     );
 
+/**
+ * @brief This function is used to get loop diagnostics details.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pValue      Output buffer to collect details.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetLoopDiagnosticsDetails
     (
@@ -241,6 +293,14 @@ CosaDmlCMGetLoopDiagnosticsDetails
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to get telephony DHCP status.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pValue      Output buffer to collect status.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetTelephonyDHCPStatus
     (
@@ -248,6 +308,14 @@ CosaDmlCMGetTelephonyDHCPStatus
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to get telephony TFTP status.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pValue      Output buffer to collect status.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetTelephonyTftpStatus
     (
@@ -255,6 +323,14 @@ CosaDmlCMGetTelephonyTftpStatus
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to get telephony registration status.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pValue      Output buffer to collect registration status.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetTelephonyRegistrationStatus
     (
@@ -262,6 +338,14 @@ CosaDmlCMGetTelephonyRegistrationStatus
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to retrieve all the DHCP info from CM hal.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pInfo       Output buffer to get DHCP info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetDHCPInfo
     (
@@ -269,6 +353,14 @@ CosaDmlCMGetDHCPInfo
         PCOSA_CM_DHCP_INFO          pInfo
     );
 
+/**
+ * @brief This function is used to retrieve DownStream channel info.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pInfo       Output buffer to get DS channel info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetDSChannel
     (
@@ -276,6 +368,14 @@ CosaDmlCMGetDSChannel
         PCOSA_CM_DS_CHANNEL         pInfo
     );
 
+/**
+ * @brief This function is used to retrieve UpStream channel info.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pInfo       Output buffer to get US channel info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetUSChannel
     (
@@ -283,6 +383,14 @@ CosaDmlCMGetUSChannel
         PCOSA_CM_US_CHANNEL         pInfo
     );
 
+/**
+ * @brief This function is used to get DOCSIS registration status.
+ *
+ * @param[in] hContext     Data Model CM Object.
+ * @param[out] pInfo       Output buffer to get docsis info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetDOCSISInfo
     (
@@ -290,6 +398,14 @@ CosaDmlCMGetDOCSISInfo
         PCOSA_CM_DOCSIS_INFO        pInfo
     );
 
+/**
+ * @brief This function is used to retrieve log information.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pCfg       Log info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetLog
     (
@@ -297,6 +413,14 @@ CosaDmlCmGetLog
         PCOSA_DML_CM_LOG           pCfg
     );
 
+/**
+ * @brief This function is used to Clear the DOCSIS event log.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[in] pCfg       Log handling configuration.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmSetLog
     (
@@ -304,6 +428,15 @@ CosaDmlCmSetLog
         PCOSA_DML_CM_LOG            pCfg
     );
 
+/**
+ * @brief This function is used to get Docsis log information.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pulCount   Docsis log number.
+ * @param[out] ppCfg      Docsis log.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetDocsisLog
     (
@@ -312,6 +445,15 @@ CosaDmlCmGetDocsisLog
         PCOSA_DML_DOCSISLOG_FULL    *ppCfg
     );
 
+/**
+ * @brief This function is used to retrieve downstream channel details.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pulCount   Number of active receiving channel.
+ * @param[out] ppConf     DS Channel info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetDownstreamChannel
     (
@@ -320,6 +462,15 @@ CosaDmlCmGetDownstreamChannel
         PCOSA_CM_DS_CHANNEL         *ppConf        
     );    
 
+/**
+ * @brief This function is used to retrieve upstream channel details.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pulCount   Number of active trasmitting channel.
+ * @param[out] ppConf     US Channel info.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetUpstreamChannel
     (
@@ -328,6 +479,14 @@ CosaDmlCmGetUpstreamChannel
         PCOSA_CM_US_CHANNEL         *ppConf        
     );    
 
+/**
+ * @brief This function is used to retrieve the market of the modem.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue     Name of the market for the modem, "US" or "EURO", to be returned.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetMarket
     (
@@ -335,6 +494,14 @@ CosaDmlCMGetMarket
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to retrieve retrieve the current MIMO status.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue     Received status.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetMDDIPOverride
     (
@@ -342,6 +509,14 @@ CosaDmlCMGetMDDIPOverride
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to set the current global MIMO status.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[in] pValue      Status to be set to.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMSetMDDIPOverride
     (
@@ -349,6 +524,15 @@ CosaDmlCMSetMDDIPOverride
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to retrieve error code words for all the active receiving channels.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pulCount   Number of active channels.
+ * @param[out] ppConf     Error code words.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetCMErrorCodewords
     (
@@ -357,6 +541,14 @@ CosaDmlCmGetCMErrorCodewords
         PCOSA_DML_CMERRORCODEWORDS_FULL   *ppConf        
     );
 
+/**
+ * @brief This function is used to retrieve all the relevant IPv6 DHCP info for the CM.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pInfo      All IPv6 DHCP info for CM, to be returned.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetIPv6DHCPInfo
     (
@@ -364,7 +556,14 @@ CosaDmlCMGetIPv6DHCPInfo
         PCOSA_CM_IPV6DHCP_INFO      pInfo
     );
 
-
+/**
+ * @brief This function is used to retrieve the US channel ID in its MAC domain.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue     Channel ID.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetLockedUpstreamChID
     (
@@ -372,6 +571,14 @@ CosaDmlCMGetLockedUpstreamChID
         PULONG                      pValue
     );
 
+/**
+ * @brief This function is used to set the US channel ID in its MAC domain.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[in] value       Index to set the UpStream Channel ID.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMSetLockedUpstreamChID
     (
@@ -379,6 +586,14 @@ CosaDmlCMSetLockedUpstreamChID
         ULONG                      value
     );
 
+/**
+ * @brief This function is used to retrieve the current primary channel DS channel frequency.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue     Channel Frequency.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetStartDSFrequency
     (
@@ -386,6 +601,14 @@ CosaDmlCMGetStartDSFrequency
         PULONG                      pValue
     );
 
+/**
+ * @brief This function is used to change the DS primary channel frequency.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[in] value       Channel Frequency.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMSetStartDSFrequency
     (
@@ -393,6 +616,14 @@ CosaDmlCMSetStartDSFrequency
         ULONG                      value
     );
 	
+/**
+ * @brief This function is used to retrieve the location of the certificate.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue      Location of the certificate.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCmGetCMCert
     (
@@ -400,6 +631,14 @@ CosaDmlCmGetCMCert
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to retrieve the provisioned wan0 IP type.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[out] pValue     Ip type currently provisioned on wan0(IPv4/IPv6/unknown).
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetProvType
     (
@@ -407,6 +646,15 @@ CosaDmlCMGetProvType
         char*                       pValue
     );
 
+/**
+ * @brief This function is used to retrieve the count of cable modem reset.
+ *
+ * @param[in] hContext    Data Model CM Object.
+ * @param[in] type        CM Reset type.
+ * @param[out] pValue     Reset count.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaDmlCMGetResetCount
     (
@@ -415,5 +663,5 @@ CosaDmlCMGetResetCount
         ULONG                       *pValue
     );
 	
-
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

@@ -77,13 +77,33 @@
 #ifndef  _COSA_APIS_BUSUTIL_H
 #define  _COSA_APIS_BUSUTIL_H
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
 
+/**
+ * @brief This function is called to retrieve a UONG value of a parameter.
+ *
+ * @param[in] pParamName     Parameter name.
+ *
+ * @return  Returns the Ulong parameter value.
+ */
 ULONG
 CosaGetParamValueUlong
     (
         char*                       pParamName
     );
 
+/**
+ * @brief This function is called to retrieve String parameter value.
+ *
+ * @param[in] pParamName     Parameter field to get.
+ * @param[out] pBuffer       Buffer space for the value.
+ * @param[out] pulSize       Buffer size.
+ *
+ * @return  Returns the status of the operation.
+ */
 int
 CosaGetParamValueString
     (
@@ -92,12 +112,27 @@ CosaGetParamValueString
         PULONG                      pulSize
     );
 
+/**
+ * @brief This function is called to get Boolean parameter value.
+ *
+ * @param[in] pParamName     Parameter field to get.
+ *
+ * @return  Returns the boolean value of the requested parameter field.
+ */
 BOOL
 CosaGetParamValueBool
     (
         char*                       pParamName
     );
 
+/**
+ * @brief This function is used to retrieve the instance number by index value.
+ *
+ * @param[in] pObjName     Object name.
+ * @param[in] ulIndex      Index value to get instance number.
+ *
+ * @return  Returns the instance number of the corresponding index value.
+ */
 ULONG
 CosaGetInstanceNumberByIndex
     (
@@ -105,5 +140,5 @@ CosaGetInstanceNumberByIndex
         ULONG                      ulIndex
     );
 
-
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

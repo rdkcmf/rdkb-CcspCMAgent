@@ -67,6 +67,10 @@
 #include "plugin_main_apis.h"
 #include "cosa_x_rdkcentral_com_cablemodem_apis.h"
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 #define COSA_IFSTACK_ALIAS_LENGTH              64
 #define RDKCM_REFRESH_INTERVAL                 20
 #define TIME_NO_NEGATIVE(x) 				   ((long)(x) < 0 ? 0 : (x))
@@ -91,26 +95,52 @@ _COSA_DATAMODEL_RDKCENTRAL_CABLDMODEM_CLASS_CONTENT
     COSA_DATAMODEL_RDKCENTRAL_CABLEMODEM_CLASS_CONTENT
 }
 COSA_DATAMODEL_RDKCENTRAL_CABLEMODEM, *PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM;
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 
 /*
     Standard function declaration
 */
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function is used to create CMAgent object in its DML layer.
+ *
+ * @return  Returns newly created object handle.
+ */
 ANSC_HANDLE
 CosaRDKCentralComCableModemCreate
     (
         VOID
     );
 
+/**
+ * @brief This function is used to Initialize middle layer for created CMAgent object in its DML layer(Device.X_RDKCENTRAL-COM_CableModem).
+ *
+ * @param[in] hThisObject  Object handle.
+ *
+ * @return  Returns status of the operation.
+ */
 ANSC_STATUS
 CosaRDKCentralComCableModemInitialize
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief This function is used to remove CMAgent object(Device.X_RDKCENTRAL-COM_CableModem).
+ *
+ * @param[in] hThisObject  Object handle to delete.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case, Otherwise returns ANSC_STATUS_FAILURE.
+ */
 ANSC_STATUS
 CosaRDKCentralComCableModemRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif /* _COSA_RDKCENTRAL_CM_INTERNAL_H */

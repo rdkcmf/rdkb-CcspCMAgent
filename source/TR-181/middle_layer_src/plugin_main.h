@@ -95,6 +95,20 @@ extern "C"{
  *  BMEL stands for "Broadway MIB Extension Library"
  *
  ***************************************************************************/
+
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief Cosa INIT API.
+ *
+ * @param[in] uMaxVersionSupported     Maximum supported plugin version.
+ * @param[in] hCosaPlugInfo            Plugin info.
+ *
+ * @return  Returns the status of the operation.
+ */
 int ANSC_EXPORT_API
 COSA_Init
     (
@@ -102,6 +116,14 @@ COSA_Init
         void*                       hCosaPlugInfo         /* PCOSA_PLUGIN_INFO passed in by the caller */
     );
 
+/**
+ * @brief Cosa Asynchronous INIT API.
+ *
+ * @param[in] uMaxVersionSupported     Maximum supported plugin version.
+ * @param[in] hCosaPlugInfo            Plugin info.
+ *
+ * @return  Returns the status of the operation.
+ */
 int ANSC_EXPORT_API
 COSA_Async_Init
     (
@@ -109,36 +131,58 @@ COSA_Async_Init
         void*                       hCosaPlugInfo         /* PCOSA_PLUGIN_INFO passed in by the caller */
     );
 
-    
+/**
+ * @brief This function is used to find the supported object.
+ *
+ * @param[in] pObjName     Object name.
+ *
+ * @return  Returns the status of the operation.
+ */
 BOOL ANSC_EXPORT_API
 COSA_IsObjectSupported
     (
         char*                        pObjName
     );
 
+/**
+ * @brief This function is used to unload all the BE manager object created.
+ *
+ * @return  Returns the status of the operation.
+ */
 void ANSC_EXPORT_API
 COSA_Unload
     (
         void
     );
 
+/**
+ * @brief This function is used to get all the memory details.
+ */
 void ANSC_EXPORT_API
 COSA_MemoryCheck
     (
         void
     );
 
+/**
+ * @brief This function is used to get all the memory usage details.
+ */
 void ANSC_EXPORT_API
 COSA_MemoryUsage
     (
         void
     );
 
+/**
+ * @brief This function is used to get all the memory table informations maintained.
+ */
 void ANSC_EXPORT_API
 COSA_MemoryTable
     (
         void
     );
+
+/** @} */  //END OF GROUP CM_AGENT_APIS
 
 #ifdef __cplusplus 
 }

@@ -67,6 +67,10 @@
 #include "plugin_main_apis.h"
 #include "cosa_device_info_apis.h"
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
 #define  COSA_DATAMODEL_DEVICEINFO_CLASS_CONTENT		\
 	COSA_BASE_CONTENT                                                       \
 	BOOLEAN		Download_Control_Flag;					\
@@ -81,26 +85,52 @@ _COSA_DATAMODEL_DEVICEINFO_CLASS_CONTENT
     COSA_DATAMODEL_DEVICEINFO_CLASS_CONTENT
 }
 COSA_DATAMODEL_DEVICEINFO, *PCOSA_DATAMODEL_DEVICEINFO;
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
 /*
     Standard function declaration
 */
+
+/**
+ * @brief This function is used to construct cosa device info object and return handle.
+ *
+ * @return  Returns newly created device info object.
+ */
 ANSC_HANDLE
 CosaDeviceInfoCreate
     (
         VOID
     );
 
+/**
+ * @brief This function is used to initialize middle layer for cosa device info object Device.DeviceInfo.
+ *
+ * @param[in] hThisObject  Object handle.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 ANSC_STATUS
 CosaDeviceInfoInitialize
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief This function is used to un initialize cosa device object.
+ *
+ * @param[in] hThisObject  Object handle.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS on success case.
+ */
 ANSC_STATUS
 CosaDeviceInfoRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

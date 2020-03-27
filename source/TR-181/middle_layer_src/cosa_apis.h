@@ -78,6 +78,11 @@
 #include "cosa_apis_util.h"
 #include "cosa_apis_busutil.h"
 
+/**
+ * @addtogroup CM_AGENT_TYPES
+ * @{
+ */
+
 typedef  ANSC_HANDLE
 (*PFN_COSADM_CREATE)
     (
@@ -146,8 +151,21 @@ COSA_CONTEXT_LINK_OBJECT,  *PCOSA_CONTEXT_LINK_OBJECT;
     (cxt)->hPoamIrepFo         = (ANSC_HANDLE)NULL;                                    \
 
 #define  COSA_DML_ALIAS_NAME_LENGTH                 64
+/** @} */  //END OF GROUP CM_AGENT_TYPES
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
 
+/**
+ * @brief This function is used to push the entry in the list by ordering with respect to instance number.
+ *
+ * @param[in] pListHead       Head node list.
+ * @param[in] pCosaContext    Context to add in the list.
+ *
+ * @return  Returns the status of the operation.
+ */
 ANSC_STATUS
 CosaSListPushEntryByInsNum
     (
@@ -155,6 +173,14 @@ CosaSListPushEntryByInsNum
         PCOSA_CONTEXT_LINK_OBJECT   pCosaContext
     );
 
+/**
+ * @brief This function is used to get the object details for the corresponding instance number.
+ *
+ * @param[in] pListHead          Head node of the list.
+ * @param[in] InstanceNumber     Instance number to get deatils.
+ *
+ * @return  Returns the context on success case, Otherwise returns NULL on failure case.
+ */
 PCOSA_CONTEXT_LINK_OBJECT
 CosaSListGetEntryByInsNum
     (
@@ -162,4 +188,5 @@ CosaSListGetEntryByInsNum
         ULONG                       InstanceNumber
     );
 
+/** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

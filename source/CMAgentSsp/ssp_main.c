@@ -56,6 +56,20 @@
 #include <systemd/sd-daemon.h>
 #endif
 
+
+/**
+ * @defgroup CM_AGENT CM Agent
+ * - Cable Modem Agent component that provides an abstraction layer software interface to third party WAN.
+ * - Provides interfaces for integrating WAN interfaces with RDK-B.
+ *
+ * @defgroup CM_AGENT_TYPES Cable Modem Agent Types
+ * @ingroup  CM_AGENT
+ *
+ * @defgroup CM_AGENT_APIS Cable Modem Agent APIs
+ * @ingroup  CM_AGENT
+ *
+ **/
+
 PDSLH_CPE_CONTROLLER_OBJECT     pDslhCpeController      = NULL;
 PCOMPONENT_COMMON_DM            g_pComponent_Common_Dm  = NULL;
 char                            g_Subsystem[32]         = {0};
@@ -65,6 +79,18 @@ PCCSP_CCD_INTERFACE             pPnmCcdIf               = (PCCSP_CCD_INTERFACE  
 PCCC_MBI_INTERFACE              pPnmMbiIf               = (PCCC_MBI_INTERFACE         )NULL;
 BOOL                            g_bActive               = FALSE;
 
+/**
+ * @addtogroup CM_AGENT_APIS
+ * @{
+ */
+
+/**
+ * @brief This function validates user input to execute different use cases(Load CMAGENT MODULE / Get parameters / Get component memory info / Unregister component).
+ *
+ * @param[in] command  User Input command to handle different use cases.
+ *
+ * @return  Returns 0 on exit.
+ */
 int  cmd_dispatch(int  command)
 {
     ULONG                           ulInsNumber        = 0;
@@ -276,6 +302,11 @@ static void daemonize(void) {
 #endif
 }
 
+/**
+ * @brief This function is used to handle signal with the corresponding signal number.
+ *
+ * @param[in] sig  Signal number to handle.
+ */
 void sig_handler(int sig)
 {
 	extern ANSC_HANDLE bus_handle;
@@ -550,5 +581,5 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
+/** @} */  //END OF GROUP CM_AGENT_APIS
 
