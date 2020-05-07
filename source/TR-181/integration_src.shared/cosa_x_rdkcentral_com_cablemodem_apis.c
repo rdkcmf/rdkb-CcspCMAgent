@@ -71,7 +71,8 @@
 //!!!  So it uses casting from one to the other
 #include "cosa_x_rdkcentral_com_cablemodem_apis.h"
 #include "cosa_x_rdkcentral_com_cablemodem_internal.h"
-#include "cm_hal.h" 
+#include "cm_hal.h"
+#include "safec_lib_common.h"
 
 ANSC_STATUS
 CosaDmlRDKCentralCMInit
@@ -109,7 +110,8 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_DS_OFDM_CHAN  pinfo 				   = NULL;
 #endif
-	int 					   output_NumberOfEntries  = 0;	
+	int 					   output_NumberOfEntries  = 0;
+        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -143,8 +145,12 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 		//Fill the required fields from HAL structure to local structure
 		*pulCount			= output_NumberOfEntries;
 		*ppDsOfdmChannel 	= (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)AnscAllocateMemory( sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
-
-		memset( *ppDsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
+        if(*ppDsOfdmChannel == NULL)
+        {
+           return ANSC_STATUS_FAILURE;
+        }
+	rc = memset_s( *ppDsOfdmChannel,sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN) * output_NumberOfEntries );
+        ERR_CHK(rc);
 
 		pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)ppDsOfdmChannel[0];
 
@@ -192,7 +198,8 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_US_OFDMA_CHAN pinfo 				     	   = NULL;
 #endif
-	int 					   	  output_NumberOfEntries  = 0;	
+	int 					   	  output_NumberOfEntries  = 0;
+        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -226,8 +233,13 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		//Fill the required fields from HAL structure to local structure
 		*pulCount			= output_NumberOfEntries;
 		*ppUsOfdmChannel 	= (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)AnscAllocateMemory( sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries );
+                if(*ppUsOfdmChannel == NULL)
+                {
+                    return ANSC_STATUS_FAILURE;
+                }
 
-		memset( *ppUsOfdmChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries );
+	      rc = memset_s( *ppUsOfdmChannel,sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries, 0, sizeof(COSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN) * output_NumberOfEntries );
+              ERR_CHK(rc);
 
 		pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)ppUsOfdmChannel[0];
 
@@ -271,7 +283,8 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CMSTATUSOFDMA_US 	 pinfo 				      = NULL;
 #endif
-	int 					   	  output_NumberOfEntries  = 0;	
+	int 					   	  output_NumberOfEntries  = 0;
+        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -305,9 +318,12 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		//Fill the required fields from HAL structure to local structure
 		*pulCount			= output_NumberOfEntries;
 		*ppCMStatusofUsChannel 	= (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)AnscAllocateMemory( sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries );
-
-		memset( *ppCMStatusofUsChannel, 0, sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries );
-
+              if(*ppCMStatusofUsChannel == NULL)
+              {
+                 return ANSC_STATUS_FAILURE;
+              }
+	      rc = memset_s( *ppCMStatusofUsChannel,sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries, 0, sizeof(COSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US) * output_NumberOfEntries );
+              ERR_CHK(rc);
 		pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)ppCMStatusofUsChannel[0];
 
 		for( iLoopCount = 0; iLoopCount < output_NumberOfEntries; ++iLoopCount )

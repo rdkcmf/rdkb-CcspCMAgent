@@ -85,6 +85,7 @@
 #include "ssp_global.h"
 #include "ccsp_trace.h"
 #include "dm_pack_create_func.h"
+#include "safec_lib_common.h"
 extern ULONG                                       g_ulAllocatedSizePeak;
 
 extern  PDSLH_CPE_CONTROLLER_OBJECT     pDslhCpeController;
@@ -104,6 +105,7 @@ ssp_create_pnm
     )
 {
     /* Create component common data model object */
+    errno_t rc = -1;
 
     g_pComponent_Common_Dm = (PCOMPONENT_COMMON_DM)AnscAllocateMemory(sizeof(COMPONENT_COMMON_DM));
 
@@ -129,7 +131,12 @@ ssp_create_pnm
         }
         else
         {
-            AnscCopyString(pPnmCcdIf->Name, CCSP_CCD_INTERFACE_NAME);
+           rc =   strcpy_s(pPnmCcdIf->Name,sizeof(pPnmCcdIf->Name), CCSP_CCD_INTERFACE_NAME);
+            if(rc != EOK)
+            {
+               ERR_CHK(rc);
+               return ANSC_STATUS_FAILURE;
+            }
 
             pPnmCcdIf->InterfaceId              = CCSP_CCD_INTERFACE_ID;
             pPnmCcdIf->hOwnerContext            = NULL;

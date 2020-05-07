@@ -70,9 +70,13 @@
 //!!!  This code assumes that all data structures are the SAME in middle-layer APIs and HAL layer APIs
 //!!!  So it uses casting from one to the other
 #include "cosa_x_cisco_com_cablemodem_apis.h"
-#include "cm_hal.h" 
+#include "cm_hal.h"
 
 #include "cosa_x_cisco_com_cablemodem_internal.h"
+
+#include "safec_lib_common.h"
+
+#define  PVALUE_MAX 1023 
 
 static pthread_mutex_t __gw_cm_client_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -97,10 +101,13 @@ void PollDocsisInformations()
   char buff[30];
   int pollinterval=4*3600;
   int i,retValue;
-
+  errno_t rc = -1;
+  int ind = -1;
   while(1)
   { 
-	   memset(buff,0,sizeof(buff));
+          
+            rc = memset_s(buff,sizeof(buff),0,sizeof(buff));
+            ERR_CHK(rc);
            fp = fopen("/nvram/docsispolltime.txt", "r");
 	   if (!fp)
 	   {
@@ -143,7 +150,9 @@ void PollDocsisInformations()
     CcspTraceWarning(("Number of Active Rxchannel is %lu\n",pMyObject->DownstreamChannelNumber));
     for (i=0 ; i < pMyObject->DownstreamChannelNumber ; i ++)
     {
-	if (strcmp(pMyObject->pDownstreamChannel[i].Frequency,""))
+	rc = strcmp_s(pMyObject->pDownstreamChannel[i].Frequency,sizeof(pMyObject->pDownstreamChannel[i].Frequency),"",&ind);
+        ERR_CHK(rc);
+        if((ind) && (rc == EOK))
 	{
     		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s and Downstream is %s on channel %d\n",pMyObject->pDownstreamChannel[i].Frequency,pMyObject->pDownstreamChannel[i].LockStatus,i));
 	}
@@ -167,7 +176,8 @@ void PollDocsisInformations()
     CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: Number of Active Txchannel is %lu\n",pMyObject->UpstreamChannelNumber));
     for (i=0 ; i < pMyObject->UpstreamChannelNumber ; i ++)
     {
-	if (strcmp(pMyObject->pUpstreamChannel[i].Frequency,""))
+        if (pMyObject->pUpstreamChannel[i].Frequency[0] != '\0')
+
 	{
     		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s and Upstream is %s on channel %d\n",pMyObject->pUpstreamChannel[i].Frequency,pMyObject->pUpstreamChannel[i].LockStatus,i));
 	}
@@ -182,14 +192,14 @@ EXIT:
     Ccsp_cm_clnt_lock();
     if ( pMyObject->pDownstreamChannel )
     {
-	memset(pMyObject->pDownstreamChannel, 0, sizeof(COSA_CM_DS_CHANNEL) * pMyObject->DownstreamChannelNumber);
+	
         AnscFreeMemory(pMyObject->pDownstreamChannel);
         pMyObject->pDownstreamChannel = NULL;
     }
 
     if ( pMyObject->pUpstreamChannel )
     {
-	memset(pMyObject->pUpstreamChannel, 0, sizeof(COSA_CM_US_CHANNEL) * pMyObject->UpstreamChannelNumber);
+     
         AnscFreeMemory(pMyObject->pUpstreamChannel);
         pMyObject->pUpstreamChannel = NULL;
     }
@@ -262,11 +272,19 @@ CosaDmlCMGetLoopDiagnosticsDetails
         char*                       pValue
     )
 {
+    errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    AnscCopyString(pValue, "Dummy");
+   rc =  strcpy_s(pValue,PVALUE_MAX, "Dummy");
+   if(rc != EOK)
+    {
+          ERR_CHK(rc);
+          return ANSC_STATUS_FAILURE;
+     }
+ 
+     
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -277,11 +295,18 @@ CosaDmlCMGetTelephonyDHCPStatus
         char*                       pValue
     )
 {
+    errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    AnscCopyString(pValue, "Dummy-InProgress");
+    rc =  strcpy_s(pValue,PVALUE_MAX, "Dummy-InProgress");
+    if(rc != EOK)
+    {
+          ERR_CHK(rc);
+          return ANSC_STATUS_FAILURE;
+     }
+
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -292,11 +317,18 @@ CosaDmlCMGetTelephonyTftpStatus
         char*                       pValue
     )
 {
+    errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    AnscCopyString(pValue, "Dummy-InProgress");
+    rc = strcpy_s(pValue,PVALUE_MAX, "Dummy-InProgress");
+    if(rc != EOK)
+    {
+          ERR_CHK(rc);
+          return ANSC_STATUS_FAILURE;
+     }
+
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -307,11 +339,17 @@ CosaDmlCMGetTelephonyRegistrationStatus
         char*                       pValue
     )
 {
+    errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    AnscCopyString(pValue, "Dummy-InProgress");
+    rc =  strcpy_s(pValue,PVALUE_MAX, "Dummy-InProgress");
+    if(rc != EOK)
+    {
+          ERR_CHK(rc);
+          return ANSC_STATUS_FAILURE;
+     }
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -379,17 +417,16 @@ CosaDmlCmGetDocsisLog
         PCOSA_DML_DOCSISLOG_FULL    *ppConf
     )    
 {
-    CMMGMT_CM_EventLogEntry_t entries[DOCSIS_EVENT_LOG_SIZE];
+    CMMGMT_CM_EventLogEntry_t entries[DOCSIS_EVENT_LOG_SIZE] = {0};
     int count = 0;
     int i;
     PCOSA_DML_DOCSISLOG_FULL p;
+    errno_t rc = -1;
 
     if((!pulCount) || (!ppConf)){
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-
-    memset(entries, 0, DOCSIS_EVENT_LOG_SIZE*sizeof(CMMGMT_CM_EventLogEntry_t));
 
     count = docsis_GetDocsisEventLogItems(entries, DOCSIS_EVENT_LOG_SIZE);
 
@@ -399,10 +436,23 @@ CosaDmlCmGetDocsisLog
         return ANSC_STATUS_FAILURE;
     }
     for(i=0;i<count;i++) {
-        memcpy(p[i].Time, ctime(&(entries[i].docsDevEvFirstTime.tv_sec)), 64);
+        rc =   memcpy_s(p[i].Time,sizeof(p[i].Time), ctime(&(entries[i].docsDevEvFirstTime.tv_sec)), sizeof(p[i].Time));
+         if(rc != EOK)
+         {
+            ERR_CHK(rc);
+            free(p);
+            return ANSC_STATUS_FAILURE;
+         }   
         p[i].EventID = entries[i].docsDevEvId;
         p[i].EventLevel = entries[i].docsDevEvLevel;
-        memcpy(p[i].Description, entries[i].docsDevEvText, 255);
+        rc = memcpy_s(p[i].Description,sizeof(p[i].Description), entries[i].docsDevEvText,sizeof(entries[i].docsDevEvText));
+        if(rc != EOK)
+         {
+            ERR_CHK(rc);
+            free(p);
+            return ANSC_STATUS_FAILURE;
+         }
+
     }
 
     *pulCount = count;
@@ -426,6 +476,10 @@ CosaDmlCmGetDownstreamChannel
     if(*pulCount) {
 
         *ppConf = (PCOSA_CM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_DS_CHANNEL) * (*pulCount) );
+         if(*ppConf == NULL)
+         {
+             return ANSC_STATUS_FAILURE;
+         }
     
         docsis_GetDSChannel((PCMMGMT_CM_DS_CHANNEL *)ppConf);
     }
@@ -450,6 +504,11 @@ CosaDmlCmGetUpstreamChannel
     if(*pulCount) {
 
         *ppConf = (PCOSA_CM_US_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_US_CHANNEL) * (*pulCount) );
+        if(*ppConf == NULL)
+         {
+             return ANSC_STATUS_FAILURE;
+         }
+
     
         docsis_GetUSChannel((PCMMGMT_CM_US_CHANNEL *)ppConf);
     }

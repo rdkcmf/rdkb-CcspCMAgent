@@ -71,6 +71,7 @@
 #include "cosa_x_cisco_com_cablemodem_apis.h"
 #include "cosa_x_cisco_com_cablemodem_dml.h"
 #include "cosa_x_cisco_com_cablemodem_internal.h"
+#include "safec_lib_common.h"
 
 static int g_DocsisLog_clean_flg=0;  
 /***********************************************************************
@@ -165,11 +166,14 @@ X_CISCO_COM_CableModem_GetParamBoolValue
 {
     PCOSA_DATAMODEL_CABLEMODEM     pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG               pCfg      = &pMyObject->CmLog;
-
+   
     COSA_CM_DOCSIS_INFO            DInfo= {0};
-
+    errno_t rc = -1;
+    int ind = -1;  
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "BPIState", TRUE) )
+     rc = strcmp_s( "BPIState",strlen("BPIState"),ParamName, &ind);
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))    
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -180,7 +184,9 @@ X_CISCO_COM_CableModem_GetParamBoolValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NetworkAccess", TRUE) )
+    rc = strcmp_s( "NetworkAccess",strlen("NetworkAccess"),ParamName,&ind );
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))  
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -191,28 +197,37 @@ X_CISCO_COM_CableModem_GetParamBoolValue
         return TRUE;
     }
 
-    if (AnscEqualString(ParamName, "LoopDiagnosticsStart", TRUE))
+     rc = strcmp_s( "LoopDiagnosticsStart",strlen("LoopDiagnosticsStart"),ParamName, &ind);
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))
     {
         if (CosaDmlCMGetLoopDiagnosticsStart(NULL, pBool) != ANSC_STATUS_SUCCESS)
             return FALSE;
         return TRUE;
     }
     
-    if( AnscEqualString(ParamName, "EnableLog", TRUE))
-    {
+     rc = strcmp_s( "EnableLog",strlen("EnableLog"),ParamName, &ind);    
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))
+     
+     {
         /* collect value */
         *pBool = pCfg->EnableLog;
         return TRUE;
-    }
+     }
 
-    if( AnscEqualString(ParamName, "CleanDocsislog", TRUE))
+     rc =  strcmp_s("CleanDocsislog",strlen("CleanDocsislog"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *pBool = pCfg->CleanDocsisLog;
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISEnableCert", TRUE))
+    rc = strcmp_s( "DOCSISEnableCert",strlen("DOCSISEnableCert"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCmGetCMCertStatus(NULL, pBool) == ANSC_STATUS_SUCCESS)
@@ -263,9 +278,12 @@ X_CISCO_COM_CableModem_GetParamIntValue
     )
 {
     COSA_CM_DHCP_INFO               Info = {0};
-
+     errno_t rc = -1;
+    int ind = -1; 
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "TimeOffset", TRUE) )
+     rc = strcmp_s("TimeOffset",strlen("TimeOffset"),ParamName, &ind);
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -323,10 +341,13 @@ X_CISCO_COM_CableModem_GetParamUlongValue
     COSA_CM_DS_CHANNEL              Dsc  = {0};
     COSA_CM_US_CHANNEL              Usc  = {0};
     COSA_CM_DOCSIS_INFO             DInfo= {0};
-
+     errno_t rc = -1;
+    int ind = -1; 
     /* check the parameter name and return the corresponding value */
 
-    if( AnscEqualString(ParamName, "DOCSISDHCPAttempts", TRUE) )
+     rc = strcmp_s( "DOCSISDHCPAttempts",strlen("DOCSISDHCPAttempts"),ParamName,&ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -337,7 +358,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISTftpAttempts", TRUE) )
+    rc =  strcmp_s( "DOCSISTftpAttempts",strlen("DOCSISTftpAttempts"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -348,7 +371,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "MaxCpeAllowed", TRUE) )
+    rc =  strcmp_s("MaxCpeAllowed",strlen("MaxCpeAllowed"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -359,7 +384,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "UpgradeServerIP", TRUE) )
+    rc =  strcmp_s( "UpgradeServerIP",strlen("UpgradeServerIP"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
@@ -370,7 +397,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "IPAddress", TRUE) )
+    rc =  strcmp_s( "IPAddress",strlen("IPAddress"),ParamName, &ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -381,7 +410,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "SubnetMask", TRUE) )
+    rc =  strcmp_s( "SubnetMask",strlen("SubnetMask"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -392,7 +423,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "Gateway", TRUE) )
+    rc =  strcmp_s("Gateway", strlen("Gateway"),ParamName, &ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -403,7 +436,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "TFTPServer", TRUE) )
+    rc =  strcmp_s("TFTPServer", strlen("TFTPServer"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -414,7 +449,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "TimeOffset", TRUE) )
+    rc =  strcmp_s( "TimeOffset",strlen("TimeOffset"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -425,7 +462,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "LeaseTimeRemaining", TRUE) )
+    rc =  strcmp_s( "LeaseTimeRemaining",strlen("LeaseTimeRemaining"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
@@ -437,7 +476,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
     }
 
 
-    if( AnscEqualString(ParamName, "IPv6LeaseTimeRemaining", TRUE) )
+    rc = strcmp_s( "IPv6LeaseTimeRemaining",strlen("IPv6LeaseTimeRemaining"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPv6Info) != ANSC_STATUS_SUCCESS)
@@ -448,7 +489,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "IPv6RebindTimeRemaining", TRUE) )
+     rc =  strcmp_s( "IPv6RebindTimeRemaining",strlen("IPv6RebindTimeRemaining"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPv6Info) != ANSC_STATUS_SUCCESS)
@@ -459,7 +502,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "IPv6RenewTimeRemaining", TRUE) )
+    rc =  strcmp_s( "IPv6RenewTimeRemaining",strlen("IPv6RenewTimeRemaining"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPv6Info) != ANSC_STATUS_SUCCESS)
@@ -470,7 +515,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "LockedUpstreamChID", TRUE) )
+       rc = strcmp_s( "LockedUpstreamChID", strlen("LockedUpstreamChID"),ParamName,&ind);
+       ERR_CHK(rc);
+       if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetLockedUpstreamChID(NULL, puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -479,7 +526,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 	}
 
 	
-	if( AnscEqualString(ParamName, "StartDSFrequency", TRUE) )
+	rc = strcmp_s( "StartDSFrequency",strlen("StartDSFrequency"),ParamName, &ind);
+        ERR_CHK(rc);
+        if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetStartDSFrequency(NULL, puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -487,7 +536,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 		return TRUE;
 	}
 
-	if( AnscEqualString(ParamName, "CMResetCount", TRUE) )
+	rc =  strcmp_s("CMResetCount",strlen("CMResetCount"),ParamName, &ind);
+        ERR_CHK(rc);
+        if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetResetCount(NULL,CABLE_MODEM_RESET,puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -495,7 +546,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 		return TRUE;
 	}
 
-	if( AnscEqualString(ParamName, "LocalResetCount", TRUE) )
+	rc =  strcmp_s( "LocalResetCount",strlen("LocalResetCount"),ParamName, &ind);
+        ERR_CHK(rc);
+        if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetResetCount(NULL,LOCAL_RESET, puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -503,7 +556,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 		return TRUE;
 	}
 
-	if( AnscEqualString(ParamName, "DocsisResetCount", TRUE) )
+	rc =  strcmp_s( "DocsisResetCount",strlen("DocsisResetCount"),ParamName, &ind);
+        ERR_CHK(rc);
+        if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetResetCount(NULL,DOCSIS_RESET,puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -511,7 +566,9 @@ X_CISCO_COM_CableModem_GetParamUlongValue
 		return TRUE;
 	}
 
-	if( AnscEqualString(ParamName, "ErouterResetCount", TRUE) )
+	rc = strcmp_s("ErouterResetCount",strlen("ErouterResetCount"),ParamName, &ind); 
+        ERR_CHK(rc);
+        if((!ind) && (rc == EOK))
 	{
 		if (CosaDmlCMGetResetCount(NULL,EROUTER_RESET,puLong) != ANSC_STATUS_SUCCESS)
 			return FALSE;
@@ -575,76 +632,127 @@ X_CISCO_COM_CableModem_GetParamStringValue
     COSA_CM_US_CHANNEL              Usc  = {0};
     COSA_CM_DOCSIS_INFO             DInfo= {0};
     COSA_CM_IPV6DHCP_INFO           IPV6Info= {0};
+    int ind                         = -1; 
+    errno_t rc                      =     -1;
+    
 
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "MACAddress", TRUE) )
+    rc = strcmp_s( "MACAddress",strlen("MACAddress"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.MACAddress);
+        rc = strcpy_s(pValue,*pUlSize,Info.MACAddress);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+        
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "BootFileName", TRUE) )
+    rc = strcmp_s("BootFileName",strlen("BootFileName"),ParamName ,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.BootFileName);
+        rc = strcpy_s(pValue,*pUlSize,Info.BootFileName);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+        
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "TimeServer", TRUE) )
+    rc =  strcmp_s( "TimeServer",strlen("TimeServer"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.TimeServer);
+        rc = strcpy_s(pValue,*pUlSize,Info.TimeServer);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "RebindTimeRemaining", TRUE) )
+    rc = strcmp_s("RebindTimeRemaining",strlen("RebindTimeRemaining"),ParamName,&ind );
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.RebindTimeRemaining);
+        rc = strcpy_s(pValue,*pUlSize,Info.RebindTimeRemaining);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "RenewTimeRemaining", TRUE) )
+    rc = strcmp_s("RenewTimeRemaining",strlen("RenewTimeRemaining"),ParamName,&ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.RenewTimeRemaining);
+        rc = strcpy_s(pValue,*pUlSize,Info.RenewTimeRemaining);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
 
-    if( AnscEqualString(ParamName, "DOCSISDHCPStatus", TRUE) )
+    rc =  strcmp_s("DOCSISDHCPStatus", strlen("DOCSISDHCPStatus"),ParamName,&ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDHCPInfo(NULL, &Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, Info.DOCSISDHCPStatus);
+        rc = strcpy_s(pValue,*pUlSize,Info.DOCSISDHCPStatus);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "CMStatus", TRUE) )
+    rc = strcmp_s( "CMStatus",strlen("CMStatus"),ParamName, &ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetStatus(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -653,161 +761,271 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISVersion", TRUE) )
+    rc = strcmp_s("DOCSISVersion",strlen("DOCSISVersion"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISVersion);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISVersion);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISDownstreamScanning", TRUE) )
+    rc = strcmp_s("DOCSISDownstreamScanning",strlen("DOCSISDownstreamScanning"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISDownstreamScanning);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISDownstreamScanning);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISDownstreamRanging", TRUE) )
+    rc = strcmp_s("DOCSISDownstreamRanging",strlen("DOCSISDownstreamRanging"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISDownstreamRanging);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISDownstreamRanging);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISUpstreamScanning", TRUE) )
+    rc =  strcmp_s("DOCSISUpstreamScanning",strlen("DOCSISUpstreamScanning"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISUpstreamScanning);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISUpstreamScanning);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISUpstreamRanging", TRUE) )
+    rc = strcmp_s("DOCSISUpstreamRanging", strlen("DOCSISUpstreamRanging"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISUpstreamRanging);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISUpstreamRanging);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISTftpStatus", TRUE) )
+    rc =  strcmp_s( "DOCSISTftpStatus",strlen("DOCSISTftpStatus"),ParamName,&ind); 
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISTftpStatus);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISTftpStatus);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISDataRegComplete", TRUE) )
+    rc = strcmp_s("DOCSISDataRegComplete", strlen("DOCSISDataRegComplete"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISDataRegComplete);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISDataRegComplete);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "CoreVersion", TRUE) )
+    rc =  strcmp_s( "CoreVersion", strlen("CoreVersion"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.CoreVersion);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.CoreVersion);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISConfigFileName", TRUE) )
+    rc = strcmp_s("DOCSISConfigFileName",strlen("DOCSISConfigFileName"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISConfigFileName);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISConfigFileName);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "ToDStatus", TRUE) )
+    rc = strcmp_s("ToDStatus",strlen("ToDStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.ToDStatus);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.ToDStatus);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "UpstreamServiceFlowParams", TRUE) )
+    rc =  strcmp_s("UpstreamServiceFlowParams",strlen("UpstreamServiceFlowParams"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.UpstreamServiceFlowParams);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.UpstreamServiceFlowParams);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DownstreamServiceFlowParams", TRUE) )
+    rc = strcmp_s( "DownstreamServiceFlowParams",strlen("DownstreamServiceFlowParams"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DownstreamServiceFlowParams);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DownstreamServiceFlowParams);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISDownstreamDataRate", TRUE) )
+    rc =  strcmp_s("DOCSISDownstreamDataRate",strlen("DOCSISDownstreamDataRate"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISDownstreamDataRate);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISDownstreamDataRate);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "DOCSISUpstreamDataRate", TRUE) )
+    rc = strcmp_s("DOCSISUpstreamDataRate",strlen("DOCSISUpstreamDataRate"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetDOCSISInfo(NULL, &DInfo) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, DInfo.DOCSISUpstreamDataRate);
+        rc = strcpy_s(pValue,*pUlSize,DInfo.DOCSISUpstreamDataRate);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "LoopDiagnosticsDetails", TRUE) )
+    rc = strcmp_s( "LoopDiagnosticsDetails",strlen("LoopDiagnosticsDetails"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetLoopDiagnosticsDetails(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -816,7 +1034,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "Market", TRUE) )
+    rc = strcmp_s("Market",strlen("Market"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetMarket(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -825,7 +1045,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "MDDIPOverride", TRUE) )
+    rc = strcmp_s("MDDIPOverride",strlen("MDDIPOverride"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetMDDIPOverride(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -835,73 +1057,117 @@ X_CISCO_COM_CableModem_GetParamStringValue
     }
 
 
-    if( AnscEqualString(ParamName, "IPv6Address", TRUE) )
+    rc =  strcmp_s( "IPv6Address",strlen("IPv6Address"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6Address);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6Address);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
     
-    if( AnscEqualString(ParamName, "IPv6BootFileName", TRUE) )
+    rc = strcmp_s("IPv6BootFileName",strlen("IPv6BootFileName"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6BootFileName);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6BootFileName);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "IPv6Prefix", TRUE) )
+    rc =  strcmp_s("IPv6Prefix",strlen("IPv6Prefix"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6Prefix);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6Prefix);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "IPv6Router", TRUE) )
+    rc =  strcmp_s("IPv6Router",strlen("IPv6Router"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6Router);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6Router);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "IPv6TFTPServer", TRUE) )
+    rc =  strcmp_s("IPv6TFTPServer",strlen("IPv6TFTPServer"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6TFTPServer);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6TFTPServer);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "IPv6TimeServer", TRUE) )
+    rc =  strcmp_s("IPv6TimeServer",strlen("IPv6TimeServer"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetIPv6DHCPInfo(NULL, &IPV6Info) != ANSC_STATUS_SUCCESS)
             return -1;
 
-        AnscCopyString(pValue, IPV6Info.IPv6TimeServer);
+        rc = strcpy_s(pValue,*pUlSize,IPV6Info.IPv6TimeServer);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
 
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "TelephonyDHCPStatus", TRUE) )
+    rc = strcmp_s("TelephonyDHCPStatus",strlen("TelephonyDHCPStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetTelephonyDHCPStatus(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -910,7 +1176,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "TelephonyTftpStatus", TRUE) )
+    rc = strcmp_s("TelephonyTftpStatus",strlen("TelephonyTftpStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetTelephonyTftpStatus(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -919,7 +1187,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "TelephonyRegistrationStatus", TRUE) )
+    rc =  strcmp_s("TelephonyRegistrationStatus",strlen("TelephonyRegistrationStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCMGetTelephonyRegistrationStatus(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -927,7 +1197,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
 
         return 0;
     }
-    if( AnscEqualString(ParamName, "DOCSISCertificate", TRUE) )
+    rc =  strcmp_s("DOCSISCertificate",strlen("DOCSISCertificate"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if (CosaDmlCmGetCMCert(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -936,7 +1208,9 @@ X_CISCO_COM_CableModem_GetParamStringValue
         return 0;
     }
 
-	if( AnscEqualString(ParamName, "ProvIpType", TRUE))
+    rc = strcmp_s("ProvIpType",strlen("ProvIpType"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
 		/* collect value */
         if (CosaDmlCMGetProvType(NULL, pValue) != ANSC_STATUS_SUCCESS)
@@ -988,23 +1262,31 @@ X_CISCO_COM_CableModem_SetParamBoolValue
 {
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG                pCfg      = &pMyObject->CmLog;
+    errno_t                         rc               = -1;
+    int                             ind              = -1;
 
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "LoopDiagnosticsStart", TRUE))
+    rc = strcmp_s("LoopDiagnosticsStart",strlen("LoopDiagnosticsStart"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         pMyObject->LoopDiagnosticsStart = bValue;
         return TRUE;
     }
 
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "EnableLog", TRUE))
+    rc = strcmp_s( "EnableLog",strlen("EnableLog"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* save update to backup */
         pCfg->EnableLog = bValue;
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "CleanDocsisLog", TRUE))
+    rc =  strcmp_s( "CleanDocsisLog",strlen("CleanDocsisLog"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* save update to backup */
         pCfg->CleanDocsisLog = bValue;
@@ -1098,14 +1380,20 @@ X_CISCO_COM_CableModem_SetParamUlongValue
     )
 {
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "LockedUpstreamChID", TRUE))
+    errno_t                         rc               = -1;
+    int                             ind              = -1;
+    rc = strcmp_s( "LockedUpstreamChID",strlen( "LockedUpstreamChID"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
     	CosaDmlCMSetLockedUpstreamChID(NULL, uValue);
         return TRUE;
     }
 	
 	/* check the parameter name and set the corresponding value */
-	if( AnscEqualString(ParamName, "StartDSFrequency", TRUE))
+	rc =  strcmp_s("StartDSFrequency",strlen("StartDSFrequency"),ParamName, &ind);
+        ERR_CHK(rc);
+      if((!ind) && (rc == EOK))
     {
     	CosaDmlCMSetStartDSFrequency(NULL, uValue);
         return TRUE;
@@ -1154,11 +1442,20 @@ X_CISCO_COM_CableModem_SetParamStringValue
     )
 {
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
+    errno_t        rc = -1;
+    int ind = -1;
 
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "MDDIPOverride", TRUE))
-    {
-        AnscCopyString(pMyObject->MDDIPOverride, pString);
+    rc =  strcmp_s("MDDIPOverride",strlen("MDDIPOverride") ,ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    { 
+        rc = strcpy_s(pMyObject->MDDIPOverride,sizeof(pMyObject->MDDIPOverride),pString);
+        if(rc != EOK)
+        {
+             ERR_CHK(rc);
+             return FALSE;
+        }
         return TRUE;
     }
 
@@ -1551,9 +1848,13 @@ CMErrorCodewords_GetParamUlongValue
     )
 {
     PCOSA_DML_CMERRORCODEWORDS_FULL        pConf        = (PCOSA_DML_CMERRORCODEWORDS_FULL)hInsContext;
+    errno_t rc = -1;
+    int ind = -1;
     
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "UnerroredCodewords", TRUE))
+    rc = strcmp_s( "UnerroredCodewords",strlen("UnerroredCodewords"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->UnerroredCodewords; 
@@ -1561,7 +1862,10 @@ CMErrorCodewords_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "CorrectableCodewords", TRUE))
+    rc =  strcmp_s("CorrectableCodewords",strlen("CorrectableCodewords"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pConf->CorrectableCodewords; 
@@ -1569,7 +1873,9 @@ CMErrorCodewords_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "UncorrectableCodewords", TRUE))
+    rc =  strcmp_s( "UncorrectableCodewords",strlen("UncorrectableCodewords"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->UncorrectableCodewords; 
@@ -1876,9 +2182,13 @@ DocsisLog_GetParamUlongValue
     )
 {
     PCOSA_DML_DOCSISLOG_FULL        pConf        = (PCOSA_DML_DOCSISLOG_FULL)hInsContext;
+    errno_t rc = -1;
+    int ind = -1;
     
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "Index", TRUE))
+    rc = strcmp_s( "Index",strlen("Index"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->Index; 
@@ -1886,7 +2196,9 @@ DocsisLog_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "EventID", TRUE))
+    rc = strcmp_s( "EventID",strlen("EventID"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->EventID; 
@@ -1894,7 +2206,9 @@ DocsisLog_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "EventLevel", TRUE))
+    rc = strcmp_s("EventLevel",strlen("EventLevel"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->EventLevel; 
@@ -1954,9 +2268,14 @@ DocsisLog_GetParamStringValue
     )
 {
     PCOSA_DML_DOCSISLOG_FULL        pConf        = (PCOSA_DML_DOCSISLOG_FULL)hInsContext;
+    errno_t        rc = -1;
+    int ind = -1;
     
     /* check the parameter name and return the corresponding value */    
-    if( AnscEqualString(ParamName, "Description", TRUE))
+    rc =  strcmp_s("Description",strlen("Description"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Description) >= *pUlSize )
@@ -1965,11 +2284,19 @@ DocsisLog_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Description);
+        rc = strcpy_s(pValue,*pUlSize , pConf->Description);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "Time", TRUE))
+    rc = strcmp_s( "Time",strlen("Time"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Time) >= *pUlSize )
@@ -1978,7 +2305,13 @@ DocsisLog_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Time);
+        rc = strcpy_s(pValue,*pUlSize, pConf->Time);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+        
         return 0;
     }
 
@@ -2228,9 +2561,13 @@ DownstreamChannel_GetParamUlongValue
     )
 {
     PCOSA_CM_DS_CHANNEL             pConf        = (PCOSA_CM_DS_CHANNEL)hInsContext;
+    errno_t rc = -1;
+    int ind =-1;
     
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "ChannelID", TRUE) )
+    rc =  strcmp_s("ChannelID",strlen("ChannelID"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->ChannelID;
@@ -2238,7 +2575,9 @@ DownstreamChannel_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "Octets", TRUE) )
+    rc =  strcmp_s("Octets",strlen("Octets"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->Octets;
@@ -2246,7 +2585,10 @@ DownstreamChannel_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "Correcteds", TRUE) )
+    rc = strcmp_s("Correcteds", strlen("Correcteds"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pConf->Correcteds;
@@ -2254,7 +2596,9 @@ DownstreamChannel_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "Uncorrectables", TRUE) )
+    rc =  strcmp_s("Uncorrectables",strlen("Uncorrectables"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pConf->Uncorrectables;
@@ -2314,9 +2658,13 @@ DownstreamChannel_GetParamStringValue
     )
 {
     PCOSA_CM_DS_CHANNEL             pConf        = (PCOSA_CM_DS_CHANNEL)hInsContext;
-    
+    errno_t        rc = -1;
+    int ind = -1;    
     /* check the parameter name and return the corresponding value */    
-    if( AnscEqualString(ParamName, "Frequency", TRUE))
+    rc = strcmp_s( "Frequency",strlen("Frequency"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Frequency) >= *pUlSize )
@@ -2325,11 +2673,20 @@ DownstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Frequency);
+        rc = strcpy_s(pValue,*pUlSize, pConf->Frequency);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "PowerLevel", TRUE))
+    rc = strcmp_s("PowerLevel",strlen("PowerLevel"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->PowerLevel) >= *pUlSize )
@@ -2338,11 +2695,19 @@ DownstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->PowerLevel);
+        rc = strcpy_s(pValue,*pUlSize , pConf->PowerLevel);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "SNRLevel", TRUE))
+    rc = strcmp_s("SNRLevel",strlen("SNRLevel"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if ( _ansc_strlen(pConf->SNRLevel) >= *pUlSize )
@@ -2351,11 +2716,19 @@ DownstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->SNRLevel);
+        rc = strcpy_s(pValue,*pUlSize , pConf->SNRLevel);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "Modulation", TRUE))
+    rc = strcmp_s("Modulation", strlen("Modulation"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Modulation) >= *pUlSize )
@@ -2364,11 +2737,20 @@ DownstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Modulation);
+        rc = strcpy_s(pValue,*pUlSize , pConf->Modulation);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "LockStatus", TRUE))
+    rc =  strcmp_s( "LockStatus",strlen( "LockStatus") ,ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->LockStatus) >= *pUlSize )
@@ -2377,7 +2759,13 @@ DownstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->LockStatus);
+        rc = strcpy_s(pValue,*pUlSize , pConf->LockStatus);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
@@ -2627,9 +3015,14 @@ UpstreamChannel_GetParamUlongValue
     )
 {
     PCOSA_CM_US_CHANNEL             pConf        = (PCOSA_CM_US_CHANNEL)hInsContext;
+    errno_t rc = -1;
+    int ind =-1;
     
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "ChannelID", TRUE) )
+    rc = strcmp_s("ChannelID",strlen("ChannelID"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pConf->ChannelID;
@@ -2689,9 +3082,13 @@ UpstreamChannel_GetParamStringValue
     )
 {
     PCOSA_CM_US_CHANNEL             pConf        = (PCOSA_CM_US_CHANNEL)hInsContext;
-    
+    errno_t        rc = -1;
+    int ind = -1;    
     /* check the parameter name and return the corresponding value */    
-    if( AnscEqualString(ParamName, "Frequency", TRUE))
+    rc = strcmp_s( "Frequency",strlen("Frequency"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Frequency) >= *pUlSize )
@@ -2700,11 +3097,20 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Frequency);
+         rc = strcpy_s(pValue,*pUlSize , pConf->Frequency);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "PowerLevel", TRUE))
+    rc = strcmp_s( "PowerLevel",strlen("PowerLevel"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->PowerLevel) >= *pUlSize )
@@ -2713,11 +3119,20 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->PowerLevel);
+        rc = strcpy_s(pValue,*pUlSize , pConf->PowerLevel);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "ChannelType", TRUE))
+    rc = strcmp_s( "ChannelType",strlen("ChannelType"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->ChannelType) >= *pUlSize )
@@ -2726,11 +3141,20 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->ChannelType);
+        rc = strcpy_s(pValue,*pUlSize , pConf->ChannelType);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "SymbolRate", TRUE))
+    rc = strcmp_s("SymbolRate", strlen("SymbolRate"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->SymbolRate) >= *pUlSize )
@@ -2739,11 +3163,20 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->SymbolRate);
+         rc = strcpy_s(pValue,*pUlSize , pConf->SymbolRate);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "Modulation", TRUE))
+    rc = strcmp_s("Modulation",strlen("Modulation"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->Modulation) >= *pUlSize )
@@ -2752,11 +3185,20 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->Modulation);
+        rc = strcpy_s(pValue,*pUlSize , pConf->Modulation);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "LockStatus", TRUE))
+    rc =  strcmp_s( "LockStatus",strlen("LockStatus"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->LockStatus) >= *pUlSize )
@@ -2765,7 +3207,13 @@ UpstreamChannel_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->LockStatus);
+        rc = strcpy_s(pValue,*pUlSize , pConf->LockStatus);
+         if(rc != EOK)
+         {
+             ERR_CHK(rc);
+             return -1;
+         }
+
         return 0;
     }
 
@@ -3014,9 +3462,14 @@ CPEList_GetParamStringValue
     )
 {
     PCOSA_DML_CPE_LIST             pConf        = (PCOSA_DML_CPE_LIST)hInsContext;
+    errno_t        rc = -1;
+    int ind = -1;
     
     /* check the parameter name and return the corresponding value */    
-    if( AnscEqualString(ParamName, "IPAddress", TRUE))
+    rc = strcmp_s( "IPAddress",strlen("IPAddress"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->IPAddress) >= *pUlSize )
@@ -3025,11 +3478,20 @@ CPEList_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->IPAddress);
+        rc = strcpy_s(pValue,*pUlSize,pConf->IPAddress);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "MACAddress", TRUE))
+    rc = strcmp_s( "MACAddress", strlen("MACAddress"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         if ( _ansc_strlen(pConf->MACAddress) >= *pUlSize )
@@ -3038,7 +3500,13 @@ CPEList_GetParamStringValue
             return 1;
         }
         
-        AnscCopyString(pValue, pConf->MACAddress);
+         rc = strcpy_s(pValue,*pUlSize,pConf->MACAddress);
+        if(rc != EOK)
+        {
+           ERR_CHK(rc);
+           return -1;
+        }
+
         return 0;
     }
 
