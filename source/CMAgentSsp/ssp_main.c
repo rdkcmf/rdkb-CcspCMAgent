@@ -49,6 +49,7 @@
 #include "pcdapi.h"
 #endif
 //#include <docsis_ext_interface.h>
+#include "safec_lib_common.h"
 
 #define DEBUG_INI_NAME "/etc/debug.ini"
 
@@ -368,7 +369,6 @@ static int is_core_dump_opened(void)
     char line[1024];
     char *start, *tok, *sp;
 #define TITLE   "Max core file size"
-
     snprintf(path, sizeof(path), "/proc/%d/limits", getpid());
     if ((fp = fopen(path, "rb")) == NULL)
         return 0;
@@ -382,11 +382,7 @@ static int is_core_dump_opened(void)
             break;
 
         fclose(fp);
-
-        if (strcmp(tok, "0") == 0)
-            return 0;
-        else
-            return 1;
+        return (tok[0] == '0' && tok[1] == '\0') ? 0 : 1;
     }
 
     fclose(fp);
@@ -406,6 +402,8 @@ int main(int argc, char* argv[])
     DmErr_t                         err;
     char                            *subSys            = NULL;
     extern ANSC_HANDLE bus_handle;
+    errno_t        rc = -1;
+    int ind = -1;
 	
 	#ifdef FEATURE_SUPPORT_RDKLOG
 	rdk_logger_init(DEBUG_INI_NAME);
@@ -437,15 +435,35 @@ int main(int argc, char* argv[])
 
     for (idx = 1; idx < argc; idx++)
     {
-        if ( (strcmp(argv[idx], "-subsys") == 0) )
+         rc = strcmp_s("-subsys",strlen("-subsys"),argv[idx],&ind);
+         ERR_CHK(rc);
+         if((!ind) && (rc == EOK))
         {
-            AnscCopyString(g_Subsystem, argv[idx+1]);
-            CcspTraceWarning(("\nSubsystem is %s\n", g_Subsystem));
+           if ((idx+1) < argc)
+           {
+              rc = strcpy_s(g_Subsystem,sizeof(g_Subsystem), argv[idx+1]);
+              if(rc != EOK)
+             {
+               ERR_CHK(rc);
+               return ANSC_STATUS_FAILURE;
+             }
+           }
+           else
+           {
+               CcspTraceError(("parameter after -subsys is missing"));
+           }
+             
         }
-        else if ( strcmp(argv[idx], "-c" ) == 0 )
+        else
         {
+           rc = strcmp_s("-c", strlen("-c"),argv[idx],&ind );
+           ERR_CHK(rc);
+           if((!ind) && (rc == EOK))
+          {
             bRunAsDaemon = FALSE;
-        }
+          }
+       }
+
     }
 
 #if  defined(_ANSC_WINDOWSNT)

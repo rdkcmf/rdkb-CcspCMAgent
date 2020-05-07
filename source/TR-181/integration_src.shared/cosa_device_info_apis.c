@@ -71,10 +71,13 @@
 #include "cosa_device_info_apis.h"
 #include "cm_hal.h"
 #include "cosa_device_info_internal.h"
+#include "safec_lib_common.h"
 
 
 #define CM_HTTPURL_LEN 512
-
+#define VALID_fW_LEN 128
+#define MAX_DL_STATUS 128 
+#define MAX_PROTOCOL  16
 ANSC_STATUS
 CosaDmlDIInit
     (
@@ -164,36 +167,96 @@ ANSC_STATUS CosaDmlDIGetFWVersion(ANSC_HANDLE hContext)
 ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status)
 {
 	int dl_status = 0;
+        errno_t        rc = -1;
 	
 	dl_status = cm_hal_Get_HTTP_Download_Status();
 	CcspTraceInfo((" Download status is %d \n", dl_status));
 	
 	if(dl_status == 0)
-		AnscCopyString(DL_Status, "Not Started");
+        {
+             rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Not Started");
+             if(rc != EOK)
+             {
+                 ERR_CHK(rc);
+                 return ANSC_STATUS_FAILURE;
+             }
+        }
 	else if(dl_status > 0 && dl_status <= 100)
-		AnscCopyString(DL_Status, "In Progress");
-	else if(dl_status == 200)
-		AnscCopyString(DL_Status, "Completed");
-	else if(dl_status >= 400)
-		AnscCopyString(DL_Status, "Failed");
-
+        {
+              rc = strcpy_s(DL_Status,MAX_DL_STATUS, "In Progress");
+              if(rc != EOK)
+               {
+                   ERR_CHK(rc);
+                   return ANSC_STATUS_FAILURE;
+                }
+        }
+         else if(dl_status == 200)
+         {
+               rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Completed");
+               if(rc != EOK)
+               {
+                      ERR_CHK(rc);
+                      return ANSC_STATUS_FAILURE;
+                }
+         }
+	  else if(dl_status >= 400)
+          {
+                rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Failed");
+                if(rc != EOK)
+                 {
+                       ERR_CHK(rc);
+                       return ANSC_STATUS_FAILURE;
+                  }
+           }
 	return ANSC_STATUS_SUCCESS;
 }
 
 ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol)
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
+        errno_t rc = -1;
+        int ind = -1;
 
 	if(strlen(pMyObject->DownloadURL) == 0)
-		AnscCopyString(Protocol, "");
-	else if(AnscEqualString2(pMyObject->DownloadURL,"https", 5, FALSE))
-		AnscCopyString(Protocol, "HTTPS");
-	else if(AnscEqualString2(pMyObject->DownloadURL,"http", 4, FALSE))
-		AnscCopyString(Protocol, "HTTP");
-	else
-		AnscCopyString(Protocol, "INVALID");
+        {
+          rc = strcpy_s(Protocol,MAX_PROTOCOL, "");
+          if(rc != EOK)
+          {
+                ERR_CHK(rc);
+                return ANSC_STATUS_FAILURE;
+          }
+ 
+        }
+        else if(AnscEqualString2(pMyObject->DownloadURL,"https", 5, FALSE))
+        {
+		rc = strcpy_s(Protocol,MAX_PROTOCOL, "HTTPS");
+                if(rc != EOK)
+               {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+               }
+        }
+        else if(AnscEqualString2(pMyObject->DownloadURL,"http", 4, FALSE))
+        {
+		   rc =  strcpy_s(Protocol,MAX_PROTOCOL, "HTTP");
+                   if(rc != EOK)
+                   {
+                     ERR_CHK(rc);
+                     return ANSC_STATUS_FAILURE;
+                    }
+         }
 
-	CcspTraceInfo((" Download Protocol is %s \n", Protocol));
+         else
+         {
+  
+                 rc = strcpy_s(Protocol,MAX_PROTOCOL, "INVALID");
+                 if(rc != EOK)
+                 {
+                         ERR_CHK(rc);
+                         return ANSC_STATUS_FAILURE;
+                 }
+         }
+         CcspTraceInfo((" Download Protocol is %s \n", Protocol));
 	
 	return ANSC_STATUS_SUCCESS;	
 }
@@ -220,23 +283,56 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
 	int dl_status = 0;
 	int ret = RETURN_ERR, res = 0;
-	char valid_fw[128]={0};
+	char valid_fw[VALID_fW_LEN]={0};
         char pHttpUrl[CM_HTTPURL_LEN] = {'0'};
+        errno_t rc = -1;
+        int ind = -1;
 	
 	if(strlen(pMyObject->Firmware_To_Download) && strlen(pMyObject->DownloadURL))
 	{
 		convert_to_validFW(pMyObject->Firmware_To_Download,valid_fw);
-		if(AnscEqualString(valid_fw, pMyObject->Current_Firmware, FALSE))
+		rc = strcasecmp_s(valid_fw,sizeof(valid_fw), pMyObject->Current_Firmware,&ind);
+                ERR_CHK(rc);
+                if((!ind) && (rc == EOK))
 		{
 			CcspTraceError((" Current FW is same, Ignoring request \n"));
 			return ANSC_STATUS_FAILURE;		
 		}
 
-                strcpy(pHttpUrl, "'");
-                strncat(pHttpUrl, pMyObject->DownloadURL, CM_HTTPURL_LEN - 1);
-                strcat(pHttpUrl, "/");
-                strncat(pHttpUrl, pMyObject->Firmware_To_Download, CM_HTTPURL_LEN - 1);
-                strcat(pHttpUrl, "'");
+                rc =  strcpy_s(pHttpUrl,sizeof(pHttpUrl), "'");
+                if(rc != EOK)
+                {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+                 }
+                rc =  strncat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->DownloadURL, CM_HTTPURL_LEN - 1);
+                if(rc != EOK)
+                {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+                 }
+
+                rc  =  strcat_s(pHttpUrl,sizeof(pHttpUrl), "/");
+                if(rc != EOK)
+                {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+                 }
+
+                rc =  strncat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->Firmware_To_Download, CM_HTTPURL_LEN - 1);
+                 if(rc != EOK)
+                {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+                 }
+
+               rc =   strcat_s(pHttpUrl,sizeof(pHttpUrl), "'");
+               if(rc != EOK)
+               {
+                  ERR_CHK(rc);
+                  return ANSC_STATUS_FAILURE;
+               }
+
 
 		ret = RETURN_ERR;
 		ret = cm_hal_Set_HTTP_Download_Url(pHttpUrl , pMyObject->Firmware_To_Download);
@@ -306,8 +402,14 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 ANSC_STATUS CosaDmlDISetURL(ANSC_HANDLE hContext, char *URL)
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
+        errno_t rc = -1;
 
-	AnscCopyString(pMyObject->DownloadURL, URL);
+ 	rc =  strcpy_s(pMyObject->DownloadURL,sizeof(pMyObject->DownloadURL), URL);
+        if(rc != EOK)
+        {
+            ERR_CHK(rc);
+            return ANSC_STATUS_FAILURE;
+         }
 	CcspTraceInfo((" URL is %s \n", pMyObject->DownloadURL));
 	return ANSC_STATUS_SUCCESS;
 }
@@ -315,8 +417,15 @@ ANSC_STATUS CosaDmlDISetURL(ANSC_HANDLE hContext, char *URL)
 ANSC_STATUS CosaDmlDISetImage(ANSC_HANDLE hContext, char *Image)
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
+        errno_t rc = -1;
 
-	AnscCopyString(pMyObject->Firmware_To_Download, Image);
+        rc = strcpy_s(pMyObject->Firmware_To_Download,sizeof(pMyObject->Firmware_To_Download), Image);
+        if(rc != EOK)
+        {
+            ERR_CHK(rc);
+            return ANSC_STATUS_FAILURE;
+         }
+
 	CcspTraceInfo((" FW DL is %s \n", pMyObject->Firmware_To_Download));
 	return ANSC_STATUS_SUCCESS;	
 }
@@ -415,6 +524,7 @@ convert_to_validFW(char *fw,char *valid_fw)
 	
 	char *buff = NULL;
 	int buff_len = 0;
+        errno_t rc =-1;
 
 	if(buff = strstr(fw,"_signed"));
 	else if(buff = strstr(fw,"-signed"));
@@ -423,7 +533,8 @@ convert_to_validFW(char *fw,char *valid_fw)
 	if(buff)
 		buff_len = strlen(buff);
 
-	strncpy(valid_fw,fw,strlen(fw)-buff_len);
+       rc = strncpy_s(valid_fw,VALID_fW_LEN,fw,strlen(fw)-buff_len);
+       ERR_CHK(rc);
 
 	CcspTraceInfo((" Converted image name = %s \n", valid_fw));
 }

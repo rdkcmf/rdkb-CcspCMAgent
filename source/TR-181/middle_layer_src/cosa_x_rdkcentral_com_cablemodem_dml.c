@@ -71,6 +71,7 @@
 #include "cosa_x_rdkcentral_com_cablemodem_apis.h"
 #include "cosa_x_rdkcentral_com_cablemodem_dml.h"
 #include "cosa_x_rdkcentral_com_cablemodem_internal.h"
+#include "safec_lib_common.h"
 
 /***********************************************************************
  IMPORTANT NOTE:
@@ -329,11 +330,17 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
 {
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN	   pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)hInsContext;
+        errno_t rc =-1;
+        int ind =-1;
 
     /* check the parameter name and return the corresponding value */
     AnscTraceWarning(("%s %d Entry '%s'\n",__FUNCTION__,__LINE__, ParamName));
 
-    if( AnscEqualString(ParamName, "ChannelID", TRUE) )
+    rc = strcmp_s("ChannelID",strlen("ChannelID"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
+    
     {
         /* collect value */
         *puLong = pDsOfdmChannel->ChannelId;
@@ -341,7 +348,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "ChanIndicator", TRUE) )
+    rc =  strcmp_s("ChanIndicator",strlen("ChanIndicator"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->ChanIndicator;
@@ -349,7 +358,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "SubcarrierZeroFreq", TRUE) )
+    rc= strcmp_s("SubcarrierZeroFreq",strlen( "SubcarrierZeroFreq"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->SubcarrierZeroFreq;
@@ -357,7 +368,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "FirstActiveSubcarrierNum", TRUE) )
+    rc = strcmp_s("FirstActiveSubcarrierNum",strlen("FirstActiveSubcarrierNum"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->FirstActiveSubcarrierNum;
@@ -365,7 +378,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "LastActiveSubcarrierNum", TRUE) )
+    rc =  strcmp_s("LastActiveSubcarrierNum",strlen("LastActiveSubcarrierNum"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->LastActiveSubcarrierNum;
@@ -373,7 +388,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NumActiveSubcarriers", TRUE) )
+    rc  = strcmp_s("NumActiveSubcarriers", strlen("NumActiveSubcarriers"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->NumActiveSubcarriers;
@@ -381,7 +398,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "SubcarrierSpacing", TRUE) )
+    rc = strcmp_s("SubcarrierSpacing",strlen("SubcarrierSpacing"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->SubcarrierSpacing;
@@ -389,7 +408,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "CyclicPrefix", TRUE) )
+    rc = strcmp_s("CyclicPrefix",strlen("CyclicPrefix"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->CyclicPrefix;
@@ -397,7 +418,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "RollOffPeriod", TRUE) )
+    rc = strcmp_s("RollOffPeriod", strlen("RollOffPeriod"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->RollOffPeriod;
@@ -405,7 +428,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "PlcFreq", TRUE) )
+    rc = strcmp_s("PlcFreq", strlen("PlcFreq"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->PlcFreq;
@@ -413,7 +438,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NumPilots", TRUE) )
+    rc =  strcmp_s( "NumPilots",strlen("NumPilots"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->NumPilots;
@@ -421,7 +448,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "TimeInterleaverDepth", TRUE) )
+    rc = strcmp_s("TimeInterleaverDepth", strlen("TimeInterleaverDepth"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pDsOfdmChannel->TimeInterleaverDepth;
@@ -429,7 +458,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "PlcTotalCodewords", TRUE) )
+    rc = strcmp_s("PlcTotalCodewords", strlen("PlcTotalCodewords"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = ( ULONG )pDsOfdmChannel->PlcTotalCodewords;
@@ -437,7 +468,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "PlcUnreliableCodewords", TRUE) )
+    rc =  strcmp_s("PlcUnreliableCodewords",strlen("PlcUnreliableCodewords"), ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = ( ULONG )pDsOfdmChannel->PlcUnreliableCodewords;
@@ -445,7 +478,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NcpTotalFields", TRUE) )
+    rc =  strcmp_s("NcpTotalFields",strlen("NcpTotalFields"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = ( ULONG )pDsOfdmChannel->NcpTotalFields;
@@ -453,7 +488,9 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NcpFieldCrcFailures", TRUE) )
+    rc =  strcmp_s("NcpFieldCrcFailures", strlen("NcpFieldCrcFailures"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = ( ULONG )pDsOfdmChannel->NcpFieldCrcFailures;
@@ -688,9 +725,12 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamBoolValue
 {
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN	   pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)hInsContext;
-
+        errno_t rc = -1;
+        int ind = -1;
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "PreEqEnabled", TRUE) )
+    rc =  strcmp_s( "PreEqEnabled",strlen("PreEqEnabled"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
 	    *pBool = pUsOfdmChannel->PreEqEnabled;
         return TRUE;
@@ -743,7 +783,12 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
 	PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN	   pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)hInsContext;
 
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "ChannelId", TRUE) )
+    errno_t rc = -1;
+    int ind =-1;
+    
+    rc =  strcmp_s("ChannelId",strlen("ChannelId"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->ChannelId;
@@ -751,7 +796,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "ConfigChangeCt", TRUE) )
+    rc =  strcmp_s("ConfigChangeCt", strlen("ConfigChangeCt"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->ConfigChangeCt;
@@ -759,7 +806,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "SubcarrierZeroFreq", TRUE) )
+    rc = strcmp_s("SubcarrierZeroFreq",strlen("SubcarrierZeroFreq"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->SubcarrierZeroFreq;
@@ -767,7 +816,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "FirstActiveSubcarrierNum", TRUE) )
+    rc =  strcmp_s("FirstActiveSubcarrierNum", strlen("FirstActiveSubcarrierNum"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->FirstActiveSubcarrierNum;
@@ -775,7 +826,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "LastActiveSubcarrierNum", TRUE) )
+    rc = strcmp_s("LastActiveSubcarrierNum", strlen("LastActiveSubcarrierNum"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->LastActiveSubcarrierNum;
@@ -783,7 +836,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NumActiveSubcarriers", TRUE) )
+    rc = strcmp_s("NumActiveSubcarriers", strlen("NumActiveSubcarriers"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->NumActiveSubcarriers;
@@ -791,7 +846,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "SubcarrierSpacing", TRUE) )
+    rc = strcmp_s("SubcarrierSpacing",strlen("SubcarrierSpacing"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->SubcarrierSpacing;
@@ -799,7 +856,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "CyclicPrefix", TRUE) )
+    rc = strcmp_s( "CyclicPrefix",strlen("CyclicPrefix"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->CyclicPrefix;
@@ -807,7 +866,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "RollOffPeriod", TRUE) )
+    rc =  strcmp_s( "RollOffPeriod",strlen("RollOffPeriod"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->RollOffPeriod;
@@ -815,7 +876,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "NumSymbolsPerFrame", TRUE) )
+    rc = strcmp_s("NumSymbolsPerFrame",strlen("NumSymbolsPerFrame"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->NumSymbolsPerFrame;
@@ -823,7 +886,9 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "TxPower", TRUE) )
+    rc =  strcmp_s("TxPower", strlen("TxPower"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pUsOfdmChannel->TxPower;
@@ -1058,9 +1123,13 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamBoolValue
 {
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject 			= (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US	   pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)hInsContext;
+        errno_t rc =-1;
+        int ind = -1;
 
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "IsMuted", TRUE) )
+    rc = strcmp_s("IsMuted",strlen("IsMuted"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
 	    *pBool = pCMStatusofUsChannel->IsMuted;
         return TRUE;
@@ -1111,9 +1180,13 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
 {
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject 			= (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US    pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)hInsContext;
+        errno_t rc = -1;
+        int ind = -1;
 
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "ChannelId", TRUE) )
+    rc =  strcmp_s( "ChannelId",strlen("ChannelId"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->ChannelId;
@@ -1121,7 +1194,10 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "T3Timeouts", TRUE) )
+    rc =  strcmp_s("T3Timeouts",strlen("T3Timeouts"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->T3Timeouts;
@@ -1129,7 +1205,10 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "T4Timeouts", TRUE) )
+    rc = strcmp_s("T4Timeouts", strlen("T4Timeouts"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->T4Timeouts;
@@ -1137,7 +1216,10 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "RangingAborteds", TRUE) )
+    rc = strcmp_s("RangingAborteds",strlen("RangingAborteds"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->RangingAborteds;
@@ -1145,7 +1227,10 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "T3Exceededs", TRUE) )
+    rc =  strcmp_s("T3Exceededs", strlen("T3Exceededs"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->T3Exceededs;
@@ -1153,7 +1238,9 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "RangingStatus", TRUE) )
+    rc =  strcmp_s("RangingStatus",strlen("RangingStatus"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         /* collect value */
         *puLong = pCMStatusofUsChannel->RangingStatus;

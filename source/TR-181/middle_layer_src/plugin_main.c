@@ -58,6 +58,7 @@
 #include "cosa_plugin_api.h"
 #include "plugin_main.h"
 #include "plugin_main_apis.h"
+#include "safec_lib_common.h"
 
 
 PCOSA_BACKEND_MANAGER_OBJECT g_pCosaBEManager;
@@ -332,13 +333,19 @@ COSA_Init
     
     /* Get Subsystem prefix */
     g_GetSubsystemPrefix = (COSAGetSubsystemPrefixProc)pPlugInfo->AcquireFunction("COSAGetSubsystemPrefix");
+    errno_t rc = -1;
     if ( g_GetSubsystemPrefix != NULL )
     {
         char*   tmpSubsystemPrefix;
         
         if ( tmpSubsystemPrefix = g_GetSubsystemPrefix(g_pDslhDmlAgent) )
         {
-            AnscCopyString(g_SubSysPrefix_Irep, tmpSubsystemPrefix);
+            rc = strcpy_s(g_SubSysPrefix_Irep,sizeof(g_SubSysPrefix_Irep), tmpSubsystemPrefix);
+            if(rc != EOK)
+            {
+	       ERR_CHK(rc);
+	       return -1;
+             }
         }
 
         /* retrieve the subsystem prefix */
@@ -442,7 +449,11 @@ COSA_IsObjSupported
 
 #if (defined(_COSA_DRG_CNS_))
 
-    if(AnscEqualString(pObjName, "Device.DNS.Client.", TRUE))
+    errno_t rc = -1;
+    int ind =-1;
+    rc = strcmp_s( "Device.DNS.Client.",strlen("Device.DNS.Client."),pObjName ,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
     {
         return FALSE;
     }        

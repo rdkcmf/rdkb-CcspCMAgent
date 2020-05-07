@@ -71,6 +71,7 @@
 #include "cosa_device_info_apis.h"
 #include "cosa_device_info_dml.h"
 #include "cosa_device_info_internal.h"
+#include "safec_lib_common.h"
 
 /***********************************************************************
 
@@ -123,9 +124,12 @@ DeviceInfo_GetParamBoolValue
     )
 {
     PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
-
+    errno_t        rc = -1;
+    int ind = -1;
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadNow", TRUE) )
+     rc = strcmp_s( "X_RDKCENTRAL-COM_FirmwareDownloadNow",strlen("X_RDKCENTRAL-COM_FirmwareDownloadNow"),ParamName,&ind);
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))   
     {
 	 if(pMyObject->Download_Control_Flag)
 	 {
@@ -135,7 +139,9 @@ DeviceInfo_GetParamBoolValue
     }
 
 #if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PRODUCT_REQ_)
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_CableRfSignalStatus", TRUE) )
+     rc =  strcmp_s( "X_RDKCENTRAL-COM_CableRfSignalStatus", strlen("X_RDKCENTRAL-COM_CableRfSignalStatus"),ParamName,&ind);
+     ERR_CHK(rc);
+     if((!ind) && (rc == EOK))
     {
         BOOLEAN rfSignalStatus = TRUE; // default is TRUE.
         CosaDmlDIGetRfSignalStatus(&rfSignalStatus);
@@ -207,9 +213,12 @@ DeviceInfo_GetParamStringValue
     PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
     char DL_Status[128]={0};
     char Protocol[16]={0};
-    
+    errno_t rc = -1;
+    int ind = -1;
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadStatus", TRUE) )
+    rc = strcmp_s("X_RDKCENTRAL-COM_FirmwareDownloadStatus",strlen("X_RDKCENTRAL-COM_FirmwareDownloadStatus"),ParamName,&ind);
+    ERR_CHK(rc);
+    if( (rc == EOK) && (!ind))
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -221,12 +230,20 @@ DeviceInfo_GetParamStringValue
 	            return 1;
 	        }
 	        
-	        AnscCopyString(pValue, DL_Status);
+	        rc =  strcpy_s(pValue,*pUlSize, DL_Status);
+                if(rc != EOK)
+                {
+	          ERR_CHK(rc);
+	          return -1;
+                }
     	 }
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadProtocol", TRUE) )
+    rc = strcmp_s("X_RDKCENTRAL-COM_FirmwareDownloadProtocol",strlen("X_RDKCENTRAL-COM_FirmwareDownloadProtocol"),ParamName,&ind);
+    ERR_CHK(rc);
+    if( (rc == EOK) && (!ind))
+
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -238,12 +255,20 @@ DeviceInfo_GetParamStringValue
 	            return 1;
 	        }
 	        
-	        AnscCopyString(pValue, Protocol);
+	        rc = strcpy_s(pValue,*pUlSize, Protocol);
+                if(rc != EOK)
+                {
+                    ERR_CHK(rc);
+                    return -1;
+                 }
     	 }
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadURL", TRUE) )
+    rc = strcmp_s("X_RDKCENTRAL-COM_FirmwareDownloadURL",strlen("X_RDKCENTRAL-COM_FirmwareDownloadURL"),ParamName,&ind);
+    ERR_CHK(rc);
+    if( (rc == EOK) && (!ind))
+
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -254,12 +279,21 @@ DeviceInfo_GetParamStringValue
 	            return 1;
 	        }
 	        
-	        AnscCopyString(pValue, pMyObject->DownloadURL);
+                rc = strcpy_s(pValue,*pUlSize, pMyObject->DownloadURL);
+                if(rc != EOK)
+                {
+                    ERR_CHK(rc);
+                    return -1;
+                 }
+
     	 }
         return 0;
     }
 
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareToDownload", TRUE) )
+    rc = strcmp_s("X_RDKCENTRAL-COM_FirmwareToDownload",strlen("X_RDKCENTRAL-COM_FirmwareToDownload"),ParamName,&ind);
+    ERR_CHK(rc);
+    if( (rc == EOK) && (!ind))
+
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -270,7 +304,13 @@ DeviceInfo_GetParamStringValue
 	            return 1;
 	        }
 	        
-	        AnscCopyString(pValue, pMyObject->Firmware_To_Download);
+                rc = strcpy_s(pValue,*pUlSize,  pMyObject->Firmware_To_Download);
+                if(rc != EOK)
+                {
+                    ERR_CHK(rc);
+                    return -1;
+                 }
+
     	 }
         return 0;
     }
@@ -317,9 +357,13 @@ DeviceInfo_SetParamBoolValue
     )
 {
     PCOSA_DATAMODEL_DEVICEINFO      pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
-
+    errno_t        rc = -1;
+    int ind = -1;
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadNow", TRUE))
+    rc = strcmp_s( "X_RDKCENTRAL-COM_FirmwareDownloadNow",strlen("X_RDKCENTRAL-COM_FirmwareDownloadNow"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -378,9 +422,12 @@ DeviceInfo_SetParamStringValue
     )
 {
     PCOSA_DATAMODEL_DEVICEINFO      pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
-
+    errno_t        rc = -1;
+    int ind = -1;
     /* check the parameter name and set the corresponding value */
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareDownloadURL", TRUE))
+    rc = strcmp_s( "X_RDKCENTRAL-COM_FirmwareDownloadURL",strlen("X_RDKCENTRAL-COM_FirmwareDownloadURL"),ParamName,&ind);
+    ERR_CHK(rc);
+     if((!ind) && (rc == EOK))
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
@@ -393,7 +440,10 @@ DeviceInfo_SetParamStringValue
         return TRUE;
     }
 
-    if( AnscEqualString(ParamName, "X_RDKCENTRAL-COM_FirmwareToDownload", TRUE))
+    rc = strcmp_s( "X_RDKCENTRAL-COM_FirmwareToDownload",strlen("X_RDKCENTRAL-COM_FirmwareToDownload"),ParamName,&ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
