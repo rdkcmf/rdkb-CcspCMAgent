@@ -217,7 +217,15 @@ CosaDmlCMInit
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)phContext;
 	if(pMyObject) 
     	CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
-    cm_hal_InitDB();
+    /*Coverity Fix CID:55875 CHECKED_RETURN */
+    if( cm_hal_InitDB() != RETURN_OK )
+    {
+            AnscTraceWarning(("cm_hal_InitDB  is Not success   %s, %d\n", __FUNCTION__, __LINE__));
+    }
+    else
+    {
+          AnscTraceWarning(("cm_hal_InitDB  is called successfully   %s, %d\n", __FUNCTION__, __LINE__));
+    }
     pthread_t docsisinfo;
     pthread_create(&docsisinfo, NULL, &PollDocsisInformations, NULL); 
     return ANSC_STATUS_SUCCESS;
@@ -472,7 +480,16 @@ CosaDmlCmGetDownstreamChannel
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    docsis_GetNumOfActiveRxChannels(pulCount);
+    /* Coverity Fix CID:79243 CHECKED_RETURN */
+    if( docsis_GetNumOfActiveRxChannels(pulCount) != RETURN_OK )
+    {
+       AnscTraceWarning(("docsis_GetNumOfActiveRxChannels is not success:%s %d\n",__FUNCTION__, __LINE__));
+    }
+    else
+    {
+       AnscTraceWarning(("docsis_GetNumOfActiveRxChannels  is called successfully   %s, %d\n", __FUNCTION__, __LINE__));
+    }
+      
     if(*pulCount) {
 
         *ppConf = (PCOSA_CM_DS_CHANNEL)AnscAllocateMemory( sizeof(COSA_CM_DS_CHANNEL) * (*pulCount) );
@@ -499,7 +516,15 @@ CosaDmlCmGetUpstreamChannel
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    docsis_GetNumOfActiveTxChannels(pulCount);
+   /*Coverity Fix CID: 78775 CHECKED_RETURN */
+    if( docsis_GetNumOfActiveTxChannels(pulCount) != RETURN_OK)
+    { 
+      AnscTraceWarning(("docsis_GetNumOfActiveTxChannels  is Not success: %s, %d\n", __FUNCTION__, __LINE__));
+    } 
+   else
+   { 
+     AnscTraceWarning(("docsis_GetNumOfActiveTxChannels  is called  successfully: %s, %d\n", __FUNCTION__, __LINE__));
+   } 
 
     if(*pulCount) {
 
@@ -570,8 +595,15 @@ CosaDmlCmGetCMErrorCodewords
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
-    docsis_GetNumOfActiveRxChannels(pulCount);
-
+    /*Coverity Fix CID:55875 CHECKED_RETURN */
+    if( docsis_GetNumOfActiveRxChannels(pulCount) != RETURN_OK)
+    {
+        AnscTraceWarning(("docsis_GetNumOfActiveRxChannels  is Not success   %s, %d\n", __FUNCTION__, __LINE__));
+    }
+    else
+    {
+       AnscTraceWarning(("docsis_GetNumOfActiveRxChannels  is called successfully : %s, %d\n", __FUNCTION__, __LINE__));
+    }
     if(*pulCount) {
 
         *ppConf = (PCOSA_DML_CMERRORCODEWORDS_FULL)AnscAllocateMemory( sizeof(COSA_DML_CMERRORCODEWORDS_FULL) * (*pulCount) );
@@ -785,11 +817,13 @@ CosaDmlCmGetCPEList
         if( (*ppCPEList = (PCOSA_DML_CPE_LIST)AnscAllocateMemory(sizeof(COSA_DML_CPE_LIST)*(*pulInstanceNumber))) == NULL )
         {
             AnscTraceWarning(("AllocateMemory error %s, %d\n", __FUNCTION__, __LINE__));
+            /*Coverity Fix CID:79510 RESOURCE_LEAK */
+            free(pInfo);
             return ANSC_STATUS_FAILURE;  
         }
         AnscCopyMemory(*ppCPEList, pInfo, sizeof(COSA_DML_CPE_LIST)*(*pulInstanceNumber));
         free(pInfo);
     }
 
-    return ANSC_STATUS_FAILURE;
+    return ANSC_STATUS_SUCCESS;
 }
