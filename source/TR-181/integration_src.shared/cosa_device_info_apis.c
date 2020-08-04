@@ -261,7 +261,7 @@ ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol)
 	return ANSC_STATUS_SUCCESS;	
 }
 
-#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PRODUCT_REQ_)
+#if defined (_XB6_PRODUCT_REQ_)
 ANSC_STATUS CosaDmlDIGetRfSignalStatus(BOOLEAN *pRfSignalStatus) {
 	int ret = RETURN_ERR;
 	

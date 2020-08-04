@@ -138,7 +138,7 @@ DeviceInfo_GetParamBoolValue
         return TRUE;
     }
 
-#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PRODUCT_REQ_)
+#if defined (_XB6_PRODUCT_REQ_)
      rc =  strcmp_s( "X_RDKCENTRAL-COM_CableRfSignalStatus", strlen("X_RDKCENTRAL-COM_CableRfSignalStatus"),ParamName,&ind);
      ERR_CHK(rc);
      if((!ind) && (rc == EOK))
