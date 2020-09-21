@@ -399,18 +399,50 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
 	return ANSC_STATUS_SUCCESS;
 }
 
-ANSC_STATUS CosaDmlDISetURL(ANSC_HANDLE hContext, char *URL)
+BOOL IsFileUpdateNeeded( ANSC_HANDLE hContext ) 
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
-        errno_t rc = -1;
+	if(strlen(pMyObject->Firmware_To_Download) && strlen(pMyObject->DownloadURL))
+	{
+		CcspTraceInfo((" Factory reset image :%s and url: %s \n", pMyObject->Firmware_To_Download, pMyObject->DownloadURL));
+		return TRUE;
+	}
+	return FALSE;
+}
 
- 	rc =  strcpy_s(pMyObject->DownloadURL,sizeof(pMyObject->DownloadURL), URL);
-        if(rc != EOK)
-        {
-            ERR_CHK(rc);
-            return ANSC_STATUS_FAILURE;
-         }
+void WriteFactoryResetParams( ANSC_HANDLE hContext )
+{
+	CcspTraceInfo((" In %s \n", __FUNCTION__));
+	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
+	FILE *fp;
+	if((fp = fopen("/tmp/FactoryReset.txt", "w")) == NULL)
+	{
+		CcspTraceError(( "FactoryReset.txt file open failed.\n"));
+		return;
+	}
+	fprintf(fp, "Url=%s\n", pMyObject->DownloadURL);
+	fprintf(fp, "Image=%s\n", pMyObject->Firmware_To_Download);
+	fclose(fp);
+
+}
+
+ANSC_STATUS CosaDmlDISetURL(ANSC_HANDLE hContext, char *URL)
+{
+	CcspTraceInfo((" In %s \n", __FUNCTION__));
+	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
+	errno_t rc = -1;
+
+	rc =  strcpy_s(pMyObject->DownloadURL,sizeof(pMyObject->DownloadURL), URL);
+	if(rc != EOK)
+	{
+		ERR_CHK(rc);
+		return ANSC_STATUS_FAILURE;
+	}
 	CcspTraceInfo((" URL is %s \n", pMyObject->DownloadURL));
+	if( IsFileUpdateNeeded( (ANSC_HANDLE)pMyObject))
+	{
+		WriteFactoryResetParams( (ANSC_HANDLE)pMyObject);
+	}
 	return ANSC_STATUS_SUCCESS;
 }
 
@@ -427,6 +459,10 @@ ANSC_STATUS CosaDmlDISetImage(ANSC_HANDLE hContext, char *Image)
          }
 
 	CcspTraceInfo((" FW DL is %s \n", pMyObject->Firmware_To_Download));
+	if( IsFileUpdateNeeded( (ANSC_HANDLE)pMyObject))
+	{
+		WriteFactoryResetParams((ANSC_HANDLE)pMyObject);
+	}
 	return ANSC_STATUS_SUCCESS;	
 }
 
