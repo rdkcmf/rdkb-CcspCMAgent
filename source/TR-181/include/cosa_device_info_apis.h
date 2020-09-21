@@ -185,5 +185,9 @@ void FWDL_ThreadFunc();
  */
 convert_to_validFW(char *fw,char *valid_fw);
 
+BOOL IsFileUpdateNeeded(ANSC_HANDLE hContext );
+void WriteFactoryResetParams(ANSC_HANDLE hContext );
+
+
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif
