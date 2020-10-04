@@ -147,6 +147,7 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if ( !pMyObject->DsOfdmChannelUpdateTime ) 
@@ -196,8 +197,8 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
-    ANSC_STATUS                     		   ret       = ANSC_STATUS_SUCCESS;
 
 	//Get DS OFDM channel information by HAL API's
 	CosaDmlRDKCentralCmGetDownstreamChannel( NULL,
@@ -235,6 +236,7 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
     
     return pMyObject->DsOfdmChannelTotalNumbers;
@@ -278,6 +280,7 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if (nIndex < pMyObject->DsOfdmChannelTotalNumbers)
@@ -328,7 +331,6 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamUlongValue
         ULONG*                      puLong
     )
 {
-    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN	   pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)hInsContext;
         errno_t rc =-1;
         int ind =-1;
@@ -544,6 +546,7 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if ( !pMyObject->UsOfdmChannelUpdateTime ) 
@@ -593,6 +596,7 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
 	//Get US OFDM channel information by HAL API's
@@ -630,6 +634,7 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
     
     return pMyObject->UsOfdmChannelTotalNumbers;
@@ -673,6 +678,7 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if (nIndex < pMyObject->UsOfdmChannelTotalNumbers)
@@ -723,7 +729,6 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamBoolValue
         BOOL*                       pBool
     )
 {
-    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN	   pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)hInsContext;
         errno_t rc = -1;
         int ind = -1;
@@ -779,7 +784,6 @@ X_RDKCENTRAL_COM_CableModem_UsOfdmaChan_GetParamUlongValue
         ULONG*                      puLong
     )
 {
-    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN	   pUsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN)hInsContext;
 
     /* check the parameter name and return the corresponding value */
@@ -942,6 +946,7 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if ( !pMyObject->CMStatusofUsChannelUpdateTime ) 
@@ -991,6 +996,7 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
 	//Get Status of US OFDM channel information by HAL API's
@@ -1028,6 +1034,7 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
     
     return pMyObject->CMStatusofUsChannelTotalNumbers;
@@ -1071,6 +1078,7 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 
     if (nIndex < pMyObject->CMStatusofUsChannelTotalNumbers)
@@ -1121,7 +1129,6 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamBoolValue
         BOOL*                       pBool
     )
 {
-    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject 			= (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US	   pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)hInsContext;
         errno_t rc =-1;
         int ind = -1;
@@ -1178,7 +1185,6 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         ULONG*                      puLong
     )
 {
-    PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM      pMyObject 			= (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)g_pCosaBEManager->hRDKCM;
 	PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US    pCMStatusofUsChannel = (PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US)hInsContext;
         errno_t rc = -1;
         int ind = -1;

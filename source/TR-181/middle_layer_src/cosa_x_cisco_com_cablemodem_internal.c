@@ -101,7 +101,6 @@ CosaCableModemCreate
         VOID
     )
 {
-    ANSC_STATUS                  returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_DATAMODEL_CABLEMODEM   pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)NULL;
 
     /*

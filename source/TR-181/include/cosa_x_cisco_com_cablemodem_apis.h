@@ -662,6 +662,24 @@ CosaDmlCMGetResetCount
 		CM_RESET_TYPE         		type,
         ULONG                       *pValue
     );
-	
+
+int Ccsp_cm_clnt_lock(void);
+int Ccsp_cm_clnt_unlock(void);
+
+ANSC_STATUS
+CosaDmlCmGetCPEList
+    (
+        ANSC_HANDLE                 hContext,
+        PULONG                      pulInstanceNumber,
+        PCOSA_DML_CPE_LIST          *ppCPEList
+    );
+
+ANSC_STATUS
+CosaDmlCmGetCMCertStatus
+    (
+        ANSC_HANDLE                 hContext,
+        BOOL*                       pBool
+    );
+
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

@@ -101,7 +101,6 @@ CosaDeviceInfoCreate
         VOID
     )
 {
-    ANSC_STATUS                  returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_DATAMODEL_DEVICEINFO   pMyObject    = (PCOSA_DATAMODEL_DEVICEINFO)NULL;
 
     /*

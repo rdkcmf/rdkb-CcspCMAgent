@@ -127,7 +127,7 @@ extern COSARegisterCallBackAfterInitDmlProc  g_RegisterCallBackAfterInitDml;
     COSA_BASE_CONTENT                                                                       \
     ANSC_HANDLE                  hCM;                                                       \
     ANSC_HANDLE                  hDI;                                                       \
-    ANSC_HANDLE                  hRDKCM;                                                       \    
+    ANSC_HANDLE                  hRDKCM;                                                       \
     PCOSA_PLUGIN_INFO            hCosaPluginInfo;											
 
 typedef  struct

@@ -164,10 +164,12 @@ X_CISCO_COM_CableModem_GetParamBoolValue
         BOOL*                       pBool
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM     pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG               pCfg      = &pMyObject->CmLog;
    
-    COSA_CM_DOCSIS_INFO            DInfo= {0};
+    COSA_CM_DOCSIS_INFO            DInfo;
+    memset(&DInfo, 0, sizeof(COSA_CM_DOCSIS_INFO));
     errno_t rc = -1;
     int ind = -1;  
     /* check the parameter name and return the corresponding value */
@@ -277,7 +279,9 @@ X_CISCO_COM_CableModem_GetParamIntValue
         int*                        pInt
     )
 {
-    COSA_CM_DHCP_INFO               Info = {0};
+    UNREFERENCED_PARAMETER(hInsContext);
+    COSA_CM_DHCP_INFO               Info;
+    memset(&Info, 0, sizeof(COSA_CM_DHCP_INFO));
      errno_t rc = -1;
     int ind = -1; 
     /* check the parameter name and return the corresponding value */
@@ -336,13 +340,16 @@ X_CISCO_COM_CableModem_GetParamUlongValue
         ULONG*                      puLong
     )
 {
-    COSA_CM_DHCP_INFO               Info = {0};
-    COSA_CM_IPV6DHCP_INFO           IPv6Info = {0};
-    COSA_CM_DS_CHANNEL              Dsc  = {0};
-    COSA_CM_US_CHANNEL              Usc  = {0};
-    COSA_CM_DOCSIS_INFO             DInfo= {0};
+    UNREFERENCED_PARAMETER(hInsContext);
+    COSA_CM_DHCP_INFO               Info;
+    COSA_CM_IPV6DHCP_INFO           IPv6Info;
+    COSA_CM_DOCSIS_INFO             DInfo;
      errno_t rc = -1;
     int ind = -1; 
+
+    memset(&Info, 0, sizeof(COSA_CM_DHCP_INFO));
+    memset(&IPv6Info, 0, sizeof(COSA_CM_IPV6DHCP_INFO));
+    memset(&DInfo, 0, sizeof(COSA_CM_DOCSIS_INFO));
     /* check the parameter name and return the corresponding value */
 
      rc = strcmp_s( "DOCSISDHCPAttempts",strlen("DOCSISDHCPAttempts"),ParamName,&ind);
@@ -627,11 +634,13 @@ X_CISCO_COM_CableModem_GetParamStringValue
         ULONG*                      pUlSize
     )
 {
-    COSA_CM_DHCP_INFO               Info = {0};
-    COSA_CM_DS_CHANNEL              Dsc  = {0};
-    COSA_CM_US_CHANNEL              Usc  = {0};
-    COSA_CM_DOCSIS_INFO             DInfo= {0};
-    COSA_CM_IPV6DHCP_INFO           IPV6Info= {0};
+    UNREFERENCED_PARAMETER(hInsContext);
+    COSA_CM_DHCP_INFO               Info;
+    memset(&Info, 0, sizeof(COSA_CM_DHCP_INFO));
+    COSA_CM_DOCSIS_INFO             DInfo;
+    memset(&DInfo, 0, sizeof(COSA_CM_DOCSIS_INFO));
+    COSA_CM_IPV6DHCP_INFO           IPV6Info;
+    memset(&IPV6Info, 0, sizeof(COSA_CM_IPV6DHCP_INFO));
     int ind                         = -1; 
     errno_t rc                      =     -1;
     
@@ -1260,6 +1269,7 @@ X_CISCO_COM_CableModem_SetParamBoolValue
         BOOL                        bValue
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG                pCfg      = &pMyObject->CmLog;
     errno_t                         rc               = -1;
@@ -1336,6 +1346,9 @@ X_CISCO_COM_CableModem_SetParamIntValue
     )
 {
     /* check the parameter name and set the corresponding value */
+    UNREFERENCED_PARAMETER(hInsContext);
+    UNREFERENCED_PARAMETER(ParamName);
+    UNREFERENCED_PARAMETER(iValue);
 
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
@@ -1380,6 +1393,7 @@ X_CISCO_COM_CableModem_SetParamUlongValue
     )
 {
     /* check the parameter name and set the corresponding value */
+    UNREFERENCED_PARAMETER(hInsContext);
     errno_t                         rc               = -1;
     int                             ind              = -1;
     rc = strcmp_s( "LockedUpstreamChID",strlen( "LockedUpstreamChID"),ParamName, &ind);
@@ -1441,6 +1455,7 @@ X_CISCO_COM_CableModem_SetParamStringValue
         char*                       pString
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     errno_t        rc = -1;
     int ind = -1;
@@ -1501,6 +1516,9 @@ X_CISCO_COM_CableModem_Validate
         ULONG*                      puLength
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
+    UNREFERENCED_PARAMETER(pReturnParamName);
+    UNREFERENCED_PARAMETER(puLength);
     return TRUE;
 }
 
@@ -1532,6 +1550,7 @@ X_CISCO_COM_CableModem_Commit
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     ANSC_STATUS                     returnStatus  = ANSC_STATUS_SUCCESS;        
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG                pCfg      = &pMyObject->CmLog;
@@ -1589,6 +1608,7 @@ X_CISCO_COM_CableModem_Rollback
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     ANSC_STATUS                     reStatus  = ANSC_STATUS_SUCCESS;     
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG                pCfg      = &pMyObject->CmLog;
@@ -1650,6 +1670,7 @@ CMErrorCodewords_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     
     return pMyObject->CMErrorCodewordsNumber;
@@ -1693,6 +1714,7 @@ CMErrorCodewords_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if (nIndex < pMyObject->CMErrorCodewordsNumber)
@@ -1733,6 +1755,7 @@ CMErrorCodewords_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ( !pMyObject->CMErrorCodewordsUpdateTime ) 
@@ -1782,6 +1805,7 @@ CMErrorCodewords_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret           = ANSC_STATUS_SUCCESS;
 
@@ -1934,8 +1958,11 @@ CMErrorCodewords_GetParamStringValue
         ULONG*                      pUlSize
     )
 {
-    PCOSA_DML_CMERRORCODEWORDS_FULL        pConf        = (PCOSA_DML_CMERRORCODEWORDS_FULL)hInsContext;
-    
+
+    UNREFERENCED_PARAMETER(hInsContext);
+    UNREFERENCED_PARAMETER(ParamName);
+    UNREFERENCED_PARAMETER(pValue);
+    UNREFERENCED_PARAMETER(pUlSize);
     /* check the parameter name and return the corresponding value */    
 
     /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
@@ -1984,6 +2011,7 @@ DocsisLog_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     
     return pMyObject->DocsisLogNumber;
@@ -2027,6 +2055,7 @@ DocsisLog_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if (nIndex < pMyObject->DocsisLogNumber)
@@ -2067,6 +2096,7 @@ DocsisLog_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ( !pMyObject->DocsisLogUpdateTime || g_DocsisLog_clean_flg == 1 ) 
@@ -2116,6 +2146,7 @@ DocsisLog_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret           = ANSC_STATUS_SUCCESS;
 
@@ -2361,6 +2392,7 @@ DownstreamChannel_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     
     return pMyObject->DownstreamChannelNumber;
@@ -2404,6 +2436,7 @@ DownstreamChannel_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ((nIndex < pMyObject->DownstreamChannelNumber) && (pMyObject->pDownstreamChannel != NULL))
@@ -2444,6 +2477,7 @@ DownstreamChannel_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ( !pMyObject->DownstreamChannelUpdateTime ) 
@@ -2493,6 +2527,7 @@ DownstreamChannel_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 
@@ -2815,6 +2850,7 @@ UpstreamChannel_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     
     return pMyObject->UpstreamChannelNumber;
@@ -2858,6 +2894,7 @@ UpstreamChannel_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ((nIndex < pMyObject->UpstreamChannelNumber) && (pMyObject->pUpstreamChannel != NULL))
@@ -2898,6 +2935,7 @@ UpstreamChannel_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ( !pMyObject->UpstreamChannelUpdateTime ) 
@@ -2947,6 +2985,7 @@ UpstreamChannel_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 
@@ -3262,6 +3301,7 @@ CPEList_GetEntryCount
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     
     return pMyObject->CPEListNumber;
@@ -3305,6 +3345,7 @@ CPEList_GetEntry
         ULONG*                      pInsNumber
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if (nIndex < pMyObject->CPEListNumber)
@@ -3345,6 +3386,7 @@ CPEList_IsUpdated
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
 
     if ( !pMyObject->CPEListUpdateTime ) 
@@ -3394,6 +3436,7 @@ CPEList_Synchronize
         ANSC_HANDLE                 hInsContext
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     ANSC_STATUS                     ret       = ANSC_STATUS_SUCCESS;
 

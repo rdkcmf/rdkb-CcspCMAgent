@@ -58,6 +58,9 @@
 #include <systemd/sd-daemon.h>
 #endif
 
+#ifndef DISABLE_LOGAGENT
+#include "ccsp_custom_logs.h"
+#endif
 
 /**
  * @defgroup CM_AGENT CM Agent
@@ -81,6 +84,12 @@ PCCSP_CCD_INTERFACE             pPnmCcdIf               = (PCCSP_CCD_INTERFACE  
 PCCC_MBI_INTERFACE              pPnmMbiIf               = (PCCC_MBI_INTERFACE         )NULL;
 BOOL                            g_bActive               = FALSE;
 
+void
+CcspBaseIf_deadlock_detection_log_print
+(
+    int sig
+);
+
 /**
  * @addtogroup CM_AGENT_APIS
  * @{
@@ -95,12 +104,8 @@ BOOL                            g_bActive               = FALSE;
  */
 int  cmd_dispatch(int  command)
 {
-    ULONG                           ulInsNumber        = 0;
-    parameterValStruct_t            val[3]             = {0};
     char*                           pParamNames[]      = {"Device.X_CISCO_COM_CableModem."};
     parameterValStruct_t**          ppReturnVal        = NULL;
-    parameterInfoStruct_t**         ppReturnValNames   = NULL;
-    parameterAttributeStruct_t**    ppReturnvalAttr    = NULL;
     ULONG                           ulReturnValCount   = 0;
     ULONG                           i                  = 0;
 
@@ -149,7 +154,7 @@ int  cmd_dispatch(int  command)
                     DSLH_MPA_ACCESS_CONTROL_ACS,
                     pParamNames,
                     1,
-                    &ulReturnValCount,
+                    (int *)&ulReturnValCount,
                     &ppReturnVal,
                     NULL
                 );
@@ -259,7 +264,6 @@ static void _print_stack_backtrace(void)
 
 #if defined(_ANSC_LINUX)
 static void daemonize(void) {
-	int fd;
 	switch (fork()) {
 	case 0:
 		break;
@@ -285,7 +289,7 @@ static void daemonize(void) {
      */
 
 #ifndef  _DEBUG
-
+	int fd;
 	fd = open("/dev/null", O_RDONLY);
 	if (fd != 0) {
 		dup2(fd, 0);
@@ -363,6 +367,7 @@ void sig_handler(int sig)
     }
 }
 
+#ifndef INCLUDE_BREAKPAD
 static int is_core_dump_opened(void)
 {
     FILE *fp;
@@ -389,12 +394,11 @@ static int is_core_dump_opened(void)
     fclose(fp);
     return 0;
 }
-
+#endif
 #endif
 
 int main(int argc, char* argv[])
 {
-    ANSC_STATUS                     returnStatus       = ANSC_STATUS_SUCCESS;
     int                             cmdChar            = 0;
     BOOL                            bRunAsDaemon       = TRUE;
     int                             idx                = 0;

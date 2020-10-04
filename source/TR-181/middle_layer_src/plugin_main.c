@@ -89,15 +89,12 @@ COSA_Init
     COSASetParamValueBoolProc       pSetParamValueBoolProc      = (COSASetParamValueBoolProc         )NULL;
     COSAGetInstanceNumbersProc      pGetInstanceNumbersProc     = (COSAGetInstanceNumbersProc        )NULL;
 
-    COSAGetCommonHandleProc         pGetCHProc                  = (COSAGetCommonHandleProc           )NULL;
     COSAValidateHierarchyInterfaceProc 
                                     pValInterfaceProc           = (COSAValidateHierarchyInterfaceProc)NULL;
     COSAGetHandleProc               pGetRegistryRootFolder      = (COSAGetHandleProc                 )NULL;
     COSAGetInstanceNumberByIndexProc
                                     pGetInsNumberByIndexProc    = (COSAGetInstanceNumberByIndexProc  )NULL;
-    COSAGetHandleProc               pGetMessageBusHandleProc    = (COSAGetHandleProc                 )NULL;
     COSAGetInterfaceByNameProc      pGetInterfaceByNameProc     = (COSAGetInterfaceByNameProc        )NULL;
-    ULONG                           ret                         = 0;
 
     if ( uMaxVersionSupported < THIS_PLUGIN_VERSION )
     {
@@ -165,7 +162,7 @@ COSA_Init
     }
 
 
-    pGetParamValueIntProc = (COSAGetParamValueUlongProc)pPlugInfo->AcquireFunction("COSAGetParamValueInt");
+    pGetParamValueIntProc = (COSAGetParamValueIntProc)pPlugInfo->AcquireFunction("COSAGetParamValueInt");
 
     if( pGetParamValueIntProc != NULL)
     {
@@ -318,7 +315,7 @@ COSA_Init
     }
 
     /* Get Message Bus Handle */
-    g_GetMessageBusHandle = (PFN_CCSPCCDM_APPLY_CHANGES)pPlugInfo->AcquireFunction("COSAGetMessageBusHandle");
+    g_GetMessageBusHandle = (ANSC_HANDLE)pPlugInfo->AcquireFunction("COSAGetMessageBusHandle");
     if ( g_GetMessageBusHandle == NULL )
     {
         goto EXIT;
@@ -338,7 +335,7 @@ COSA_Init
     {
         char*   tmpSubsystemPrefix;
         
-        if ( tmpSubsystemPrefix = g_GetSubsystemPrefix(g_pDslhDmlAgent) )
+        if ( ( tmpSubsystemPrefix = g_GetSubsystemPrefix(g_pDslhDmlAgent) ) )
         {
             rc = strcpy_s(g_SubSysPrefix_Irep,sizeof(g_SubSysPrefix_Irep), tmpSubsystemPrefix);
             if(rc != EOK)
@@ -376,9 +373,11 @@ COSA_Async_Init
         void*                       hCosaPlugInfo         /* PCOSA_PLUGIN_INFO passed in by the caller */
     )
 {
-    PCOSA_PLUGIN_INFO               pPlugInfo      = (PCOSA_PLUGIN_INFO)hCosaPlugInfo;
+    UNREFERENCED_PARAMETER(uMaxVersionSupported);
+    UNREFERENCED_PARAMETER(hCosaPlugInfo);
 
 #if 0
+    PCOSA_PLUGIN_INFO               pPlugInfo      = (PCOSA_PLUGIN_INFO)hCosaPlugInfo;
     if (g_pCosaBEManager)
     {
 #ifdef _COSA_SIM_   
@@ -437,6 +436,9 @@ COSA_IsObjSupported
      * We can rule them out by return FALSE even if they're defined in COSA XML file.
      */
 
+#if (!defined(_COSA_DRG_CNS_))
+    UNREFERENCED_PARAMETER(pObjName);
+#endif
 #if 0 
 
     if( AnscEqualString(pObjName, "InternetGatewayDevice.UserInterface.",TRUE))
