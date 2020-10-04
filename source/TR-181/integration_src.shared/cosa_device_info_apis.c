@@ -68,6 +68,8 @@
 
 //!!!  This code assumes that all data structures are the SAME in middle-layer APIs and HAL layer APIs
 //!!!  So it uses casting from one to the other
+#define _GNU_SOURCE
+#include <string.h>
 #include "cosa_device_info_apis.h"
 #include "cm_hal.h"
 #include "cosa_device_info_internal.h"
@@ -85,6 +87,7 @@ CosaDmlDIInit
         PANSC_HANDLE                phContext
     )
 {
+    UNREFERENCED_PARAMETER(hDml);
     PCOSA_DATAMODEL_DEVICEINFO      pMyObject    = (PCOSA_DATAMODEL_DEVICEINFO)phContext;
 
     CosaDmlDIGetDLFlag((ANSC_HANDLE)pMyObject);
@@ -114,7 +117,7 @@ ANSC_STATUS CosaDmlDIGetDLFlag(ANSC_HANDLE hContext)
 		if(strstr(buff, "BUILD_TYPE") != NULL) 
 		{
 		//RDKB-22703: Enabled support to allow TR-181 firmware download on PROD builds.
-			if((strcasestr(buff, "dev") != NULL) || (strcasestr(buff, "vbn") != NULL) || (strcasestr(buff, "prod") != NULL))
+			if((strcasestr(buff, "dev"))  || (strcasestr(buff, "vbn") ) || (strcasestr(buff, "prod") ))
 			{
 				pMyObject->Download_Control_Flag = TRUE;
 				break;
@@ -166,6 +169,7 @@ ANSC_STATUS CosaDmlDIGetFWVersion(ANSC_HANDLE hContext)
 
 ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status)
 {
+	UNREFERENCED_PARAMETER(hContext);
 	int dl_status = 0;
         errno_t        rc = -1;
 	
@@ -215,7 +219,6 @@ ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol)
 {
 	PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)hContext;
         errno_t rc = -1;
-        int ind = -1;
 
 	if(strlen(pMyObject->DownloadURL) == 0)
         {
@@ -466,8 +469,9 @@ ANSC_STATUS CosaDmlDISetImage(ANSC_HANDLE hContext, char *Image)
 	return ANSC_STATUS_SUCCESS;	
 }
 
-void FWDL_ThreadFunc()
+void *FWDL_ThreadFunc(void *args)
 {
+	UNREFERENCED_PARAMETER(args);
 	int dl_status = 0;
 	int ret = RETURN_ERR;
 	ULONG reboot_ready_status = 0;
@@ -479,7 +483,7 @@ void FWDL_ThreadFunc()
         if( ret == RETURN_ERR)
         {
                 CcspTraceError((" Failed to start download \n"));
-          	return;
+                return NULL;
         }
         else
         {
@@ -515,7 +519,7 @@ void FWDL_ThreadFunc()
 			else if(dl_status >= 400)
 			{
 				CcspTraceError((" FW DL is failed with status %d \n", dl_status));
-				return;
+				return NULL;
 			}
 		}
 
@@ -547,9 +551,10 @@ void FWDL_ThreadFunc()
 			CcspTraceError((" Reboot Already in progress!\n"));
 		}	
 	}
+	return args;
 }
 
-convert_to_validFW(char *fw,char *valid_fw)
+void convert_to_validFW(char *fw,char *valid_fw)
 {
 	/* Valid FW names
 		TG1682_DEV_stable2_20170717081507sdy
@@ -562,9 +567,9 @@ convert_to_validFW(char *fw,char *valid_fw)
 	int buff_len = 0;
         errno_t rc =-1;
 
-	if(buff = strstr(fw,"_signed"));
-	else if(buff = strstr(fw,"-signed"));
-	else if(buff = strstr(fw,"."));
+	if( (buff = strstr(fw,"_signed")) ){}
+	else if( (buff = strstr(fw,"-signed")) ){}
+	else if( (buff = strstr(fw,".")) ){}
 
 	if(buff)
 		buff_len = strlen(buff);

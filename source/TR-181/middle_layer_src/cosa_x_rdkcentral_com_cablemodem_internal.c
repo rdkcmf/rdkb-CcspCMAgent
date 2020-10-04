@@ -101,7 +101,6 @@ CosaRDKCentralComCableModemCreate
         VOID
     )
 {
-    ANSC_STATUS                  			returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM   pMyObject    = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)NULL;
 
     /*

@@ -123,6 +123,7 @@ DeviceInfo_GetParamBoolValue
         BOOL*                       pBool
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
     errno_t        rc = -1;
     int ind = -1;
@@ -210,6 +211,7 @@ DeviceInfo_GetParamStringValue
         ULONG*                      pUlSize
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_DEVICEINFO     pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
     char DL_Status[128]={0};
     char Protocol[16]={0};
@@ -229,8 +231,9 @@ DeviceInfo_GetParamStringValue
 	            *pUlSize = _ansc_strlen(DL_Status);
 	            return 1;
 	        }
-	        
-	        rc =  strcpy_s(pValue,*pUlSize, DL_Status);
+
+                char *pDL_Status = DL_Status;
+	        rc =  strcpy_s(pValue,*pUlSize, pDL_Status);
                 if(rc != EOK)
                 {
 	          ERR_CHK(rc);
@@ -253,9 +256,10 @@ DeviceInfo_GetParamStringValue
 	        {
 	            *pUlSize = _ansc_strlen(Protocol);
 	            return 1;
-	        }
-	        
-	        rc = strcpy_s(pValue,*pUlSize, Protocol);
+	       }
+
+                char *pProtocol = Protocol;
+	        rc = strcpy_s(pValue,*pUlSize, pProtocol);
                 if(rc != EOK)
                 {
                     ERR_CHK(rc);
@@ -356,6 +360,7 @@ DeviceInfo_SetParamBoolValue
         BOOL                        bValue
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_DEVICEINFO      pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
     errno_t        rc = -1;
     int ind = -1;
@@ -421,6 +426,7 @@ DeviceInfo_SetParamStringValue
         char*                       pString
     )
 {
+    UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_DEVICEINFO      pMyObject = (PCOSA_DATAMODEL_DEVICEINFO)g_pCosaBEManager->hDI;
     errno_t        rc = -1;
     int ind = -1;

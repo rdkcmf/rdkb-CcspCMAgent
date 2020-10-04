@@ -130,7 +130,7 @@ ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status);
  */
 ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol);
 
-#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PROD_REQ_)
+#if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PROD_REQ_) || defined (_XB6_PRODUCT_REQ_)
 /**
  * @brief This function checks for energy detection and retrieves the signal status.
  *
@@ -174,7 +174,7 @@ ANSC_STATUS CosaDmlDISetImage(ANSC_HANDLE hContext, char *Image);
 /**
  * @brief Firmware Download Thread function.
  */
-void FWDL_ThreadFunc();
+void *FWDL_ThreadFunc(void *args);
 
 /**
  * @brief This function used to convert download firmware info into defined firmware format.
@@ -183,7 +183,7 @@ void FWDL_ThreadFunc();
  * @param[in]  fw           Firmware to download.
  * @param[out] valid_fw     Valid firmware.
  */
-convert_to_validFW(char *fw,char *valid_fw);
+void convert_to_validFW(char *fw,char *valid_fw);
 
 BOOL IsFileUpdateNeeded(ANSC_HANDLE hContext );
 void WriteFactoryResetParams(ANSC_HANDLE hContext );

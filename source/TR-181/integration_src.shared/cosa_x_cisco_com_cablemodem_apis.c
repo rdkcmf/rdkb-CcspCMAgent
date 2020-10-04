@@ -92,15 +92,16 @@ extern int Ccsp_cm_clnt_unlock(void)
 
 
 // Below function will poll the Docsis diagnostic information
-void PollDocsisInformations()
+void *PollDocsisInformations(void *args)
 {
-
+  UNREFERENCED_PARAMETER(args);
   system("touch /nvram/docsispolltime.txt");
 
   FILE *fp;
   char buff[30];
   int pollinterval=4*3600;
-  int i,retValue;
+  int retValue;
+  ULONG i;
   errno_t rc = -1;
   int ind = -1;
   while(1)
@@ -214,6 +215,7 @@ CosaDmlCMInit
         PANSC_HANDLE                phContext
     )
 {
+    UNREFERENCED_PARAMETER(hDml);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)phContext;
 	if(pMyObject) 
     	CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
@@ -238,6 +240,7 @@ CosaDmlCMGetStatus
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -255,6 +258,7 @@ CosaDmlCMGetLoopDiagnosticsStart
         BOOL*                       pBool
     )
 {
+   UNREFERENCED_PARAMETER(hContext);
    if(!pBool){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -270,6 +274,8 @@ CosaDmlCMSetLoopDiagnosticsStart
         BOOL                        pBool
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
+    UNREFERENCED_PARAMETER(pBool);
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -280,6 +286,7 @@ CosaDmlCMGetLoopDiagnosticsDetails
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -303,6 +310,7 @@ CosaDmlCMGetTelephonyDHCPStatus
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -325,6 +333,7 @@ CosaDmlCMGetTelephonyTftpStatus
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -347,6 +356,7 @@ CosaDmlCMGetTelephonyRegistrationStatus
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     errno_t        rc = -1;
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -368,6 +378,7 @@ CosaDmlCMGetDHCPInfo
         PCOSA_CM_DHCP_INFO          pInfo
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if (cm_hal_GetDHCPInfo((PCMMGMT_CM_DHCP_INFO)pInfo) == RETURN_OK)
         return ANSC_STATUS_SUCCESS;
     else 
@@ -381,6 +392,7 @@ CosaDmlCMGetDOCSISInfo
         PCOSA_CM_DOCSIS_INFO        pInfo
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if( docsis_GetDOCSISInfo((PCMMGMT_CM_DOCSIS_INFO)pInfo) == RETURN_OK)
         return ANSC_STATUS_SUCCESS;
     else 
@@ -393,7 +405,9 @@ CosaDmlCmGetLog
         ANSC_HANDLE                hContext,
         PCOSA_DML_CM_LOG           pCfg
     )
-{   
+{
+    UNREFERENCED_PARAMETER(hContext);
+    UNREFERENCED_PARAMETER(pCfg);
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -404,6 +418,7 @@ CosaDmlCmSetLog
         PCOSA_DML_CM_LOG            pCfg
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if(!pCfg){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -425,7 +440,8 @@ CosaDmlCmGetDocsisLog
         PCOSA_DML_DOCSISLOG_FULL    *ppConf
     )    
 {
-    CMMGMT_CM_EventLogEntry_t entries[DOCSIS_EVENT_LOG_SIZE] = {0};
+    UNREFERENCED_PARAMETER(hContext);
+    CMMGMT_CM_EventLogEntry_t entries[DOCSIS_EVENT_LOG_SIZE];
     int count = 0;
     int i;
     PCOSA_DML_DOCSISLOG_FULL p;
@@ -476,6 +492,7 @@ CosaDmlCmGetDownstreamChannel
         PCOSA_CM_DS_CHANNEL         *ppConf        
     )    
 {
+    UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -512,6 +529,7 @@ CosaDmlCmGetUpstreamChannel
         PCOSA_CM_US_CHANNEL         *ppConf        
     )    
 {
+    UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -548,7 +566,7 @@ CosaDmlCMGetMarket
         char*                       pValue
     )
 {
-
+    UNREFERENCED_PARAMETER(hContext);
     if( cm_hal_GetMarket(pValue) == RETURN_OK)
         return ANSC_STATUS_SUCCESS;
     else
@@ -562,6 +580,7 @@ CosaDmlCMGetMDDIPOverride
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if ( docsis_GetMddIpModeOverride(pValue) == RETURN_OK)
         return ANSC_STATUS_SUCCESS; 
     else
@@ -576,6 +595,7 @@ CosaDmlCMSetMDDIPOverride
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if ( docsis_SetMddIpModeOverride(pValue) == RETURN_OK)
         return ANSC_STATUS_SUCCESS; 
     else
@@ -591,6 +611,7 @@ CosaDmlCmGetCMErrorCodewords
         PCOSA_DML_CMERRORCODEWORDS_FULL   *ppConf
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
 	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -621,6 +642,7 @@ CosaDmlCmGetCMCert
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if(!pValue)
     {
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -645,6 +667,7 @@ CosaDmlCmGetCMCertStatus
         BOOL*                       pBool
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     ULONG ulcertStatus = 0;
     if(!pBool){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
@@ -669,7 +692,7 @@ CosaDmlCMGetIPv6DHCPInfo
         PCOSA_CM_IPV6DHCP_INFO      pInfo
     )
 {
-
+    UNREFERENCED_PARAMETER(hContext);
     if (cm_hal_GetIPv6DHCPInfo((PCMMGMT_CM_IPV6DHCP_INFO)pInfo) == RETURN_OK)
         return ANSC_STATUS_SUCCESS;
     else 
@@ -683,6 +706,7 @@ CosaDmlCMGetLockedUpstreamChID
         PULONG                      pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -699,6 +723,7 @@ CosaDmlCMSetLockedUpstreamChID
         ULONG                      value
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     int chId = (int)value;
     docsis_SetUSChannelId(chId);
 
@@ -712,6 +737,7 @@ CosaDmlCMGetStartDSFrequency
         PULONG                      pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if(!pValue){
 	AnscTraceWarning(("Input parameter is NULL  %s, %d\n", __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
@@ -728,6 +754,7 @@ CosaDmlCMSetStartDSFrequency
         ULONG                      value
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     docsis_SetStartFreq(value);
 
     return ANSC_STATUS_SUCCESS;
@@ -740,6 +767,7 @@ CosaDmlCMGetProvType
         char*                       pValue
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     if ( docsis_GetProvIpType(pValue) == RETURN_OK)
         return ANSC_STATUS_SUCCESS; 
     else
@@ -754,6 +782,7 @@ CosaDmlCMGetResetCount
         ULONG                       *pValue
     )
 {
+	UNREFERENCED_PARAMETER(hContext);
 	INT ret_val=RETURN_ERR;
 	switch(type)
 	{
@@ -797,6 +826,7 @@ CosaDmlCmGetCPEList
         PCOSA_DML_CPE_LIST          *ppCPEList
     )
 {
+    UNREFERENCED_PARAMETER(hContext);
     char    LanMode[64] = {0};
     ULONG   size = 64;
     if((!pulInstanceNumber) || (!ppCPEList)){

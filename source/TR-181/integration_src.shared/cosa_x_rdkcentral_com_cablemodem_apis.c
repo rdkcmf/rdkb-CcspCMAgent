@@ -81,6 +81,7 @@ CosaDmlRDKCentralCMInit
         PANSC_HANDLE                phContext
     )
 {
+    UNREFERENCED_PARAMETER(hDml);
     PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM  pMyObject      = (PCOSA_DATAMODEL_RDKCENTRAL_CABLEMODEM)phContext;
 
 	//Get DS OFDM channel information by HAL API's
@@ -97,6 +98,7 @@ CosaDmlRDKCentralCMInit
 	CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel( NULL,
 													 &pMyObject->CMStatusofUsChannelTotalNumbers,
 													 &pMyObject->pCMStatusofUsChannel );
+	return ANSC_STATUS_SUCCESS;
 }
 
 ANSC_STATUS
@@ -107,11 +109,10 @@ CosaDmlRDKCentralCmGetDownstreamChannel
         PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN *ppDsOfdmChannel        
     )    
 {
+	UNREFERENCED_PARAMETER(hContext);
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_DS_OFDM_CHAN  pinfo 				   = NULL;
 #endif
-	int 					   output_NumberOfEntries  = 0;
-        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -130,6 +131,8 @@ CosaDmlRDKCentralCmGetDownstreamChannel
 
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get DownStream channel tables information
+        int                                        output_NumberOfEntries  = 0;
+	errno_t rc = -1;
 	if ( ANSC_STATUS_SUCCESS != docsis_GetDsOfdmChanTable( &pinfo, &output_NumberOfEntries ) )
 	{
 		return ANSC_STATUS_FAILURE;
@@ -195,11 +198,10 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CM_US_OFDMA_CHAN *ppUsOfdmChannel 	   
     )
 {
+	UNREFERENCED_PARAMETER(hContext);
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CM_US_OFDMA_CHAN pinfo 				     	   = NULL;
 #endif
-	int 					   	  output_NumberOfEntries  = 0;
-        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -218,6 +220,9 @@ CosaDmlRDKCentralCmGetUpstreamChannel
 
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get UpStream channel tables information
+        int                                               output_NumberOfEntries  = 0;
+        errno_t rc = -1;
+
    	if( ANSC_STATUS_SUCCESS != docsis_GetUsOfdmaChanTable( &pinfo, &output_NumberOfEntries ))
 	{
 		return ANSC_STATUS_FAILURE;
@@ -280,11 +285,10 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     )
 {
+	UNREFERENCED_PARAMETER(hContext);
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 	PDOCSIF31_CMSTATUSOFDMA_US 	 pinfo 				      = NULL;
 #endif
-	int 					   	  output_NumberOfEntries  = 0;
-        errno_t rc = -1;	
 
     if( NULL == pulCount )
 	{
@@ -303,6 +307,9 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 
 #if defined(_XB6_PRODUCT_REQ_)|| defined(_CBR_PRODUCT_REQ_)
 //	Call CM HAL API to get status of UpStream channel tables information
+        int                                               output_NumberOfEntries  = 0;
+        errno_t rc = -1;
+
 	if ( ANSC_STATUS_SUCCESS != docsis_GetStatusOfdmaUsTable( &pinfo, &output_NumberOfEntries ) )
 	{
 		return ANSC_STATUS_FAILURE;

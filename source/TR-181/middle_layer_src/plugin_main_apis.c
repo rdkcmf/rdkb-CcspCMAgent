@@ -68,6 +68,11 @@
 //#include "dml_tr181_custom_cfg.h"
 #include "plugin_main_apis.h"
 #include "cosa_x_cisco_com_cablemodem_internal.h"
+#include "cosa_x_rdkcentral_com_cablemodem_internal.h"
+#include "cosa_device_info_internal.h"
+#ifdef _COSA_INTEL_XB3_ARM_
+#include <syscfg/syscfg.h>
+#endif
 
 /*PCOSA_DIAG_PLUGIN_INFO             g_pCosaDiagPluginInfo;*/
 COSAGetParamValueByPathNameProc    g_GetParamValueByPathNameProc;
@@ -121,7 +126,6 @@ CosaBackEndManagerCreate
         VOID
     )
 {
-    ANSC_STATUS                     returnStatus = ANSC_STATUS_SUCCESS;
     PCOSA_BACKEND_MANAGER_OBJECT    pMyObject    = (PCOSA_BACKEND_MANAGER_OBJECT)NULL;
 
     /*
