@@ -305,7 +305,7 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
                   ERR_CHK(rc);
                   return ANSC_STATUS_FAILURE;
                  }
-                rc =  strncat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->DownloadURL, CM_HTTPURL_LEN - 1);
+                rc = strcat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->DownloadURL);
                 if(rc != EOK)
                 {
                   ERR_CHK(rc);
@@ -319,7 +319,7 @@ ANSC_STATUS CosaDmlDIDownloadNow(ANSC_HANDLE hContext)
                   return ANSC_STATUS_FAILURE;
                  }
 
-                rc =  strncat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->Firmware_To_Download, CM_HTTPURL_LEN - 1);
+                rc = strcat_s(pHttpUrl,sizeof(pHttpUrl), pMyObject->Firmware_To_Download);
                  if(rc != EOK)
                 {
                   ERR_CHK(rc);
