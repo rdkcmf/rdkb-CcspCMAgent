@@ -19,14 +19,16 @@
 AM_CFLAGS = -D_ANSC_LINUX
 AM_CFLAGS += -D_ANSC_USER
 AM_CFLAGS += -D_ANSC_LITTLE_ENDIAN_
-AM_LDFLAGS = -lccsp_common
-AM_LDFLAGS += -lcm_mgnt
 
-AM_CPPFLAGS = -Wall -Werror
 ACLOCAL_AMFLAGS = -I m4
-hardware_platform = i686-linux-gnu
 
 noinst_LTLIBRARIES = libCcspCMAgent_middle_layer_src.la
-libCcspCMAgent_middle_layer_src_la_CPPFLAGS = -I/var/tmp/pc-rdkb/include/dbus-1.0 -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/custom -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/include -I$(top_srcdir)/../CcspCommonLibrary/source/debug_api/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/include/linux -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/components/include -I$(top_srcdir)/../CcspCommonLibrary/source/cosa/package/slap/include -I$(top_srcdir)/../hal/include -I$(top_srcdir)/source/TR-181/board_sbapi -I$(top_srcdir)/../CcspCommonLibrary/source/util_api/http/include -I$(top_srcdir)/../CcspCommonLibrary/source/util_api/ansc/include -I$(top_srcdir)/source/TR-181/middle_layer_src -I$(top_srcdir)/../CcspCommonLibrary/source/ccsp/components/common/MessageBusHelper/include -I$(top_srcdir)/source/TR-181/include -I$(top_srcdir)/source/Custom $(CPPFLAGS)
+
+libCcspCMAgent_middle_layer_src_la_CPPFLAGS = \
+    -I$(top_srcdir)/source/TR-181/board_sbapi \
+    -I$(top_srcdir)/source/TR-181/middle_layer_src \
+    -I$(top_srcdir)/source/TR-181/include \
+    -I$(top_srcdir)/source/Custom
+
 libCcspCMAgent_middle_layer_src_la_SOURCES = plugin_main.c plugin_main_apis.c cosa_x_cisco_com_cablemodem_dml.c cosa_x_cisco_com_cablemodem_internal.c cosa_device_info_dml.c cosa_device_info_internal.c cosa_x_rdkcentral_com_cablemodem_dml.c cosa_x_rdkcentral_com_cablemodem_internal.c
 libCcspCMAgent_middle_layer_src_la_LDFLAGS =  -lccsp_common -lcm_mgnt
