@@ -80,6 +80,22 @@
 #define VALID_fW_LEN 128
 #define MAX_DL_STATUS 128 
 #define MAX_PROTOCOL  16
+
+/* 
+ * The firmware file name table has the suffix type for the different possible file names
+ * in all platforms. The order of the types must not be changed.
+ * These are the file name types which are handled to use the input file name and get
+ * the converted file name.
+ */
+
+static char *fw_file_name_type_table[] = {
+							"_svn_d30_signed",
+							"_d30_signed",
+							"_signed",
+							"-signed",
+							".bin.ccs",
+							".bin"
+							};
 ANSC_STATUS
 CosaDmlDIInit
     (
@@ -176,16 +192,7 @@ ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status)
 	dl_status = cm_hal_Get_HTTP_Download_Status();
 	CcspTraceInfo((" Download status is %d \n", dl_status));
 	
-	if(dl_status == 0)
-        {
-             rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Not Started");
-             if(rc != EOK)
-             {
-                 ERR_CHK(rc);
-                 return ANSC_STATUS_FAILURE;
-             }
-        }
-	else if(dl_status > 0 && dl_status <= 100)
+	  if(dl_status > 0 && dl_status <= 100)
         {
               rc = strcpy_s(DL_Status,MAX_DL_STATUS, "In Progress");
               if(rc != EOK)
@@ -194,7 +201,7 @@ ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status)
                    return ANSC_STATUS_FAILURE;
                 }
         }
-         else if(dl_status == 200)
+      else if(dl_status == 200)
          {
                rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Completed");
                if(rc != EOK)
@@ -212,6 +219,15 @@ ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status)
                        return ANSC_STATUS_FAILURE;
                   }
            }
+	  else
+	  	  {
+             rc = strcpy_s(DL_Status,MAX_DL_STATUS, "Not Started");
+             if(rc != EOK)
+             {
+                 ERR_CHK(rc);
+                 return ANSC_STATUS_FAILURE;
+            }
+	      }
 	return ANSC_STATUS_SUCCESS;
 }
 
@@ -565,13 +581,30 @@ void convert_to_validFW(char *fw,char *valid_fw)
 	
 	char *buff = NULL;
 	int buff_len = 0;
-        errno_t rc =-1;
 
-	if( (buff = strstr(fw,"_signed")) ){}
-	else if( (buff = strstr(fw,"-signed")) ){}
-	else if( (buff = strstr(fw,".")) ){}
+    int found = 0;
+    char fw_name_str[VALID_fW_LEN] = {0};
+	int index = 0;
+	int patt_table_len = sizeof(fw_file_name_type_table)/sizeof(fw_file_name_type_table[0]);
+	errno_t rc =-1;
+    /*
+     * Defect ARRISXB6 12180: Fix for handling file names like TG3482PC2_4.8p3s2_DEV_sey.bin,
+	 * TG3482PC2_4.8p3s2_DEV_sey.bin.ccs, or TG3482PC2_4.8p3s2_DEV_sey_svn_d30_signed.bin.
+     * When there is release version as part of the firmware file name, we have to use .bin as
+     * the pattern in the fw_file_name_type_table. Handle other patterns like _d30_signed.bin and
+	 * _svn_d30_signed.bin to get valid firmware name.
+	 */
+	index = 0;
+    strncpy(fw_name_str, fw, VALID_fW_LEN);
+	do {
+		  if ((buff = strstr(fw_name_str, fw_file_name_type_table[index])) != NULL) {
+			  found = 1;
+			  break;
+			}
+		  index++;
+	} while (index < patt_table_len);
 
-	if(buff)
+	if((found == 1) && buff)
 		buff_len = strlen(buff);
 
        rc = strncpy_s(valid_fw,VALID_fW_LEN,fw,strlen(fw)-buff_len);
