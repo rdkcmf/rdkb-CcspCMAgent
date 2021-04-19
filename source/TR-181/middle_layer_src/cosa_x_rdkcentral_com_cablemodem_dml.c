@@ -550,16 +550,10 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
         ULONG*                      pUlSize
     )
 {
-    int ind = -1;
-    errno_t rc = -1;
-
     PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN     pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)hInsContext;
     
     /* check the parameter name and return the corresponding value */
-    rc =  strcmp_s( "PowerLevel",strlen("PowerLevel"),ParamName, &ind);
-    ERR_CHK(rc);
-
-    if((!ind) && (rc == EOK))
+    if (strcmp(ParamName, "PowerLevel") == 0)
     {
 	    /* collect value */
 	    if ( _ansc_strlen(pDsOfdmChannel->PowerLevel) >= *pUlSize )
@@ -572,11 +566,7 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
 	    return 0;
     }
 
-    /* check the parameter name and return the corresponding value */
-    rc =  strcmp_s( "SNRLevel",strlen("SNRLevel"),ParamName, &ind);
-    ERR_CHK(rc);
-
-    if((!ind) && (rc == EOK))
+    if (strcmp(ParamName, "SNRLevel") == 0)
     {
 
 	    /* collect value */

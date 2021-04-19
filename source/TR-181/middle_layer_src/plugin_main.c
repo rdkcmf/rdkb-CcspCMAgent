@@ -430,16 +430,7 @@ COSA_IsObjSupported
 
     UNREFERENCED_PARAMETER(pObjName);
 #if 0 
-    int ind = -1;
-    errno_t rc = -1;
- 
-    
-     /* check the parameter name and return the corresponding value */
-
-    rc =  strcmp_s( "InternetGatewayDevice.UserInterface.",strlen("InternetGatewayDevice.UserInterface."),pObjName, &ind);
-    ERR_CHK(rc);
-
-    if((!ind) && (rc == EOK))
+    if (strcmp(pObjName, "InternetGatewayDevice.UserInterface.") == 0)
     {
         /* all the objects/parameters under "UserInterface" will not be populated in Data Model Tree. */
         return FALSE;
