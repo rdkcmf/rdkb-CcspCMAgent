@@ -550,33 +550,44 @@ X_RDKCENTRAL_COM_CableModem_DsOfdmChan_GetParamStringValue
         ULONG*                      pUlSize
     )
 {
+    int ind = -1;
+    errno_t rc = -1;
 
     PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN     pDsOfdmChannel = (PCOSA_X_RDKCENTRAL_COM_CM_DS_OFDM_CHAN)hInsContext;
+    
     /* check the parameter name and return the corresponding value */
-    if( AnscEqualString(ParamName, "PowerLevel", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pDsOfdmChannel->PowerLevel) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pDsOfdmChannel->PowerLevel);
-            return 1;
-        }
+    rc =  strcmp_s( "PowerLevel",strlen("PowerLevel"),ParamName, &ind);
+    ERR_CHK(rc);
 
-        AnscCopyString(pValue, pDsOfdmChannel->PowerLevel);
-        return 0;
+    if((!ind) && (rc == EOK))
+    {
+	    /* collect value */
+	    if ( _ansc_strlen(pDsOfdmChannel->PowerLevel) >= *pUlSize )
+	    {
+		    *pUlSize = _ansc_strlen(pDsOfdmChannel->PowerLevel);
+		    return 1;
+	    }
+
+	    AnscCopyString(pValue, pDsOfdmChannel->PowerLevel);
+	    return 0;
     }
 
-    if( AnscEqualString(ParamName, "SNRLevel", TRUE))
-    {
-        /* collect value */
-        if ( _ansc_strlen(pDsOfdmChannel->averageSNR) >= *pUlSize )
-        {
-            *pUlSize = _ansc_strlen(pDsOfdmChannel->averageSNR);
-            return 1;
-        }
+    /* check the parameter name and return the corresponding value */
+    rc =  strcmp_s( "SNRLevel",strlen("SNRLevel"),ParamName, &ind);
+    ERR_CHK(rc);
 
-        AnscCopyString(pValue, pDsOfdmChannel->averageSNR);
-        return 0;
+    if((!ind) && (rc == EOK))
+    {
+
+	    /* collect value */
+	    if ( _ansc_strlen(pDsOfdmChannel->averageSNR) >= *pUlSize )
+	    {
+		    *pUlSize = _ansc_strlen(pDsOfdmChannel->averageSNR);
+		    return 1;
+	    }
+
+	    AnscCopyString(pValue, pDsOfdmChannel->averageSNR);
+	    return 0;
     }
     /* CcspTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return -1;
