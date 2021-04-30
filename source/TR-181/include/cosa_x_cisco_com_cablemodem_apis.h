@@ -66,11 +66,16 @@
 
 #include "cosa_apis.h"
 #include "plugin_main_apis.h"
-
 /**********************************************************************
                 STRUCTURE AND CONSTANT DEFINITIONS
 **********************************************************************/
-
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+#define WAN_DBUS_PATH                     "/com/cisco/spvtg/ccsp/wanmanager"
+#define WAN_COMPONENT_NAME                "eRT.com.cisco.spvtg.ccsp.wanmanager"
+#define WAN_PHY_STATUS_PARAM_NAME         "Device.X_RDK_WanManager.CPEInterface.%d.Phy.Status"
+#define WAN_OPER_STATUS_PARAM_NAME        "Device.X_RDK_WanManager.CPEInterface.%d.Wan.OperationalStatus"
+#define WAN_CM_INTERFACE_INSTANCE_NUM      1
+#endif
 /**
  * @addtogroup CM_AGENT_TYPES
  * @{
@@ -170,6 +175,17 @@ _COSA_DML_CM_LOG
     BOOLEAN                         CleanDocsisLog;
 }
 COSA_DML_CM_LOG,  *PCOSA_DML_CM_LOG;
+
+typedef  struct
+_COSA_DML_CM_WANCFG
+{
+    char                            wanInstanceNumber[4];
+    BOOLEAN                         MonitorPhyStatusAndNotify;
+    BOOLEAN                         MonitorOperStatusAndNotify;
+    BOOLEAN                         ConfigureWan;
+    BOOLEAN                         CustomWanConfigUpdate;
+}
+COSA_DML_CM_WANCFG,  *PCOSA_DML_CM_WANCFG;
 
 typedef  struct
 _COSA_DML_CMERRORCODEWORDS_FULL
@@ -680,6 +696,18 @@ CosaDmlCmGetCMCertStatus
         ANSC_HANDLE                 hContext,
         BOOL*                       pBool
     );
+
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+ANSC_STATUS
+CosaDmlCMWanUpdateCustomConfig
+    (
+        void* arg,
+        BOOL             bValue
+    );
+
+ANSC_STATUS CosaDmlCMWanMonitorPhyStatusAndNotify(void* arg);
+ANSC_STATUS CosaDmlCMWanMonitorOperStatusAndNotify(void* arg);
+#endif
 
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

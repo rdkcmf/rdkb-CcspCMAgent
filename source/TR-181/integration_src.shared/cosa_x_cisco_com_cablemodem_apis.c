@@ -77,9 +77,17 @@
 #include "safec_lib_common.h"
 
 #define  PVALUE_MAX 1023 
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+#define DOCSIS_INF_NAME "cm0"
+#define WAN_PHY_NAME "erouter0"
+#define MONITOR_PHY_STATUS_MAX_TIMEOUT 240
+#define MONITOR_OPER_STATUS_MAX_TIMEOUT 240
+#define MONITOR_OPER_STATUS_QUERY_INTERVAL 10
+#define MONITOR_PHY_STATUS_QUERY_INTERVAL 2
+#endif
 
 static pthread_mutex_t __gw_cm_client_lock = PTHREAD_MUTEX_INITIALIZER;
-
+extern ANSC_HANDLE bus_handle;
 extern int Ccsp_cm_clnt_lock(void)
 {
     return pthread_mutex_lock(&__gw_cm_client_lock);
@@ -90,6 +98,50 @@ extern int Ccsp_cm_clnt_unlock(void)
     return pthread_mutex_unlock(&__gw_cm_client_lock);
 }
 
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+ANSC_STATUS SetParamValues( char *pComponent, char *pBus, char *pParamName, char *pParamVal, enum dataType_e type, BOOLEAN bCommit )
+{
+    CCSP_MESSAGE_BUS_INFO *bus_info              = (CCSP_MESSAGE_BUS_INFO *)bus_handle;
+    parameterValStruct_t   param_val[1]          = { 0 };
+    char                  *faultParam            = NULL;
+    char                   acParameterName[256]  = { 0 },
+                           acParameterValue[256] = { 0 };
+    int                    ret                   = 0;
+
+    //Copy Name
+    sprintf( acParameterName, "%s", pParamName );
+    param_val[0].parameterName  = acParameterName;
+
+    //Copy Value
+    sprintf( acParameterValue, "%s", pParamVal );
+    param_val[0].parameterValue = acParameterValue;
+
+    //Copy Type
+    param_val[0].type           = type;
+    CcspTraceInfo(("%s-%d Param set %s value %s\n",__FUNCTION__,__LINE__,pParamName,pParamVal));
+
+    ret = CcspBaseIf_setParameterValues(
+                                        bus_handle,
+                                        pComponent,
+                                        pBus,
+                                        0,
+                                        0,
+                                        param_val,
+                                        1,
+                                        bCommit,
+                                        &faultParam
+                                       );
+
+    if( ( ret != CCSP_SUCCESS ) && ( faultParam != NULL ) )
+    {
+        CcspTraceError(("%s-%d Failed to set %s\n",__FUNCTION__,__LINE__,pParamName));
+        bus_info->freefunc( faultParam );
+        return ANSC_STATUS_FAILURE;
+    }
+
+    return ANSC_STATUS_SUCCESS;
+}
+#endif
 
 // Below function will poll the Docsis diagnostic information
 void *PollDocsisInformations(void *args)
@@ -217,8 +269,13 @@ CosaDmlCMInit
 {
     UNREFERENCED_PARAMETER(hDml);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)phContext;
+    PCOSA_DML_CM_WANCFG               pWanCfg      = NULL;
 	if(pMyObject) 
+    {
     	CosaDmlCmGetLog( NULL, &pMyObject->CmLog);
+        pWanCfg      = &pMyObject->CmWanCfg;
+        memset(pWanCfg,0,sizeof(COSA_DML_CM_WANCFG));
+    }
     /*Coverity Fix CID:55875 CHECKED_RETURN */
     if( cm_hal_InitDB() != RETURN_OK )
     {
@@ -250,6 +307,214 @@ CosaDmlCMGetStatus
     else
         return ANSC_STATUS_FAILURE;
 }
+
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+ANSC_STATUS
+CosaDmlCMWanUpdateCustomConfig
+    (
+        void *arg,
+        BOOL             bValue
+    )
+{
+    char command[256] = {0};
+    UNREFERENCED_PARAMETER(arg);
+    if (bValue == TRUE)
+    {
+       memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"ip addr flush dev %s",DOCSIS_INF_NAME);
+        system(command);
+        memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"ip -6 addr flush dev %s",DOCSIS_INF_NAME);
+        system(command);
+        memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"sysctl -w net.ipv6.conf.%s.accept_ra=0",DOCSIS_INF_NAME);
+        system(command);
+        memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"brctl addif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
+        system(command);
+    }
+    else
+    {
+        memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"brctl delif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
+        system(command);
+    }
+    return ANSC_STATUS_SUCCESS;
+}
+
+void* ThreadMonitorPhyStatusAndNotify(void *args)
+{
+    PCOSA_DATAMODEL_CABLEMODEM pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)args;
+    pthread_detach(pthread_self());
+    if (pMyObject)
+    {
+        PCOSA_DML_CM_WANCFG pWanCfg = &pMyObject->CmWanCfg;
+        INT ret = -1;
+        INT counter = 0;
+        INT iWanInstanceNumber = WAN_CM_INTERFACE_INSTANCE_NUM;
+        BOOLEAN rfStatus = FALSE;
+        char acSetParamName[256];
+        char acSetParamValue[128];
+        ANSC_STATUS retval = ANSC_STATUS_SUCCESS;
+        if (pWanCfg)
+        {
+            if (pWanCfg->wanInstanceNumber)
+            {
+                iWanInstanceNumber = atoi(pWanCfg->wanInstanceNumber);
+            }
+            while(1)
+            {
+
+                // cmoff file only for debugging purpose to simulate cable modem down case.
+                if ( 0 == access( "/tmp/cmoff" , F_OK ) )                
+                {
+                    rfStatus = FALSE;
+                    sleep(1);
+                    continue;
+                }
+                ret = docsis_IsEnergyDetected(&rfStatus);
+
+                if(ret == RETURN_OK)
+                {
+                    if (rfStatus == TRUE)
+                    {
+                        break;
+                    }
+                }
+                if (counter >= MONITOR_PHY_STATUS_MAX_TIMEOUT)
+                {
+                    break;
+                }
+
+                sleep(MONITOR_PHY_STATUS_QUERY_INTERVAL);
+                counter += MONITOR_PHY_STATUS_QUERY_INTERVAL;
+
+            }
+            memset(acSetParamName, 0, sizeof(acSetParamName));
+            snprintf(acSetParamName, sizeof(acSetParamName), WAN_PHY_STATUS_PARAM_NAME, iWanInstanceNumber);
+            memset(acSetParamValue, 0, sizeof(acSetParamValue));
+            if (TRUE == rfStatus)
+            {
+                snprintf(acSetParamValue, sizeof(acSetParamValue), "Up");
+
+            }
+            else
+            {
+                snprintf(acSetParamValue, sizeof(acSetParamValue), "Down");
+            }
+            CcspTraceInfo(("%s-%d Param set %s\n",__FUNCTION__,__LINE__,acSetParamName));
+            counter = 0;
+            do
+            {
+                if (counter > 3) // retry 3 times
+                {
+                    break;
+                }
+                retval = SetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, acSetParamName, acSetParamValue,ccsp_string,TRUE);
+                sleep(1);
+                ++counter;
+            }while(retval == ANSC_STATUS_FAILURE);
+            pWanCfg->MonitorPhyStatusAndNotify = FALSE;
+        }
+    }
+    return args;
+}
+
+void* ThreadMonitorOperStatusAndNotify(void *args)
+{
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)args;
+    pthread_detach(pthread_self());
+    if (pMyObject)
+    {
+        PCOSA_DML_CM_WANCFG pWanCfg = &pMyObject->CmWanCfg;
+        char buf[128];
+        char acSetParamName[256];
+        BOOL isOperational = FALSE;
+        INT counter = 0;
+        INT iWanInstanceNumber = WAN_CM_INTERFACE_INSTANCE_NUM;
+        char acSetParamValue[128];
+        ANSC_STATUS retval = ANSC_STATUS_SUCCESS;
+        if (pWanCfg)
+        {
+            if (pWanCfg->wanInstanceNumber)
+            {
+                iWanInstanceNumber = atoi(pWanCfg->wanInstanceNumber);
+            }
+            while(1)
+            {
+                memset(buf,0,sizeof(buf));
+                if ( 0 == access( "/tmp/cmoff" , F_OK ) )
+                {
+                     isOperational = FALSE;
+                     sleep(1);
+                     continue;
+                }
+ 
+                if(docsis_getCMStatus(buf) == RETURN_OK)
+                {
+                    if (strncmp(buf,"OPERATIONAL",sizeof(buf)) == 0)
+                    {              
+                        isOperational = TRUE;
+                        break;
+                    }
+                }
+               if (counter >= MONITOR_OPER_STATUS_MAX_TIMEOUT)
+                {
+                    break;
+                }
+                sleep(MONITOR_OPER_STATUS_QUERY_INTERVAL);
+                counter += MONITOR_OPER_STATUS_QUERY_INTERVAL;
+            }
+            memset(acSetParamName, 0, sizeof(acSetParamName));
+            snprintf(acSetParamName, sizeof(acSetParamName), WAN_OPER_STATUS_PARAM_NAME, iWanInstanceNumber);
+
+            memset(acSetParamValue, 0, sizeof(acSetParamValue));
+            if (isOperational == TRUE)
+            {
+                snprintf(acSetParamValue, sizeof(acSetParamValue), "Operational");
+            }
+            else
+            {
+                snprintf(acSetParamValue, sizeof(acSetParamValue), "NotOperational");
+            }
+            CcspTraceInfo(("%s-%d Param set %s\n",__FUNCTION__,__LINE__,acSetParamName));
+            counter = 0;
+            do
+            {
+                if (counter > 3) // retry 3 times
+                {
+                    break;
+                }
+                retval = SetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, acSetParamName, acSetParamValue,ccsp_string,TRUE);
+                sleep(1);
+                ++counter;
+            }while(retval == ANSC_STATUS_FAILURE);
+
+            pWanCfg->MonitorOperStatusAndNotify = FALSE;
+        }
+    }
+    return args;
+}
+
+
+ANSC_STATUS
+CosaDmlCMWanMonitorPhyStatusAndNotify(void *arg)
+{
+    pthread_t CmPhyMonitorThreadId;
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)arg;
+    pthread_create(&CmPhyMonitorThreadId, NULL, &ThreadMonitorPhyStatusAndNotify, pMyObject);
+    return ANSC_STATUS_SUCCESS;
+}
+
+ANSC_STATUS
+CosaDmlCMWanMonitorOperStatusAndNotify(void *arg)
+{
+    pthread_t CmOperMonitorThreadId;
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)arg;
+    pthread_create(&CmOperMonitorThreadId, NULL, &ThreadMonitorOperStatusAndNotify, pMyObject);
+    return ANSC_STATUS_SUCCESS;
+}
+#endif
 
 ANSC_STATUS
 CosaDmlCMGetLoopDiagnosticsStart

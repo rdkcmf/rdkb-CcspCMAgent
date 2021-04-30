@@ -95,10 +95,11 @@ ssp_PnmMbi_MessageBusEngage
 {
     ANSC_STATUS                 returnStatus       = ANSC_STATUS_SUCCESS;
     CCSP_Base_Func_CB           cb                 = {0};
-    
+   
+#ifndef ENABLE_RDK_WANMANAGER 
     char PsmName[256];
     errno_t rc = -1;
-
+#endif
     if ( ! component_id || ! path )
     {
         CcspTraceError((" !!! ssp_PnmMbi_MessageBusEngage: component_id or path is NULL !!!\n"));
@@ -122,6 +123,7 @@ ssp_PnmMbi_MessageBusEngage
         return returnStatus;
     }
 
+#ifndef ENABLE_RDK_WANMANAGER
     if ( g_Subsystem[0] != 0 )
     {
         _ansc_sprintf(PsmName, "%s%s", g_Subsystem, CCSP_DBUS_PSM);
@@ -138,7 +140,7 @@ ssp_PnmMbi_MessageBusEngage
 
     /* Wait for PSM */
     waitConditionReady(bus_handle, PsmName, CCSP_DBUS_PATH_PSM, component_id);
-
+#endif
     CcspTraceInfo(("!!! Connected to message bus... bus_handle: 0x%08X !!!\n", bus_handle));
 
     CCSP_Msg_SleepInMilliSeconds(1000);

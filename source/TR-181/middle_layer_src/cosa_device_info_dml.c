@@ -145,6 +145,14 @@ DeviceInfo_GetParamBoolValue
      if((!ind) && (rc == EOK))
     {
         BOOLEAN rfSignalStatus = TRUE; // default is TRUE.
+#ifdef ENABLE_RDK_WANMANAGER
+         if ( 0 == access( "/tmp/rfoff" , F_OK ) )
+         {
+             *pBool = FALSE;
+             return TRUE;
+         }
+#endif
+
         CosaDmlDIGetRfSignalStatus(&rfSignalStatus);
         if(rfSignalStatus) {
             pMyObject->RfSignalStatus = TRUE;

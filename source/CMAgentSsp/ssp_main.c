@@ -62,6 +62,43 @@
 #include "ccsp_custom_logs.h"
 #endif
 
+#define WAN_DBUS_PATH                     "/com/cisco/spvtg/ccsp/wanmanager"
+#define WAN_COMPONENT_NAME                "eRT.com.cisco.spvtg.ccsp.wanmanager"
+#define WAN_COMP_NAME_WITHOUT_SUBSYSTEM "com.cisco.spvtg.ccsp.wanmanager"
+#define WAN_CM_INTERFACE_INSTANCE_NUM      1
+#define WAN_BOOTINFORM_CUSTOMCONFIG_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.EnableCustomConfig"
+#define WAN_BOOTINFORM_CONFIGWANENABLE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.ConfigureWanEnable"
+#define WAN_BOOTINFORM_OPERSTATUSENABLE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.EnableOperStatusMonitor"
+#define WAN_BOOTINFORM_PHYPATH_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Phy.Path"
+#define WAN_BOOTINFORM_INTERFACE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Wan.Name"
+#define WAN_PHYIF_NAME_PRIMARY "erouter0"
+#define WAN_PHYIF_DOCSIS_NAME "cm0"
+#define WAN_PHYPATH_VALUE "Device.X_CISCO_COM_CableModem."
+#define WAN_NOE_PARAM_NAME                "Device.X_RDK_WanManager.CPEInterfaceNumberOfEntries"
+#define WAN_IF_NAME_PARAM_NAME            "Device.X_RDK_WanManager.CPEInterface.%d.Name"
+
+typedef struct _WAN_PARAM_INFO
+{
+    CHAR paramName[256];
+    CHAR paramValue[256];
+    enum dataType_e paramType;
+}WAN_PARAM_INFO;
+
+enum WANBOOTINFORM_MSG
+{
+    MSG_WAN_NAME = 0,
+    MSG_PHY_PATH,
+    MSG_OPER_STATUS,
+    MSG_CUSTOMCONFIG,
+    MSG_CONFIGURE_WAN,
+    MSG_TOTAL_NUM
+};
+typedef struct _WAN_BOOTINFORM_MSG
+{
+    WAN_PARAM_INFO param[MSG_TOTAL_NUM];
+    INT iNumOfParam;
+    INT iWanInstanceNumber;
+}WAN_BOOTINFORM_MSG;
 /**
  * @defgroup CM_AGENT CM Agent
  * - Cable Modem Agent component that provides an abstraction layer software interface to third party WAN.
@@ -84,6 +121,12 @@ PCCSP_CCD_INTERFACE             pPnmCcdIf               = (PCCSP_CCD_INTERFACE  
 PCCC_MBI_INTERFACE              pPnmMbiIf               = (PCCC_MBI_INTERFACE         )NULL;
 BOOL                            g_bActive               = FALSE;
 
+#ifdef ENABLE_RDK_WANMANAGER
+static pthread_t docsisclbk_tid;
+pthread_t bootInformThreadId;
+extern void RegisterDocsisCallback();
+void* ThreadBootInformMsg(void *arg);
+#endif
 void
 CcspBaseIf_deadlock_detection_log_print
 (
@@ -137,6 +180,12 @@ int  cmd_dispatch(int  command)
             }
 
 #endif
+
+#ifdef ENABLE_RDK_WANMANAGER
+                CcspTraceInfo(("pthread create boot inform \n"));
+                pthread_create(&bootInformThreadId, NULL, &ThreadBootInformMsg, NULL);
+#endif
+
 
                 ssp_create_pnm(gpPnmStartCfg);
                 ssp_engage_pnm(gpPnmStartCfg);
@@ -397,6 +446,336 @@ static int is_core_dump_opened(void)
 #endif
 #endif
 
+#ifdef ENABLE_RDK_WANMANAGER
+static void *GWP_docsisregistration_threadfunc(void *data)
+{
+if ( !data )
+{
+printf("\n");
+ }           
+pthread_detach(pthread_self());
+CcspTraceError(("GWP_docsisregistration_threadfunc\n"));
+RegisterDocsisCallback();
+return NULL;
+}
+
+ANSC_STATUS SendMsg( char *pComponent, char *pBus, char *pParamName, char *pParamVal, enum dataType_e type, BOOLEAN bCommit )
+{
+    extern ANSC_HANDLE bus_handle;
+    CCSP_MESSAGE_BUS_INFO *bus_info              = (CCSP_MESSAGE_BUS_INFO *)bus_handle;
+    parameterValStruct_t   param_val[1]          = { 0 };
+    char                  *faultParam            = NULL;
+    char                   acParameterName[256]  = { 0 },
+                           acParameterValue[256] = { 0 };
+    int                    ret                   = 0;
+
+    //Copy Name
+    sprintf( acParameterName, "%s", pParamName );
+    param_val[0].parameterName  = acParameterName;
+
+    //Copy Value
+    sprintf( acParameterValue, "%s", pParamVal );
+    param_val[0].parameterValue = acParameterValue;
+
+    //Copy Type
+    param_val[0].type           = type;
+
+    ret = CcspBaseIf_setParameterValues(
+                                        bus_handle,
+                                        pComponent,
+                                        pBus,
+                                        0,
+                                        0,
+                                        param_val,
+                                        1,
+                                        bCommit,
+                                        &faultParam
+                                       );
+
+    if( ( ret != CCSP_SUCCESS ) && ( faultParam != NULL ) )
+    {
+        CcspTraceError(("%s-%d Failed to set %s\n",__FUNCTION__,__LINE__,pParamName));
+        bus_info->freefunc( faultParam );
+        return ANSC_STATUS_FAILURE;
+    }
+
+    return ANSC_STATUS_SUCCESS;
+}
+
+ANSC_STATUS CosaDmlGetParamValues(char *pComponent, char *pBus, char *pParamName, char *pReturnVal)
+{
+    parameterValStruct_t **retVal;
+    extern ANSC_HANDLE bus_handle;
+    char *ParamName[1];
+    int ret = 0,
+        nval;
+
+    //Assign address for get parameter name
+    ParamName[0] = pParamName;
+
+    ret = CcspBaseIf_getParameterValues(
+        bus_handle,
+        pComponent,
+        pBus,
+        ParamName,
+        1,
+        &nval,
+        &retVal);
+
+    //Copy the value
+    if (CCSP_SUCCESS == ret)
+    {
+        CcspTraceWarning(("%s parameterValue[%s]\n", __FUNCTION__, retVal[0]->parameterValue));
+
+        if (NULL != retVal[0]->parameterValue)
+        {
+            memcpy(pReturnVal, retVal[0]->parameterValue, strlen(retVal[0]->parameterValue) + 1);
+        }
+
+        if (retVal)
+        {
+            free_parameterValStruct_t(bus_handle, nval, retVal);
+        }
+
+        return ANSC_STATUS_SUCCESS;
+    }
+
+    if (retVal)
+    {
+        free_parameterValStruct_t(bus_handle, nval, retVal);
+    }
+
+    return ANSC_STATUS_FAILURE;
+}
+
+ANSC_STATUS CosaDmlGetWanInstance(CHAR *pIfName, INT *pInstanceNumber)
+{
+    char acTmpReturnValue[256] = {0};
+    INT iLoopCount = 0;
+    INT iTotalNoofEntries = 0;
+
+
+    if (NULL == pInstanceNumber|| NULL == pIfName)
+    {
+        CcspTraceError(("%s Invalid Buffer\n", __FUNCTION__));
+        return ANSC_STATUS_FAILURE;
+    }
+    *pInstanceNumber = -1;
+    if (ANSC_STATUS_FAILURE == CosaDmlGetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, WAN_NOE_PARAM_NAME, acTmpReturnValue))
+    {
+        CcspTraceError(("%s %d Failed to get param value\n", __FUNCTION__, __LINE__));
+        return ANSC_STATUS_FAILURE;
+    }
+
+    //Total count
+    iTotalNoofEntries = atoi(acTmpReturnValue);
+    CcspTraceInfo(("%s %d - TotalNoofEntries:%d\n", __FUNCTION__, __LINE__, iTotalNoofEntries));
+
+    if (0 >= iTotalNoofEntries)
+    {
+        return ANSC_STATUS_SUCCESS;
+    }
+
+    //Traverse from loop
+    for (iLoopCount = 0; iLoopCount < iTotalNoofEntries; iLoopCount++)
+    {
+        char acTmpQueryParam[256] = {0};
+
+        //Query
+        snprintf(acTmpQueryParam, sizeof(acTmpQueryParam), WAN_IF_NAME_PARAM_NAME, iLoopCount + 1);
+
+        memset(acTmpReturnValue, 0, sizeof(acTmpReturnValue));
+        if (ANSC_STATUS_FAILURE == CosaDmlGetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, acTmpQueryParam, acTmpReturnValue))
+        {
+            CcspTraceError(("%s %d Failed to get param value\n", __FUNCTION__, __LINE__));
+            continue;
+        }
+
+        //Compare name
+        if (0 == strcmp(acTmpReturnValue, pIfName))
+        {
+            *pInstanceNumber = iLoopCount + 1;
+            break;
+        }
+    }
+
+    return ANSC_STATUS_SUCCESS;
+}
+
+static void checkComponentHealthStatus(char * compName, char * dbusPath, char *status, int *retStatus)
+{
+    int ret = 0, val_size = 0;
+    parameterValStruct_t **parameterval = NULL;
+    extern ANSC_HANDLE bus_handle;
+    char *parameterNames[1] = {};
+    char tmp[256];
+    char str[256];
+    char l_Subsystem[128] = { 0 };
+
+    sprintf(tmp,"%s.%s",compName, "Health");
+    parameterNames[0] = tmp;
+
+    strncpy(l_Subsystem, "eRT.",sizeof(l_Subsystem));
+    snprintf(str, sizeof(str), "%s%s", l_Subsystem, compName);
+    CcspTraceDebug(("str is:%s\n", str));
+
+    ret = CcspBaseIf_getParameterValues(bus_handle, str, dbusPath,  parameterNames, 1, &val_size, &parameterval);
+    CcspTraceDebug(("ret = %d val_size = %d\n",ret,val_size));
+    if(ret == CCSP_SUCCESS)
+    {
+        CcspTraceDebug(("parameterval[0]->parameterName : %s parameterval[0]->parameterValue : %s\n",parameterval[0]->parameterName,parameterval[0]->parameterValue));
+        strcpy(status, parameterval[0]->parameterValue);
+        CcspTraceDebug(("status of component:%s\n", status));
+    }
+    free_parameterValStruct_t (bus_handle, val_size, parameterval);
+
+    *retStatus = ret;
+}
+
+static void waitForWanMgrComponentReady()
+{
+    char status[32] = {'\0'};
+    int count = 0;
+    int ret = -1;
+    while(1)
+    {
+        checkComponentHealthStatus(WAN_COMP_NAME_WITHOUT_SUBSYSTEM, WAN_DBUS_PATH, status,&ret);
+        if(ret == CCSP_SUCCESS && (strcmp(status, "Green") == 0))
+        {
+            CcspTraceInfo(("%s component health is %s, continue\n", WAN_COMPONENT_NAME, status));
+            break;
+        }
+        else
+        {
+            count++;
+            if(count%5 == 0)
+            {
+                CcspTraceError(("%s component Health, ret:%d, waiting\n", WAN_COMPONENT_NAME, ret));
+            }
+            sleep(5);
+        }
+    }
+}
+
+INT InitBootInformInfo(WAN_BOOTINFORM_MSG *pMsg)
+{
+    BOOL bEthWanEnable = FALSE;
+    CHAR wanName[64];
+    CHAR out_value[64];
+    CHAR acSetParamName[256];
+    INT iWANInstance = 0;
+
+    if (!pMsg)
+        return -1;
+    if ( 0 == access( "/nvram/ETHWAN_ENABLE" , F_OK ) )
+    {
+        bEthWanEnable = TRUE;
+    }
+
+    memset(out_value,0,sizeof(out_value));
+    memset(wanName,0,sizeof(wanName));
+    syscfg_get(NULL, "wan_physical_ifname", out_value, sizeof(out_value));
+
+    if(0 != strnlen(out_value,sizeof(out_value)))
+    {
+        snprintf(wanName, sizeof(wanName), "%s", out_value);
+    }
+    else
+    {
+        snprintf(wanName, sizeof(wanName), "%s", WAN_PHYIF_NAME_PRIMARY);
+    }
+
+    pMsg->iWanInstanceNumber = WAN_CM_INTERFACE_INSTANCE_NUM;
+    pMsg->iNumOfParam = MSG_TOTAL_NUM;
+
+    CosaDmlGetWanInstance(WAN_PHYIF_DOCSIS_NAME, &iWANInstance);
+
+    if (-1 != iWANInstance)
+    {
+        pMsg->iWanInstanceNumber = iWANInstance;
+    }
+
+    memset(acSetParamName, 0, sizeof(acSetParamName));
+    snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_INTERFACE_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
+    strncpy(pMsg->param[MSG_WAN_NAME].paramName,acSetParamName,sizeof(pMsg->param[MSG_WAN_NAME].paramName));
+    pMsg->param[MSG_WAN_NAME].paramType = ccsp_string;
+
+    if (bEthWanEnable == TRUE)
+    {
+        strncpy(pMsg->param[MSG_WAN_NAME].paramValue,WAN_PHYIF_DOCSIS_NAME,sizeof(pMsg->param[MSG_WAN_NAME].paramValue));
+    }
+    else
+    {
+        strncpy(pMsg->param[MSG_WAN_NAME].paramValue,wanName,sizeof(pMsg->param[MSG_WAN_NAME].paramValue));
+    }
+    memset(acSetParamName, 0, sizeof(acSetParamName));
+    snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_PHYPATH_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
+    strncpy(pMsg->param[MSG_PHY_PATH].paramName,acSetParamName,sizeof(pMsg->param[MSG_PHY_PATH].paramName));
+    strncpy(pMsg->param[MSG_PHY_PATH].paramValue,WAN_PHYPATH_VALUE,sizeof(pMsg->param[MSG_PHY_PATH].paramValue));
+    pMsg->param[MSG_PHY_PATH].paramType = ccsp_string;
+
+    memset(acSetParamName, 0, sizeof(acSetParamName));
+    snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_OPERSTATUSENABLE_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
+    strncpy(pMsg->param[MSG_OPER_STATUS].paramName,acSetParamName,sizeof(pMsg->param[MSG_OPER_STATUS].paramName));
+    strncpy(pMsg->param[MSG_OPER_STATUS].paramValue,"true",sizeof(pMsg->param[MSG_OPER_STATUS].paramValue));
+    pMsg->param[MSG_OPER_STATUS].paramType = ccsp_boolean;
+
+    memset(acSetParamName, 0, sizeof(acSetParamName));
+    snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_CONFIGWANENABLE_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
+    strncpy(pMsg->param[MSG_CONFIGURE_WAN].paramName,acSetParamName,sizeof(pMsg->param[MSG_CONFIGURE_WAN].paramName));
+    strncpy(pMsg->param[MSG_CONFIGURE_WAN].paramValue,"false",sizeof(pMsg->param[MSG_CONFIGURE_WAN].paramValue));
+    pMsg->param[MSG_CONFIGURE_WAN].paramType = ccsp_boolean;
+
+    memset(acSetParamName, 0, sizeof(acSetParamName));
+    snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_CUSTOMCONFIG_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
+    strncpy(pMsg->param[MSG_CUSTOMCONFIG].paramName,acSetParamName,sizeof(pMsg->param[MSG_CUSTOMCONFIG].paramName));
+    strncpy(pMsg->param[MSG_CUSTOMCONFIG].paramValue,"false",sizeof(pMsg->param[MSG_CUSTOMCONFIG].paramValue));
+    pMsg->param[MSG_CUSTOMCONFIG].paramType = ccsp_boolean;
+        
+    return 0;
+}
+
+void* ThreadBootInformMsg(void *arg)
+{
+    WAN_BOOTINFORM_MSG msg = {0};
+    INT retryMax = 60;
+    INT retryCount = 0;
+    BOOL retryBootInform = FALSE;
+    pthread_detach(pthread_self());
+    waitForWanMgrComponentReady();
+    InitBootInformInfo(&msg);
+    while (1)
+    {
+        INT index = 0;
+        for (index = 0; index < msg.iNumOfParam; ++index)
+        {
+            ANSC_STATUS ret = SendMsg(
+                    WAN_COMPONENT_NAME,
+                    WAN_DBUS_PATH,
+                    msg.param[index].paramName,
+                    msg.param[index].paramValue,
+                    msg.param[index].paramType,
+                    TRUE);
+            if (ret == ANSC_STATUS_FAILURE)
+            {
+                retryBootInform = TRUE;
+                break;
+            }
+        }
+        if (FALSE == retryBootInform)
+        {
+            break;
+        }
+        if (retryCount > retryMax)
+            break;
+        ++retryCount;
+        sleep(1);
+    }
+    return arg;
+}
+
+#endif
+
 int main(int argc, char* argv[])
 {
     int                             cmdChar            = 0;
@@ -534,8 +913,17 @@ int main(int argc, char* argv[])
     PCD_api_register_exception_handlers( argv[0], NULL );
 #endif
 
-    cmd_dispatch('e');
     syscfg_init();
+#ifdef ENABLE_RDK_WANMANAGER
+     if ( 0 != access( "/nvram/ETHWAN_ENABLE" , F_OK ) )
+     {
+               CcspTraceInfo(("pthread create docsis registration\n"));
+            pthread_create(&docsisclbk_tid, NULL, GWP_docsisregistration_threadfunc, NULL);
+     }
+#endif
+
+	
+    cmd_dispatch('e');
     CcspTraceInfo(("CM_DBG:-------Read Log Info\n"));
     char buffer[5] = {0};
     if( 0 == syscfg_get( NULL, "X_RDKCENTRAL-COM_LoggerEnable" , buffer, sizeof( buffer ) ) &&  ( buffer[0] != '\0' ) )

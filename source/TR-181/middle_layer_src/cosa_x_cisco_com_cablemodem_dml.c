@@ -167,7 +167,9 @@ X_CISCO_COM_CableModem_GetParamBoolValue
     UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM     pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG               pCfg      = &pMyObject->CmLog;
-   
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+    PCOSA_DML_CM_WANCFG               pWanCfg      = &pMyObject->CmWanCfg;
+#endif   
     COSA_CM_DOCSIS_INFO            DInfo;
     memset(&DInfo, 0, sizeof(COSA_CM_DOCSIS_INFO));
     errno_t rc = -1;
@@ -236,6 +238,26 @@ X_CISCO_COM_CableModem_GetParamBoolValue
             return TRUE;
         return FALSE;
     }
+
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+     rc =  strcmp_s("ConfigureWan",strlen("ConfigureWan"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* collect value */
+        *pBool = pWanCfg->ConfigureWan;
+        return TRUE;
+    }
+
+     rc =  strcmp_s("CustomWanConfigUpdate",strlen("CustomWanConfigUpdate"),ParamName, &ind);
+     ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* collect value */
+        *pBool = pWanCfg->CustomWanConfigUpdate;
+        return TRUE;
+    }
+#endif
 
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
@@ -763,6 +785,13 @@ X_CISCO_COM_CableModem_GetParamStringValue
     ERR_CHK(rc);
     if((!ind) && (rc == EOK))
     {
+#ifdef ENABLE_RDK_WANMANAGER        
+        if ( 0 == access( "/tmp/cmoff" , F_OK ) )
+        {
+            strcpy_s(pValue,*pUlSize,"CMOFF");
+            return 0;
+        }
+#endif
         /* collect value */
         if (CosaDmlCMGetStatus(NULL, pValue) != ANSC_STATUS_SUCCESS)
             return -1;
@@ -1272,6 +1301,9 @@ X_CISCO_COM_CableModem_SetParamBoolValue
     UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
     PCOSA_DML_CM_LOG                pCfg      = &pMyObject->CmLog;
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+    PCOSA_DML_CM_WANCFG             pWanCfg      = &pMyObject->CmWanCfg;
+#endif
     errno_t                         rc               = -1;
     int                             ind              = -1;
 
@@ -1302,7 +1334,29 @@ X_CISCO_COM_CableModem_SetParamBoolValue
         pCfg->CleanDocsisLog = bValue;
         return TRUE;
     }
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+    rc =  strcmp_s( "ConfigureWan",strlen("ConfigureWan"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* save update to backup */
+        pWanCfg->ConfigureWan = bValue;
+        return TRUE;
+    }
 
+    rc =  strcmp_s( "CustomWanConfigUpdate",strlen("CustomWanConfigUpdate"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* save update to backup */
+        if (pWanCfg->CustomWanConfigUpdate != bValue)
+        {
+            pWanCfg->CustomWanConfigUpdate = bValue;
+            CosaDmlCMWanUpdateCustomConfig(pMyObject,bValue);
+        }
+        return TRUE;
+    }
+#endif
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
 }
@@ -1457,6 +1511,9 @@ X_CISCO_COM_CableModem_SetParamStringValue
 {
     UNREFERENCED_PARAMETER(hInsContext);
     PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)g_pCosaBEManager->hCM;
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+    PCOSA_DML_CM_WANCFG             pWanCfg      = &pMyObject->CmWanCfg;
+#endif
     errno_t        rc = -1;
     int ind = -1;
 
@@ -1473,7 +1530,47 @@ X_CISCO_COM_CableModem_SetParamStringValue
         }
         return TRUE;
     }
+#if defined (FEATURE_RDKB_WAN_MANAGER)
+    rc =  strcmp_s( "RequestPhyStatus",strlen("RequestPhyStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))    
+    {
+        rc = strcpy_s(pWanCfg->wanInstanceNumber,sizeof(pWanCfg->wanInstanceNumber),pString);
+        if(rc != EOK)
+        {
+            ERR_CHK(rc);
+            return FALSE;
+        }
 
+        /* save update to backup */
+        if (pWanCfg->MonitorPhyStatusAndNotify != TRUE)
+        {
+             pWanCfg->MonitorPhyStatusAndNotify = TRUE;
+            CosaDmlCMWanMonitorPhyStatusAndNotify(pMyObject);
+        }
+        return TRUE;
+    }
+
+    rc =  strcmp_s( "RequestOperationalStatus",strlen("RequestOperationalStatus"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* save update to backup */
+        if (pWanCfg->MonitorOperStatusAndNotify  != TRUE)
+        {
+            rc = strcpy_s(pWanCfg->wanInstanceNumber,sizeof(pWanCfg->wanInstanceNumber),pString);
+            if(rc != EOK)
+            {
+                ERR_CHK(rc);
+                return FALSE;
+            }
+
+            pWanCfg->MonitorOperStatusAndNotify = TRUE;
+            CosaDmlCMWanMonitorOperStatusAndNotify(pMyObject);
+        }
+        return TRUE;
+    }
+#endif
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
 }

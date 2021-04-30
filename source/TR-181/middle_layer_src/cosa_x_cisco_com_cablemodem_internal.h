@@ -81,6 +81,7 @@
     /* start of Lan config security object class content */                 \
     BOOLEAN LoopDiagnosticsStart;                                           \
     COSA_DML_CM_LOG                 CmLog;                                               \
+    COSA_DML_CM_WANCFG              CmWanCfg;                                            \
     ULONG                           CMErrorCodewordsNumber;                              \
     ULONG                           CMErrorCodewordsUpdateTime;                          \
     PCOSA_DML_CMERRORCODEWORDS_FULL pCMErrorCodewords;                                   \

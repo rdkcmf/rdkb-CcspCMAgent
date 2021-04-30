@@ -31,4 +31,5 @@ libCcspCMAgent_middle_layer_src_la_CPPFLAGS = \
     -I$(top_srcdir)/source/Custom
 
 libCcspCMAgent_middle_layer_src_la_SOURCES = plugin_main.c plugin_main_apis.c cosa_x_cisco_com_cablemodem_dml.c cosa_x_cisco_com_cablemodem_internal.c cosa_device_info_dml.c cosa_device_info_internal.c cosa_x_rdkcentral_com_cablemodem_dml.c cosa_x_rdkcentral_com_cablemodem_internal.c
+libCcspCMAgent_middle_layer_src_la_CFLAGS = $(WANMGR_CFLAGS)
 libCcspCMAgent_middle_layer_src_la_LDFLAGS =  -lccsp_common -lcm_mgnt

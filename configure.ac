@@ -41,6 +41,9 @@ AM_PROG_LIBTOOL(libtool)
 SYSTEMD_CFLAGS=" "
 SYSTEMD_LDFLAGS=" "
 
+WANMGR_CFLAGS=" "
+WANMGR_LDFLAGS=" "
+
 AC_ARG_ENABLE([notify],
         AS_HELP_STRING([--enable-notify],[enable systemd notify]),
         [
@@ -53,8 +56,26 @@ AC_ARG_ENABLE([notify],
            ],
          [echo "systemd notify is disabled."])
 
+AC_ARG_ENABLE([wanmgr],
+        AS_HELP_STRING([--enable-wanmgr],[enable wanmgr]),
+        [
+          case "${enableval}" in
+           yes) WANMGR_CFLAGS="-DENABLE_RDK_WANMANAGER"
+                WANMGR_SOURCE_T="gw_prov_sm.c"
+                WANMGR_LDFLAGS="-lgwprovappabs -lsysevent -lulog -lsecure_wrapper" ;;
+           no) AC_MSG_ERROR([wanmgr is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-notify ]) ;;
+           esac
+           ],
+         [echo "wanmgr is disabled."])
+
+
 AC_SUBST(SYSTEMD_CFLAGS)
 AC_SUBST(SYSTEMD_LDFLAGS)
+
+AC_SUBST(WANMGR_CFLAGS)
+AC_SUBST(WANMGR_LDFLAGS)
+
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])

@@ -28,8 +28,10 @@ CcspCMAgentSsp_CPPFLAGS = \
     -I$(top_srcdir)/source/TR-181/board_sbapi \
     -I$(top_srcdir)/source/TR-181/middle_layer_src \
     -I$(top_srcdir)/source/TR-181/include \
-    -I$(top_srcdir)/source/Custom
+    -I$(top_srcdir)/source/Custom \
+	-I$(top_srcdir)
 
 CcspCMAgentSsp_CFLAGS = $(SYSTEMD_CFLAGS)
-CcspCMAgentSsp_SOURCES = ssp_main.c ssp_messagebus_interface.c ssp_action.c dm_pack_datamodel.c
-CcspCMAgentSsp_LDFLAGS =  -lccsp_common -lsyscfg -lcm_mgnt $(SYSTEMD_LDFLAGS)
+CcspCMAgentSsp_CFLAGS = $(WANMGR_CFLAGS)
+CcspCMAgentSsp_SOURCES = gw_prov_sm.c ssp_main.c ssp_messagebus_interface.c ssp_action.c dm_pack_datamodel.c 
+CcspCMAgentSsp_LDFLAGS = -lccsp_common -lsyscfg -lcm_mgnt $(SYSTEMD_LDFLAGS)  $(WANMGR_LDFLAGS)
