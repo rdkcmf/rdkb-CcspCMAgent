@@ -404,14 +404,6 @@ COSA_Async_Init
             pMoca->Remove(pMoca);
             g_pCosaBEManager->hMoCA = (ANSC_HANDLE)CosaMoCACreate();
         }
-#elif defined(_COSA_DRG_CNS_)
-        PCOSA_DATAMODEL_MOCA pMoca = g_pCosaBEManager->hMoCA;
-        pMoca->Remove(pMoca);
-        g_pCosaBEManager->hMoCA = (ANSC_HANDLE)CosaMoCACreate();
-#elif defined(_COSA_DRG_TPG_)
-        PCOSA_DATAMODEL_WIFI pWifi = g_pCosaBEManager->hWifi;
-        pWifi->Remove(pWifi);
-        g_pCosaBEManager->hWifi = (ANSC_HANDLE)CosaWifiCreate();
 #endif
 
     }
@@ -436,9 +428,7 @@ COSA_IsObjSupported
      * We can rule them out by return FALSE even if they're defined in COSA XML file.
      */
 
-#if (!defined(_COSA_DRG_CNS_))
     UNREFERENCED_PARAMETER(pObjName);
-#endif
 #if 0 
     int ind = -1;
     errno_t rc = -1;
@@ -457,18 +447,6 @@ COSA_IsObjSupported
 
 #endif
 
-#if (defined(_COSA_DRG_CNS_))
-
-    errno_t rc = -1;
-    int ind =-1;
-    rc = strcmp_s( "Device.DNS.Client.",strlen("Device.DNS.Client."),pObjName ,&ind);
-    ERR_CHK(rc);
-    if((!ind) && (rc == EOK))
-    {
-        return FALSE;
-    }        
-
-#endif
 
     return TRUE;
 }
