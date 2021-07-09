@@ -75,8 +75,6 @@
 #include "ansc_string_util.h"
 
 #include "cosa_dml_api_common.h"
-#include "cosa_apis_util.h"
-#include "cosa_apis_busutil.h"
 
 /**
  * @addtogroup CM_AGENT_TYPES
