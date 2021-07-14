@@ -66,6 +66,7 @@
 
 #include "cosa_apis.h"
 #include "plugin_main_apis.h"
+#include "cm_hal.h"
 
 /**********************************************************************
                 STRUCTURE AND CONSTANT DEFINITIONS
@@ -197,6 +198,58 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
         PULONG                      pulCount,
 		PCOSA_X_RDKCENTRAL_COM_CMSTATUSOFDMA_US *ppCMStatusofUsChannel 	   
     );
+
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+/**
+ * @brief This function is used to Initialize middle layer for Device.X_RDK_CableModem.
+ * Device.X_RDK_CableModem is a CMAgent object in its DML layer.
+ *
+ * @param[in] hDml       Handle of Data Model Layer.
+ * @param[out] phContext  DM Object.
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS when successfully initialize, Otherwise returns ANSC_STATUS_FAILURE.
+ */
+ANSC_STATUS
+CosaDmlRDKCMInit
+    (
+        ANSC_HANDLE                 hDml,
+        PANSC_HANDLE                phContext
+    );
+
+/**
+ * @brief This function is used to register diplexer change callback from CM HAL API.
+ *
+ * @return  Returns nothing.
+ */
+VOID
+CosaDmlRDKCmRegisterDiplexerVariationCallback
+    (
+        VOID   
+    );
+
+/**
+ * @brief This function is used to receive diplexer change callback from CM HAL API.
+ *
+ * @param[in] CM_DIPLEXER_SETTINGS  stCMDiplexerValue , value to be received
+ * 
+ * @return  Returns 0 when successfully received and processed info, Otherwise returns -1.
+ */
+INT CosaDmlRDKCmDiplexerVariationCallback
+    (
+        CM_DIPLEXER_SETTINGS stCMDiplexerValue   
+    );
+
+/**
+ * @brief This function is used to get CM diplexer values from CM HAL API.
+ *
+ * @param[in] UINT *pUSValue , CM upstream value to be received
+ * @param[in] UINT *pDSValue , CM downstream value to be received
+ *
+ * @return  Returns ANSC_STATUS_SUCCESS when successfully received and processed info, Otherwise returns ANSC_STATUS_FAILURE.
+ */
+ANSC_STATUS CosaDmlRDKCmGetDiplexerSettings( UINT *pUSValue, UINT *pDSValue );
+
+#endif /* _CM_HIGHSPLIT_SUPPORTED_ */
 
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif /* _COSA_RDKCENTRAL_CM_APIS_H */

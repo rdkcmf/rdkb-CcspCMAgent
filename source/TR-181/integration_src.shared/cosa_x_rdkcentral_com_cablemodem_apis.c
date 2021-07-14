@@ -71,8 +71,20 @@
 //!!!  So it uses casting from one to the other
 #include "cosa_x_rdkcentral_com_cablemodem_apis.h"
 #include "cosa_x_rdkcentral_com_cablemodem_internal.h"
-#include "cm_hal.h"
 #include "safec_lib_common.h"
+
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+#include <unistd.h>
+#include <sysevent/sysevent.h>
+
+static int sysevent_fd;
+static token_t sysevent_token;
+
+extern  ANSC_HANDLE   bus_handle;
+extern char           g_Subsystem[32];
+
+static VOID CosaDmlRDKCmCheckAndDisableMoCA( VOID );
+#endif/* _CM_HIGHSPLIT_SUPPORTED_ */
 
 ANSC_STATUS
 CosaDmlRDKCentralCMInit
@@ -360,3 +372,186 @@ CosaDmlRDKCentralCmGetCMStatusofUpstreamChannel
 
     return ANSC_STATUS_SUCCESS;
 }
+
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+ANSC_STATUS
+CosaDmlRDKCMInit
+    (
+        ANSC_HANDLE                 hDml,
+        PANSC_HANDLE                phContext
+    )
+{
+    UNREFERENCED_PARAMETER(hDml);
+    UNREFERENCED_PARAMETER(phContext);
+
+    //Initialize sysevent
+	sysevent_fd = sysevent_open("127.0.0.1", SE_SERVER_WELL_KNOWN_PORT, SE_VERSION, "CMAgent", &sysevent_token);
+
+    if ( sysevent_fd < 0 )
+	{
+        CcspTraceError(("Failed to open sysevent for CMAgent '%s'\n", __FUNCTION__));
+	}
+
+    CcspTraceInfo(("%s Done\n",__FUNCTION__));
+
+	return ANSC_STATUS_SUCCESS;
+}
+
+VOID
+CosaDmlRDKCmRegisterDiplexerVariationCallback
+    (
+        VOID
+    )
+{ 
+	//Register Diplexer variation callback
+	cm_hal_Register_DiplexerVariationCallback(CosaDmlRDKCmDiplexerVariationCallback);
+}
+
+ANSC_STATUS
+CosaDmlRDKCmGetDiplexerSettings( UINT *pUSValue, UINT *pDSValue )
+{
+    CM_DIPLEXER_SETTINGS stCMDiplexer = { 0 };
+
+    //Get CM Diplexer Value
+    if( ANSC_STATUS_SUCCESS == cm_hal_get_DiplexerSettings( &stCMDiplexer ) )
+    {
+        *pUSValue = stCMDiplexer.usDiplexerSetting;
+        *pDSValue = stCMDiplexer.dsDiplexerSetting;
+
+        return ANSC_STATUS_SUCCESS;
+    }
+
+    return ANSC_STATUS_FAILURE;
+}
+
+/* CosaDmlRDKCmCheckAndDisableMoCA() */
+static VOID CosaDmlRDKCmCheckAndDisableMoCA( VOID )
+{
+	parameterValStruct_t    value 		 = { "Device.MoCA.Interface.1.Enable", "false", ccsp_boolean};
+	char  					*paramNames[]= { "Device.MoCA.Interface.1.Enable" };
+	parameterValStruct_t    **valStrMoCAEnable;
+	char  compo[ 256 ] 			  = "eRT.com.cisco.spvtg.ccsp.moca";
+	char  bus[ 256 ]   			  = "/com/cisco/spvtg/ccsp/moca";
+	char* faultParam 			  = NULL;
+	int   ret 					  = 0,
+		  nval					  = 0;
+	BOOL  bNeedtoDisableMoCA	  = FALSE;
+
+	ret = CcspBaseIf_getParameterValues ( bus_handle,
+									      compo,
+										  bus,
+										  paramNames,
+										  1,
+										  &nval,
+										  &valStrMoCAEnable
+										 );
+	if( ret != CCSP_Message_Bus_OK )
+	{
+		CcspTraceError(("%s: MoCA-Get Failed ret %d\n", __FUNCTION__, ret));
+		return;
+	}
+
+	if( strcmp( "true", valStrMoCAEnable[0]->parameterValue ) == 0 )
+	{
+		bNeedtoDisableMoCA = TRUE;
+	}
+	else
+	{
+		CcspTraceInfo(("CM_HIGH_SPLIT: Ignoring MoCA disable since already disabled\n"));
+	}
+
+	free_parameterValStruct_t ( bus_handle, nval, valStrMoCAEnable );
+
+	/* If MoCA enabled then we have to disable when this case */
+	if( bNeedtoDisableMoCA )
+	{
+		ret = CcspBaseIf_setParameterValues(  bus_handle,
+											  compo,
+											  bus,
+											  0,
+											  0,
+											  &value,
+											  1,
+											  TRUE,
+											  &faultParam );
+
+		if( ret != CCSP_Message_Bus_OK )
+		{
+			CcspTraceWarning(("%s: MoCA-Set Failed ret %d\n",__FUNCTION__,ret));
+		}
+		else
+		{
+			CcspTraceInfo(("CM_HIGH_SPLIT: Disabling MoCA due to CM High Split Detected\n"));
+		}
+	}
+}
+
+INT CosaDmlRDKCmDiplexerVariationCallback(CM_DIPLEXER_SETTINGS stCMDiplexerValue)
+{
+	INT ret = 0;
+
+    /*  
+	 *  Upstream (Upper Edge)
+	 *  Mid-split - 85MHz 
+	 *  High-split - 204MHz
+	 * 
+	 *  Downstream (Lower Edge) 
+	 *  Mid-split - 108MHz 
+	 *  High-split - 258MHz
+	 * 
+	 *  Downstream (Upper Edge) 
+	 *  Mid-split - 1002MHz 
+	 *  High-split - 1218MHz
+	 * 
+	 */
+
+    AnscTraceInfo(("CM_HIGH_SPLIT_CB: Upstream:%d Downstream:%d\n", stCMDiplexerValue.usDiplexerSetting, stCMDiplexerValue.dsDiplexerSetting));
+
+	if( stCMDiplexerValue.usDiplexerSetting > 85 )
+	{
+		//High Split Detected
+		AnscTraceInfo(("CM_HIGH_SPLIT: High Split Detected from driver\n"));
+
+		if( 0 == sysevent_set(sysevent_fd, sysevent_token, "cm_diplexer_mode", "high_split", 0)) 
+        {
+			CcspTraceInfo(("CM_HIGH_SPLIT: Updated cm_diplexer_mode as high_split\n"));	
+		}
+		else
+		{
+			CcspTraceInfo(("CM_HIGH_SPLIT: Failed to update cm_diplexer_mode as high_split\n"));	
+		}
+
+        /* 
+		 * Check whether MoCA process initialized or not. 
+		 * If Initialized then configure via DBUS call
+		 * If not initialized then MoCA process initialization will take care of high split check
+		 */
+        if ( access("/tmp/moca_initialized", F_OK) == 0 )
+		{
+			//Check and Disable MoCA if enable
+			CosaDmlRDKCmCheckAndDisableMoCA();
+		}
+        else
+        {   
+            CcspTraceInfo(("CM_HIGH_SPLIT: MoCA process is not up so unable to disable MoCA by using IPC\n"));
+        }
+	}
+	else
+	{
+		//Mid Split Detected
+		AnscTraceInfo(("CM_MID_SPLIT: Mid Split Detected from driver\n"));
+
+		//Update sysevent value for mid split mode
+        if( 0 == sysevent_set(sysevent_fd, sysevent_token, "cm_diplexer_mode", "mid_split", 0))
+		{
+			CcspTraceInfo(("CM_HIGH_SPLIT: Updated cm_diplexer_mode as mid_split\n"));	
+		}
+		else
+		{
+			CcspTraceInfo(("CM_HIGH_SPLIT: Failed to update cm_diplexer_mode as mid_split\n"));	
+		}
+	}
+
+	return ret;
+}
+#endif /* _CM_HIGHSPLIT_SUPPORTED_ */

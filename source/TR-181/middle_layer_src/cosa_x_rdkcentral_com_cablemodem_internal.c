@@ -166,6 +166,11 @@ CosaRDKCentralComCableModemInitialize
     /* Initialize middle layer for Device.X_RDKCENTRAL-COM_CableModem.  */
     CosaDmlRDKCentralCMInit(NULL, (PANSC_HANDLE)pMyObject);
 
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+    /* Initialize middle layer for Device.X_RDK_CableModem.  */
+    CosaDmlRDKCMInit(NULL, (PANSC_HANDLE)pMyObject);
+#endif /* _CM_HIGHSPLIT_SUPPORTED_ */
+
     return returnStatus;
 }
 

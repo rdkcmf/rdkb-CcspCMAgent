@@ -223,6 +223,11 @@ CosaBackEndManagerInitialize
     pMyObject->hRDKCM            = (ANSC_HANDLE)CosaRDKCentralComCableModemCreate();
     AnscTraceWarning(("  CosaRDKCentralComCableModemCreate done!\n"));
 
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+    CosaDmlRDKCmRegisterDiplexerVariationCallback();
+    AnscTraceWarning(("  CosaDmlRDKCmRegisterDiplexerVariationCallback done!\n"));
+#endif /* _CM_HIGHSPLIT_SUPPORTED_ */
+
     printf("************ CM initialization done! ********************\n");
     return returnStatus;
 }

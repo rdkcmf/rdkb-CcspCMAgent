@@ -386,5 +386,37 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
         ULONG*                      pUlong
     );
 
+#if defined (_CM_HIGHSPLIT_SUPPORTED_)
+/***********************************************************************
+
+ APIs for Object:
+
+    X_RDK_CableModem.
+
+    *  X_RDK_CableModem_GetParamUlongValue
+
+***********************************************************************/
+
+/**
+ * @brief This function checks for the parameter field of CM status and retrieves the parameter's value
+ * associated with X_RDK_CableModem. datamodel.
+ *
+ * @param[in] hInsContext     Instance handle.
+ * @param[in] ParamName       Parameter field.
+ * @param[in] pUlong          Parameter's Value.
+ *
+ * @return  Returns TRUE once get the value, returns FALSE when receive unsupported parameter.
+ */
+
+BOOL
+X_RDK_CableModem_GetParamUlongValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        ULONG*                      puLong
+    );
+
+#endif /* * _CM_HIGHSPLIT_SUPPORTED_ */
+
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif /* _COSA_RDKCENTRAL_CM_DML_H */

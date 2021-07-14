@@ -1413,7 +1413,28 @@
 						</parameters>
 					</object>
 		</objects>
-	</object>	  
+    </object>
+<?ifdef _CM_HIGHSPLIT_SUPPORTED_?>
+  	<object>
+      <name>X_RDK_CableModem</name>
+      <objectType>object</objectType>
+      <functions>
+        <func_GetParamUlongValue>X_RDK_CableModem_GetParamUlongValue</func_GetParamUlongValue>
+      </functions>
+      <parameters>
+        <parameter>
+          <name>DownstreamDiplexerSetting</name>
+          <type>unsignedInt</type>
+          <syntax>uint32</syntax>
+        </parameter>
+        <parameter>
+          <name>UpstreamDiplexerSetting</name>
+          <type>unsignedInt</type>
+          <syntax>uint32</syntax>
+        </parameter>		
+	  </parameters>	
+  </object>
+<?endif?>
   </objects>
 
 </dataModelInfo>

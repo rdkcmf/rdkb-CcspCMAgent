@@ -1336,3 +1336,84 @@ X_RDKCENTRAL_COM_CableModem_StatusOfdma_GetParamUlongValue
     return FALSE;
 }
 
+#if defined(_CM_HIGHSPLIT_SUPPORTED_)
+/***********************************************************************
+
+ APIs for Object:
+
+    X_RDK_CableModem.
+
+    *  X_RDK_CableModem_GetParamUlongValue
+
+***********************************************************************/
+/**********************************************************************  
+
+    caller:     owner of this object 
+
+    prototype: 
+
+        BOOL
+        X_RDK_CableModem_GetParamUlongValue
+            (
+                ANSC_HANDLE                 hInsContext,
+                char*                       ParamName,
+                ULONG*                      puLong
+            );
+
+    description:
+
+        This function is called to retrieve ULONG parameter value; 
+
+    argument:   ANSC_HANDLE                 hInsContext,
+                The instance handle;
+
+                char*                       ParamName,
+                The parameter name;
+
+                ULONG*                      puLong
+                The buffer of returned ULONG value;
+
+    return:     TRUE if succeeded.
+
+**********************************************************************/
+BOOL
+X_RDK_CableModem_GetParamUlongValue
+    (
+        ANSC_HANDLE                 hInsContext,
+        char*                       ParamName,
+        ULONG*                      puLong
+    )
+{
+    UNREFERENCED_PARAMETER(hInsContext);
+    errno_t rc = -1;
+    int ind = -1; 
+    UINT uiUSValue = 0, uiDSValue = 0;
+
+    //Get US and DS Diplexer values from HAL
+    CosaDmlRDKCmGetDiplexerSettings( &uiUSValue, &uiDSValue );
+
+    /* check the parameter name and return the corresponding value */
+    rc =  strcmp_s( "DownstreamDiplexerSetting",strlen("DownstreamDiplexerSetting"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* collect value */
+        *puLong = uiDSValue;
+
+        return TRUE;
+    }
+
+    rc =  strcmp_s("UpstreamDiplexerSetting",strlen("UpstreamDiplexerSetting"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        /* collect value */
+        *puLong = uiUSValue;
+
+        return TRUE;
+    }
+
+    /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
+    return FALSE;
+}
+#endif /* * _CM_HIGHSPLIT_SUPPORTED_ */
