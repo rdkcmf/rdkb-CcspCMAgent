@@ -75,6 +75,7 @@
 #include "cosa_device_info_internal.h"
 #include "safec_lib_common.h"
 #include <syscfg/syscfg.h>
+#include "secure_wrapper.h"
 
 #define CM_HTTPURL_LEN 512
 #define VALID_fW_LEN 128
@@ -620,7 +621,7 @@ void *FWDL_ThreadFunc(void *args)
 		}
 		CcspTraceInfo((" Waiting for reboot ready over, setting last reboot reason \n"));
 
-		system("dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason string Forced_Software_upgrade");
+		v_secure_system("dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason string Forced_Software_upgrade");
 
 		ret = RETURN_ERR;
 		ret = cm_hal_HTTP_Download_Reboot_Now();

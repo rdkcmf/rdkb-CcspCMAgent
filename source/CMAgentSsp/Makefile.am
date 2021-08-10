@@ -34,4 +34,5 @@ CcspCMAgentSsp_CPPFLAGS = \
 CcspCMAgentSsp_CFLAGS = $(SYSTEMD_CFLAGS)
 CcspCMAgentSsp_CFLAGS = $(WANMGR_CFLAGS)
 CcspCMAgentSsp_SOURCES = gw_prov_sm.c ssp_main.c ssp_messagebus_interface.c ssp_action.c dm_pack_datamodel.c 
-CcspCMAgentSsp_LDFLAGS = -lccsp_common -lsyscfg -lcm_mgnt $(SYSTEMD_LDFLAGS)  $(WANMGR_LDFLAGS)
+CcspCMAgentSsp_LDFLAGS = -lccsp_common -lsyscfg -lcm_mgnt -lsecure_wrapper $(SYSTEMD_LDFLAGS)  $(WANMGR_LDFLAGS) 
+

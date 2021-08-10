@@ -75,6 +75,7 @@
 #include "cosa_x_cisco_com_cablemodem_internal.h"
 #include "syscfg/syscfg.h"
 #include "safec_lib_common.h"
+#include <sys/stat.h>
 
 #define  PVALUE_MAX 1023 
 #if defined (FEATURE_RDKB_WAN_MANAGER)
@@ -148,7 +149,7 @@ ANSC_STATUS SetParamValues( char *pComponent, char *pBus, char *pParamName, char
 void *PollDocsisInformations(void *args)
 {
   UNREFERENCED_PARAMETER(args);
-  system("touch /nvram/docsispolltime.txt");
+  creat("/nvram/docsispolltime.txt",S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
   FILE *fp;
   char buff[30];

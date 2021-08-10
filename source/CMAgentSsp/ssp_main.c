@@ -51,6 +51,7 @@
 //#include <docsis_ext_interface.h>
 #include "safec_lib_common.h"
 #include "syscfg/syscfg.h"
+#include <sys/stat.h>
 
 #define DEBUG_INI_NAME "/etc/debug.ini"
 
@@ -1004,7 +1005,7 @@ int main(int argc, char* argv[])
     CcspTraceInfo(("RDKB_SYSTEM_BOOT_UP_LOG : CcspCMAgent sd_notify Called\n"));
 #endif
 
-    system("touch /tmp/cm_initialized");
+    creat("/tmp/cm_initialized",S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
     printf("Entering CM loop\n");
     CcspTraceWarning(("RDKB_SYSTEM_BOOT_UP_LOG : Entering CM loop\n"));
