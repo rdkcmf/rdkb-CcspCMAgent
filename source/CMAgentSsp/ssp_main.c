@@ -62,6 +62,12 @@
 #include "ccsp_custom_logs.h"
 #endif
 
+#if (defined(INTEL_PUMA7))
+#include "syscfg/syscfg.h"
+#include "cap.h"
+static cap_user appcaps;
+#endif
+
 #define WAN_DBUS_PATH                     "/com/cisco/spvtg/ccsp/wanmanager"
 #define WAN_COMPONENT_NAME                "eRT.com.cisco.spvtg.ccsp.wanmanager"
 #define WAN_COMP_NAME_WITHOUT_SUBSYSTEM "com.cisco.spvtg.ccsp.wanmanager"
@@ -775,7 +781,31 @@ void* ThreadBootInformMsg(void *arg)
 }
 
 #endif
-
+#if (defined(INTEL_PUMA7))
+static bool drop_root()
+{
+    char buf[8] = {'\0'};
+    appcaps.caps = NULL;
+    appcaps.user_name = NULL;
+    bool ret = false;
+    syscfg_init();
+    syscfg_get( NULL, "NonRootSupport", buf, sizeof(buf));
+    if( buf != NULL )  {
+        if (strncmp(buf, "true", strlen("true")) == 0) {
+            CcspTraceInfo(("Dropping root privileges for CcspCMAgentSsp Process\n"));
+            if(init_capability() != NULL) {
+               if(drop_root_caps(&appcaps) != -1) {
+                  if(update_process_caps(&appcaps) != -1) {
+                     read_capability(&appcaps);
+                     ret = true;
+                  }
+               }
+            }
+        }
+    }
+    return ret;
+}
+#endif
 int main(int argc, char* argv[])
 {
     int                             cmdChar            = 0;
@@ -865,6 +895,11 @@ int main(int argc, char* argv[])
         cmd_dispatch(cmdChar);
     }
 #elif defined(_ANSC_LINUX)
+#if (defined(INTEL_PUMA7))
+    if(!drop_root()) {
+       CcspTraceInfo(("Dropping root privileges for CcspCMAgentSsp is failed\n"));
+    }
+#endif
     if ( bRunAsDaemon )
         daemonize();
 
