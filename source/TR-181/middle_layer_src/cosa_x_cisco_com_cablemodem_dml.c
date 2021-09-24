@@ -1348,12 +1348,8 @@ X_CISCO_COM_CableModem_SetParamBoolValue
     ERR_CHK(rc);
     if((!ind) && (rc == EOK))
     {
-        /* save update to backup */
-        if (pWanCfg->CustomWanConfigUpdate != bValue)
-        {
-            pWanCfg->CustomWanConfigUpdate = bValue;
-            CosaDmlCMWanUpdateCustomConfig(pMyObject,bValue);
-        }
+        pWanCfg->CustomWanConfigUpdate = bValue;
+        CosaDmlCMWanUpdateCustomConfig(pMyObject,bValue);
         return TRUE;
     }
 #endif
