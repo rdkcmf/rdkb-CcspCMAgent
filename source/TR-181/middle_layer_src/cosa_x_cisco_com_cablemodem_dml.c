@@ -1566,6 +1566,16 @@ X_CISCO_COM_CableModem_SetParamStringValue
         }
         return TRUE;
     }
+    rc =  strcmp_s( "PostCfgWanFinalize",strlen("PostCfgWanFinalize"),ParamName, &ind);
+    ERR_CHK(rc);
+    if((!ind) && (rc == EOK))
+    {
+        if ( 0 != access( "/tmp/autowan_iface_finalized" , F_OK ) )
+        {
+            system("touch /tmp/autowan_iface_finalized"); 
+        }
+        return TRUE;
+    }
 #endif
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
