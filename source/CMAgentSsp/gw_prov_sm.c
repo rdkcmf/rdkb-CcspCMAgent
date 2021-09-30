@@ -2118,7 +2118,7 @@ static void *GWP_sysevent_threadfunc(void *data)
                         webui_started = 1 ;
 #ifdef CONFIG_CISCO_HOME_SECURITY
 			{
-			char buf[0] = {0};
+			char buf[10] = {0};
                         //Piggy back off the webui start event to signal XHS startup
                         sysevent_get(sysevent_fd_gs, sysevent_token_gs, "homesecurity_lan_l3net", buf, sizeof(buf));
                         if (buf[0] != '\0') sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv4-up", buf, 0);
