@@ -63,7 +63,6 @@
 #endif
 
 #if (defined(INTEL_PUMA7))
-#include "syscfg/syscfg.h"
 #include "cap.h"
 static cap_user appcaps;
 #endif
@@ -784,24 +783,26 @@ void* ThreadBootInformMsg(void *arg)
 #if (defined(INTEL_PUMA7))
 static bool drop_root()
 {
-    char buf[8] = {'\0'};
     appcaps.caps = NULL;
     appcaps.user_name = NULL;
     bool ret = false;
-    syscfg_init();
-    syscfg_get( NULL, "NonRootSupport", buf, sizeof(buf));
-    if( buf != NULL )  {
-        if (strncmp(buf, "true", strlen("true")) == 0) {
-            CcspTraceInfo(("Dropping root privileges for CcspCMAgentSsp Process\n"));
-            if(init_capability() != NULL) {
-               if(drop_root_caps(&appcaps) != -1) {
-                  if(update_process_caps(&appcaps) != -1) {
-                     read_capability(&appcaps);
-                     ret = true;
-                  }
-               }
-            }
-        }
+    bool blocklist_ret = false;
+    blocklist_ret = isBlocklisted();
+    if(blocklist_ret)
+    {
+      CcspTraceInfo(("NonRoot feature is disabled\n"));
+    }
+    else
+    {
+    CcspTraceInfo(("NonRoot feature is enabled, dropping root privileges for CcspCMAgentSsp Process\n"));
+    if(init_capability() != NULL) {
+       if(drop_root_caps(&appcaps) != -1) {
+          if(update_process_caps(&appcaps) != -1) {
+             read_capability(&appcaps);
+             ret = true;
+          }
+       }
+    }
     }
     return ret;
 }
