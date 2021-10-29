@@ -141,7 +141,7 @@ ssp_PnmMbi_MessageBusEngage
     /* Wait for PSM */
     waitConditionReady(bus_handle, PsmName, CCSP_DBUS_PATH_PSM, component_id);
 #endif
-    CcspTraceInfo(("!!! Connected to message bus... bus_handle: 0x%08X !!!\n", bus_handle));
+    CcspTraceInfo(("!!! Connected to message bus... bus_handle: 0x%8p !!!\n", bus_handle));
 
     CCSP_Msg_SleepInMilliSeconds(1000);
 
@@ -178,7 +178,7 @@ ssp_PnmMbi_MessageBusEngage
 
     if ( returnStatus != CCSP_Message_Bus_OK )
     {
-        CcspTraceError((" !!! CCSP_Message_Bus_Register_Path ERROR returnStatus: %d\n!!!\n", returnStatus));
+        CcspTraceError((" !!! CCSP_Message_Bus_Register_Path ERROR returnStatus: %lu\n!!!\n", returnStatus));
 
         return returnStatus;
     }
@@ -195,7 +195,7 @@ ssp_PnmMbi_MessageBusEngage
 
     if ( returnStatus != CCSP_Message_Bus_OK )
     {
-        CcspTraceError((" !!! CCSP_Message_Bus_Register_Event: CurrentSessionIDSignal ERROR returnStatus: %d!!!\n", returnStatus));
+        CcspTraceError((" !!! CCSP_Message_Bus_Register_Event: CurrentSessionIDSignal ERROR returnStatus: %lu!!!\n", returnStatus));
 
         return returnStatus;
     }

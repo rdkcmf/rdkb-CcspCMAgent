@@ -207,7 +207,7 @@ void *PollDocsisInformations(void *args)
         ERR_CHK(rc);
         if((ind) && (rc == EOK))
 	{
-    		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s and Downstream is %s on channel %d\n",pMyObject->pDownstreamChannel[i].Frequency,pMyObject->pDownstreamChannel[i].LockStatus,i));
+		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Downstream frequency is %s and Downstream is %s on channel %lu\n",pMyObject->pDownstreamChannel[i].Frequency,pMyObject->pDownstreamChannel[i].LockStatus,i));
 	}
     }
     pMyObject->UpstreamChannelNumber = 0;
@@ -232,7 +232,7 @@ void *PollDocsisInformations(void *args)
         if (pMyObject->pUpstreamChannel[i].Frequency[0] != '\0')
 
 	{
-    		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s and Upstream is %s on channel %d\n",pMyObject->pUpstreamChannel[i].Frequency,pMyObject->pUpstreamChannel[i].LockStatus,i));
+		CcspTraceWarning(("RDKB_DOCSIS_DIAG_INFO: CM Upstream frequency is %s and Upstream is %s on channel %lu\n",pMyObject->pUpstreamChannel[i].Frequency,pMyObject->pUpstreamChannel[i].LockStatus,i));
 	}
 
     }
@@ -713,7 +713,7 @@ CosaDmlCmGetDocsisLog
     errno_t rc = -1;
 
     if((!pulCount) || (!ppConf)){
-	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %ln , ppConf = %p , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
 
@@ -759,7 +759,7 @@ CosaDmlCmGetDownstreamChannel
 {
     UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
-	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %ln , ppConf = %p , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
     /* Coverity Fix CID:79243 CHECKED_RETURN */
@@ -796,7 +796,7 @@ CosaDmlCmGetUpstreamChannel
 {
     UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
-	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %ln , ppConf = %p , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
    /*Coverity Fix CID: 78775 CHECKED_RETURN */
@@ -878,7 +878,7 @@ CosaDmlCmGetCMErrorCodewords
 {
     UNREFERENCED_PARAMETER(hContext);
     if((!pulCount) || (!ppConf)){
-	AnscTraceWarning(("Input parameter is NULL  pulCount = %d , ppConf = %d , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
+	AnscTraceWarning(("Input parameter is NULL  pulCount = %ln , ppConf = %p , %s, %d\n",pulCount, ppConf, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
     /*Coverity Fix CID:55875 CHECKED_RETURN */
@@ -1095,7 +1095,7 @@ CosaDmlCmGetCPEList
     char    LanMode[64] = {0};
     ULONG   size = 64;
     if((!pulInstanceNumber) || (!ppCPEList)){
-	AnscTraceWarning(("Input parameter is NULL  pulInstanceNumber = %d , ppCPEList = %d , %s, %d\n",pulInstanceNumber, ppCPEList, __FUNCTION__, __LINE__));
+	AnscTraceWarning(("Input parameter is NULL  pulInstanceNumber = %ln , ppCPEList = %p , %s, %d\n",pulInstanceNumber, ppCPEList, __FUNCTION__, __LINE__));
 	return ANSC_STATUS_FAILURE;
 	}
     if(0 != g_GetParamValueString(g_pDslhDmlAgent, LANMODE_DM, LanMode, &size))
