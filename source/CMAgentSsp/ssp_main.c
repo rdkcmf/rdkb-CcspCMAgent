@@ -952,13 +952,9 @@ int main(int argc, char* argv[])
 
     syscfg_init();
 #ifdef ENABLE_RDK_WANMANAGER
-     if ( 0 != access( "/nvram/ETHWAN_ENABLE" , F_OK ) )
-     {
-               CcspTraceInfo(("pthread create docsis registration\n"));
-            pthread_create(&docsisclbk_tid, NULL, GWP_docsisregistration_threadfunc, NULL);
-     }
+    CcspTraceInfo(("pthread create docsis registration\n"));
+    pthread_create(&docsisclbk_tid, NULL, GWP_docsisregistration_threadfunc, NULL);
 #endif
-
 	
     cmd_dispatch('e');
     CcspTraceInfo(("CM_DBG:-------Read Log Info\n"));

@@ -73,11 +73,12 @@
 #include "cm_hal.h"
 
 #include "cosa_x_cisco_com_cablemodem_internal.h"
-
+#include "syscfg/syscfg.h"
 #include "safec_lib_common.h"
 
 #define  PVALUE_MAX 1023 
 #if defined (FEATURE_RDKB_WAN_MANAGER)
+#define WAN_INTERFACE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Wan.Name"
 #define DOCSIS_INF_NAME "cm0"
 #define WAN_PHY_NAME "erouter0"
 #define MONITOR_PHY_STATUS_MAX_TIMEOUT 240
@@ -316,8 +317,8 @@ CosaDmlCMWanUpdateCustomConfig
         BOOL             bValue
     )
 {
+#ifdef _COSA_BCM_ARM_
     char command[256] = {0};
-    UNREFERENCED_PARAMETER(arg);
     if (bValue == TRUE)
     {
        memset(command,0,sizeof(command));
@@ -330,6 +331,12 @@ CosaDmlCMWanUpdateCustomConfig
         snprintf(command,sizeof(command),"sysctl -w net.ipv6.conf.%s.accept_ra=0",DOCSIS_INF_NAME);
         system(command);
         memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"sysctl -w net.ipv6.conf.%s.disable_ipv6=1",DOCSIS_INF_NAME);
+        system(command); 
+        memset(command,0,sizeof(command));
+        snprintf(command,sizeof(command),"ip link set %s up",DOCSIS_INF_NAME);
+        system(command);
+        memset(command,0,sizeof(command));
         snprintf(command,sizeof(command),"brctl addif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
         system(command);
     }
@@ -339,6 +346,10 @@ CosaDmlCMWanUpdateCustomConfig
         snprintf(command,sizeof(command),"brctl delif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
         system(command);
     }
+#else
+    UNREFERENCED_PARAMETER(bValue);
+#endif
+    UNREFERENCED_PARAMETER(arg);
     return ANSC_STATUS_SUCCESS;
 }
 
@@ -496,6 +507,65 @@ void* ThreadMonitorOperStatusAndNotify(void *args)
     return args;
 }
 
+void* ThreadUpdateInformMsg(void *args)
+{
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject    = (PCOSA_DATAMODEL_CABLEMODEM)args;
+    pthread_detach(pthread_self());
+    if (pMyObject)
+    {
+        PCOSA_DML_CM_WANCFG pWanCfg = &pMyObject->CmWanCfg;
+        if (pWanCfg)
+        {
+            INT iWanInstanceNumber = WAN_CM_INTERFACE_INSTANCE_NUM;
+            BOOL bEthWanEnable = FALSE;
+            CHAR wanName[64];
+            CHAR out_value[64];
+            CHAR acSetParamName[256];
+            ANSC_STATUS retval = ANSC_STATUS_SUCCESS;
+
+            if (pWanCfg->wanInstanceNumber)
+            {
+                iWanInstanceNumber = atoi(pWanCfg->wanInstanceNumber);
+            }
+
+            if ( 0 == access( "/nvram/ETHWAN_ENABLE" , F_OK ) )
+            {
+                bEthWanEnable = TRUE;
+            }
+
+            memset(out_value,0,sizeof(out_value));
+            memset(wanName,0,sizeof(wanName));
+            syscfg_get(NULL, "wan_physical_ifname", out_value, sizeof(out_value));
+
+            if(0 != strnlen(out_value,sizeof(out_value)))
+            {
+                snprintf(wanName, sizeof(wanName), "%s", out_value);
+            }
+            else
+            {
+                snprintf(wanName, sizeof(wanName), "%s", WAN_PHY_NAME);
+            }
+
+
+            memset(acSetParamName, 0, sizeof(acSetParamName));
+            snprintf(acSetParamName, sizeof(acSetParamName), WAN_INTERFACE_PARAM_NAME, iWanInstanceNumber);
+
+            if (bEthWanEnable == TRUE)
+            {
+                retval = SetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, acSetParamName, DOCSIS_INF_NAME,ccsp_string,TRUE);
+            }
+            else
+            {
+                retval = SetParamValues(WAN_COMPONENT_NAME, WAN_DBUS_PATH, acSetParamName, wanName,ccsp_string,TRUE);
+            }
+            if (retval != ANSC_STATUS_SUCCESS)
+            {
+                 CcspTraceError(("%s-%d Failed to set %s\n",__FUNCTION__,__LINE__,acSetParamName));
+            }
+        }
+    }
+    return args;   
+}
 
 ANSC_STATUS
 CosaDmlCMWanMonitorPhyStatusAndNotify(void *arg)
@@ -514,6 +584,15 @@ CosaDmlCMWanMonitorOperStatusAndNotify(void *arg)
     pthread_create(&CmOperMonitorThreadId, NULL, &ThreadMonitorOperStatusAndNotify, pMyObject);
     return ANSC_STATUS_SUCCESS;
 }
+
+ANSC_STATUS CosaDmlCMUpdateInformMsgToWanMgr(void *arg)
+{
+    pthread_t CmInformMsgThreadId;
+    PCOSA_DATAMODEL_CABLEMODEM      pMyObject = (PCOSA_DATAMODEL_CABLEMODEM)arg;
+    pthread_create(&CmInformMsgThreadId, NULL, &ThreadUpdateInformMsg, pMyObject);
+    return ANSC_STATUS_SUCCESS;
+}
+
 #endif
 
 ANSC_STATUS

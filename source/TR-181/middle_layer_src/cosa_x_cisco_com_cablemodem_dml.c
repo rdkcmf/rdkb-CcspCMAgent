@@ -1574,6 +1574,13 @@ X_CISCO_COM_CableModem_SetParamStringValue
         {
             system("touch /tmp/autowan_iface_finalized"); 
         }
+        rc = strcpy_s(pWanCfg->wanInstanceNumber,sizeof(pWanCfg->wanInstanceNumber),pString);
+        if(rc != EOK)
+        {
+            ERR_CHK(rc);
+            return FALSE;
+        }
+        CosaDmlCMUpdateInformMsgToWanMgr(pMyObject);
         return TRUE;
     }
 #endif

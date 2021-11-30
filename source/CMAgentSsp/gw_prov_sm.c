@@ -353,6 +353,23 @@ static int sIPv6_acquired = 0;
 static void GWP_EnterBridgeMode(void);
 static void GWP_EnterRouterMode(void);
 
+bool IsEthWanEnabled()
+{
+    char buf[32];
+
+    memset(buf,0,sizeof(buf));
+    if (0 == access( "/nvram/ETHWAN_ENABLE" , F_OK ))
+    {
+        if (syscfg_get(NULL, "eth_wan_enabled", buf, sizeof(buf)) == 0)
+        {
+            if (0 == strcmp(buf,"true"))
+            {
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
 eGwpThreadType Get_GwpThreadType(char * name)
 {
     errno_t rc       = -1;
@@ -1423,6 +1440,12 @@ static void GWP_UpdateERouterMode(void)
     }
 }
 
+static void UpdateActiveDeviceMode()
+{
+    bridge_mode = GWP_SysCfgGetInt("bridge_mode");
+    active_mode = getSyseventBridgeMode(eRouterMode,bridge_mode);
+}
+
 /**************************************************************************/
 /*! \fn void GWP_ProcessUtopiaRestart(void)
  **************************************************************************
@@ -1905,9 +1928,17 @@ static void *GWP_sysevent_threadfunc(void *data)
         }
         else
         {
-                CcspTraceInfo((" %s : name = %s, val = %s \n", __FUNCTION__, name, val));
+           CcspTraceInfo((" %s : name = %s, val = %s \n", __FUNCTION__, name, val));
             eGwpThreadType ret_value;
             ret_value = Get_GwpThreadType(name);
+            if (TRUE == IsEthWanEnabled())
+            {
+                if (ret_value == SYSTEM_RESTART)
+                {
+                    UpdateActiveDeviceMode();
+                }
+                continue;
+            } 
             if (ret_value == EROUTER_MODE)
             {
                 oldRouterMode = eRouterMode;
@@ -2015,6 +2046,11 @@ static void *GWP_sysevent_threadfunc(void *data)
 **************************************************************************/
 static void GWP_act_DocsisLinkDown_callback_1()
 {
+
+    if (TRUE == IsEthWanEnabled())
+    {
+        return;
+    }
     phylink_wan_state = 0;
 	CcspTraceInfo((" Entry %s \n", __FUNCTION__));
     sysevent_set(sysevent_fd_gs, sysevent_token_gs, "phylink_wan_state", "down", 0);
@@ -2027,7 +2063,12 @@ static void GWP_act_DocsisLinkDown_callback_1()
 
 static void GWP_act_DocsisLinkDown_callback_2()
 {
-                CcspTraceInfo(("Entry %s \n",__FUNCTION__));
+    if (TRUE == IsEthWanEnabled())
+    {
+        return;
+    }
+ 
+    CcspTraceInfo(("Entry %s \n",__FUNCTION__));
     if (eRouterMode != DOCESAFE_ENABLE_DISABLE_extIf)
     {
         ClbkInfo info = {0};
@@ -2082,6 +2123,10 @@ static int GWP_act_DocsisLinkUp_callback()
     int uptime = 0;
     char buffer[64] = {0};
     FILE *fp = NULL;
+    if (TRUE == IsEthWanEnabled())
+    {
+        return -1;
+    } 
     phylink_wan_state = 1;
     CcspTraceInfo(("Entry %s \n",__FUNCTION__));
     info.eventType = EVENT_GWP_LINK_UP;
@@ -2875,6 +2920,7 @@ static void GWP_act_ProvEntry_callback()
 #ifdef MULTILAN_FEATURE
     macaddr_t macAddr;
 #endif
+
 #if !defined(_PLATFORM_RASPBERRYPI_)
     CcspTraceInfo(("Entry %s \n",__FUNCTION__));
     //v_secure_system("sysevent set lan-start");
@@ -3242,12 +3288,7 @@ void *GWP_EventHandler(void *arg)
             }
             break;
         }
-        v_secure_system("ccsp_bus_client_tool eRT setv  Device.X_RDK_WanManager.CPEInterface.1.Wan.Name string erouter0 false"); 
         v_secure_system("ccsp_bus_client_tool eRT setv %s string %s true",WAN_INTERFACE_PHY_STATUS_PARAM_NAME,paramValue);
-
-        sleep(5); //Just to check
-
-        v_secure_system("ccsp_bus_client_tool eRT setv  Device.X_RDK_WanManager.CPEInterface.1.Wan.LinkStatus string Up true"); 
  
         //CosaDmlSetParamValues(/*WAN_COMPONENT_NAME*/"eRT.com.cisco.spvtg.ccsp.lmlite", /*WAN_DBUS_PATH*/"/com/cisco/spvtg/ccsp/lmlite", paramName, paramValue, ccsp_string, TRUE);
 
