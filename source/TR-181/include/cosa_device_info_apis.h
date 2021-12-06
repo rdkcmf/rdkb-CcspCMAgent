@@ -128,7 +128,7 @@ ANSC_STATUS CosaDmlDIGetDLStatus(ANSC_HANDLE hContext, char *DL_Status);
  *
  * @return  Returns ANSC_STATUS_SUCCESS on successfully getting download protocol.
  */
-ANSC_STATUS CosaDmlDIGetProtocol(ANSC_HANDLE hContext, char *Protocol);
+ANSC_STATUS CosaDmlDIGetProtocol(char *Protocol);
 
 #if defined (_COSA_INTEL_XB3_ARM_) || defined (_XB6_PROD_REQ_) || defined (_XB6_PRODUCT_REQ_)
 /**
@@ -187,7 +187,8 @@ void convert_to_validFW(char *fw,char *valid_fw);
 
 BOOL IsFileUpdateNeeded(ANSC_HANDLE hContext );
 void WriteFactoryResetParams(ANSC_HANDLE hContext );
-
+ANSC_STATUS CosaDmlDIGetURL(ANSC_HANDLE pMyObject);
+ANSC_STATUS CosaDmlDIGetImage(ANSC_HANDLE pMyObject);
 
 /** @} */  //END OF GROUP CM_AGENT_APIS
 #endif

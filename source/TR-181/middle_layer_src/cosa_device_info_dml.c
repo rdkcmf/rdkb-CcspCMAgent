@@ -257,9 +257,9 @@ DeviceInfo_GetParamStringValue
 
     {
     	 if(pMyObject->Download_Control_Flag)
-    	 {
+   	 {
 	        /* collect value */
-	        CosaDmlDIGetProtocol((ANSC_HANDLE)pMyObject, Protocol);
+	        CosaDmlDIGetProtocol(Protocol);
 	        if ( _ansc_strlen(Protocol) >= *pUlSize )
 	        {
 	            *pUlSize = _ansc_strlen(Protocol);
@@ -284,6 +284,9 @@ DeviceInfo_GetParamStringValue
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
+                //sometimes syscfg db init not done during bootup call of CosaDmlDIInit.So recalling CosaDmlDIGetURL
+                if(_ansc_strlen(pMyObject->DownloadURL) == 0)
+                    CosaDmlDIGetURL((ANSC_HANDLE)pMyObject);
 	        /* collect value */
 	        if ( _ansc_strlen(pMyObject->DownloadURL) >= *pUlSize )
 	        {
@@ -309,6 +312,9 @@ DeviceInfo_GetParamStringValue
     {
     	 if(pMyObject->Download_Control_Flag)
     	 {
+                //sometimes syscfg db init not done during bootup call of CosaDmlDIInit.So recalling CosaDmlDIGetURL
+                if(_ansc_strlen(pMyObject->Firmware_To_Download) == 0)
+                    CosaDmlDIGetImage((ANSC_HANDLE)pMyObject); 
 	        /* collect value */
 	        if ( _ansc_strlen(pMyObject->Firmware_To_Download) >= *pUlSize )
 	        {
