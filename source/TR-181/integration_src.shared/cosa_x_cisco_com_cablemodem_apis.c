@@ -709,6 +709,7 @@ CosaDmlCmGetDocsisLog
     CMMGMT_CM_EventLogEntry_t entries[DOCSIS_EVENT_LOG_SIZE];
     int count = 0;
     int i;
+    int cnt=0;
     PCOSA_DML_DOCSISLOG_FULL p;
     errno_t rc = -1;
 
@@ -725,26 +726,29 @@ CosaDmlCmGetDocsisLog
         return ANSC_STATUS_FAILURE;
     }
     for(i=0;i<count;i++) {
-        rc =   memcpy_s(p[i].Time,sizeof(p[i].Time), ctime(&(entries[i].docsDevEvFirstTime.tv_sec)), sizeof(p[i].Time));
+     if (entries[i].docsDevEvFirstTime.tv_sec == 0 )
+      continue;
+        rc =   memcpy_s(p[cnt].Time,sizeof(p[cnt].Time), ctime(&(entries[i].docsDevEvFirstTime.tv_sec)), sizeof(p[cnt].Time));
          if(rc != EOK)
          {
             ERR_CHK(rc);
             free(p);
             return ANSC_STATUS_FAILURE;
          }   
-        p[i].EventID = entries[i].docsDevEvId;
-        p[i].EventLevel = entries[i].docsDevEvLevel;
-        rc = memcpy_s(p[i].Description,sizeof(p[i].Description), entries[i].docsDevEvText,sizeof(entries[i].docsDevEvText));
+        p[cnt].EventID = entries[i].docsDevEvId;
+        p[cnt].EventLevel = entries[i].docsDevEvLevel;
+        rc = memcpy_s(p[cnt].Description,sizeof(p[cnt].Description), entries[i].docsDevEvText,sizeof(entries[i].docsDevEvText));
         if(rc != EOK)
          {
             ERR_CHK(rc);
             free(p);
             return ANSC_STATUS_FAILURE;
          }
+         cnt++;
 
     }
 
-    *pulCount = count;
+    *pulCount = cnt;
     *ppConf = p;
     return ANSC_STATUS_SUCCESS;
 }
