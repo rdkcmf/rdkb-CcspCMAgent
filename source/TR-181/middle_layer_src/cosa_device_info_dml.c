@@ -139,11 +139,11 @@ DeviceInfo_GetParamBoolValue
         return TRUE;
     }
 
-#if defined (_XB6_PRODUCT_REQ_)
      rc =  strcmp_s( "X_RDKCENTRAL-COM_CableRfSignalStatus", strlen("X_RDKCENTRAL-COM_CableRfSignalStatus"),ParamName,&ind);
      ERR_CHK(rc);
      if((!ind) && (rc == EOK))
     {
+#if defined (_XB6_PRODUCT_REQ_)
         BOOLEAN rfSignalStatus = TRUE; // default is TRUE.
 #ifdef ENABLE_RDK_WANMANAGER
          if ( 0 == access( "/tmp/rfoff" , F_OK ) )
@@ -163,10 +163,12 @@ DeviceInfo_GetParamBoolValue
             *pBool = FALSE;
             AnscTraceWarning(("Cable RF Signal Not Detected\n"));
         }
+#else
+        *pBool = FALSE;
+#endif
 
         return TRUE;
     }
-#endif
 
     /* AnscTraceWarning(("Unsupported parameter '%s'\n", ParamName)); */
     return FALSE;
