@@ -807,6 +807,7 @@ static bool drop_root()
     return ret;
 }
 #endif
+
 int main(int argc, char* argv[])
 {
     int                             cmdChar            = 0;

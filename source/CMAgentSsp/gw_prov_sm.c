@@ -66,9 +66,8 @@
 #include "CC-ARM/sys_types.h"
 #include "CC-ARM/sys_nettypes.h"
 #include "generic_tlv_parser.h"
-#else
-#include <syscfg/syscfg.h>
 #endif
+#include <syscfg/syscfg.h>
 #include <pthread.h>
 #include "gw_prov_abstraction.h"
 #include "Tr69_Tlv.h"
@@ -290,7 +289,13 @@ static void check_lan_wan_ready();
 static TlvParseCallbackStatusExtIf_e GW_setTopologyMode(Uint8 type, Uint16 length, const Uint8* value);
 #endif
 /* New implementation !*/
+#if !defined(INTEL_PUMA7)
 static void LAN_start();
+#endif
+#if defined(INTEL_PUMA7)
+void setGWP_ipv4_event();
+void setGWP_ipv6_event();
+#endif
 
 void *GWP_UpdateTr069CfgThread( void *data );
 
@@ -303,11 +308,7 @@ int GWP_PushEventInMsgq(ClbkInfo *pInfo );
 
 
 static int snmp_inited = 0;
-static int pnm_inited = 0;
-static int netids_inited = 0;
 static int gDocTftpOk = 0;
-static int hotspot_started = 0;
-static int lan_telnet_started = 0;
 #ifdef CONFIG_CISCO_FEATURE_CISCOCONNECT
 static int ciscoconnect_started = 0;
 #endif
@@ -1096,10 +1097,29 @@ validate_mode(int* bridge_mode, int* eRouterMode)
 #if !defined(_PLATFORM_RASPBERRYPI_)
 void docsis_gotEnable_callback(Uint8 state)
 {
+    char buf[32] = {0};
+
 	CcspTraceInfo((" Entry %s , state = %d \n", __FUNCTION__, state));
    eRouterMode = state;
-
+    snprintf(buf, sizeof(buf), "%d", eRouterMode);
+    sysevent_set(sysevent_fd_gs, sysevent_token_gs, "erouterModeInternal", buf, 0);
 }
+
+#if defined(INTEL_PUMA7)
+/**************************************************************************/
+/*! \fn void docsis_GetRATransInterval_callback(Uint16 raTransInterval)
+ **************************************************************************
+ *  \brief Get Router Advertisement Transfer Interval Time
+ *  \param[in] raTransInterval - Value
+ *  \return None
+**************************************************************************/
+void docsis_GetRATransInterval_callback(Uint16 raTransInterval)
+{
+    int radv_trans_interval = raTransInterval;
+    GWP_SysCfgSetInt("ra_interval", radv_trans_interval);  // save the Router Advertisement Transfer Interval Time
+}
+#endif
+
 /**************************************************************************/
 /*! \fn void GWP_DocsisInited(void)
  **************************************************************************
@@ -1337,6 +1357,7 @@ static void GWP_UpdateERouterMode(void)
             // to 2 since user did not specify it
             bridge_mode = 2;
             webui_started = 0;
+            sysevent_set(sysevent_fd_gs, sysevent_token_gs, "webuiStartedFlagReset", "0", 0);
             active_mode = BRMODE_GLOBAL_BRIDGE; //This is set so that the callback from LanMode does not trigger another transition.
                                                 //The code here will here will handle it.
 #ifdef DSLITE_FEATURE_SUPPORT
@@ -1382,6 +1403,7 @@ static void GWP_UpdateERouterMode(void)
             /*else*/ if (oldRouterMode == DOCESAFE_ENABLE_DISABLE_extIf) // from disable to enable
             {
                 webui_started = 0;
+                sysevent_set(sysevent_fd_gs, sysevent_token_gs, "webuiStartedFlagReset", "0", 0);
                 active_mode = BRMODE_ROUTER; //This is set so that the callback from LanMode does not trigger another transition.
                                                     //The code here will here will handle it.
                 v_secure_system("ccsp_bus_client_tool eRT setv Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanMode string router");
@@ -1426,6 +1448,7 @@ static void GWP_ProcessUtopiaRestart(void)
     if (oldActiveMode == active_mode) return; // Exit if no transition
     
     webui_started = 0;
+    sysevent_set(sysevent_fd_gs, sysevent_token_gs, "webuiStartedFlagReset", "0", 0);
     switch ( active_mode) 
 	{
         case BRMODE_ROUTER:
@@ -1858,14 +1881,6 @@ static void *GWP_sysevent_threadfunc(void *data)
 #endif
 
 
-#if defined(_XB6_PRODUCT_REQ_)
- 	LEDMGMT_PARAMS ledMgmt;
-#endif
-
-	FILE *responsefd=NULL;
-      	char *networkResponse = "/var/tmp/networkresponse.txt";
-        int iresCode = 0 , iRet = 0;
-        char responseCode[10]={0}, cp_enable[10]={0}, redirect_flag[10]={0};
         err = sysevent_getnotification(sysevent_fd, sysevent_token, name, &namelen,  val, &vallen, &getnotification_asyncid);
 
         if (err)
@@ -1959,280 +1974,13 @@ static void *GWP_sysevent_threadfunc(void *data)
                 printf("gw_prov_sm: got system restart\n");
                 GWP_ProcessUtopiaRestart();
             }
-#if !defined(INTEL_PUMA7) && !defined(_COSA_BCM_MIPS_) && !defined(_COSA_BCM_ARM_)
-            else if (ret_value == BRING_LAN)
-#else
-            else if (ret_value == PNM_STATUS)
-#endif
-            {
-		 CcspTraceInfo((" bring-lan/pnm-status received \n"));
-                pnm_inited = 1;
-                if (netids_inited) {
-                        LAN_start();
-                }
-            }
-#if defined(_XB6_PRODUCT_REQ_)
-            else if (ret_value == PING_STATUS)
-            {
-
-                 CcspTraceInfo(("Received ping-status event notification, ping-status value is %s\n", val));
-                 rc =  memset_s(&ledMgmt,sizeof(LEDMGMT_PARAMS), 0, sizeof(LEDMGMT_PARAMS));
-                 ERR_CHK(rc);
-
-                rc = strcmp_s("missed", strlen("missed"),val, &ind);
-                ERR_CHK(rc);
-                if ((ind == 0) && (rc == EOK))
-                {
-
-			ledMgmt.LedColor = RED;
-			ledMgmt.State	 = SOLID;
-			ledMgmt.Interval = 0;
-
-                        CcspTraceInfo(("Ping missed, Setting LED to RED\n"));
-			if(0 != platform_hal_setLed(&ledMgmt)) {
-
-				CcspTraceInfo(("platform_hal_setLed failed\n"));
-			}
-
-			// Set LED state to RED
-                }
-                else
-                {
-		   rc = strcmp_s("received", strlen("received"),val, &ind);
-                   ERR_CHK(rc);
-                   if ((ind == 0) && (rc == EOK))
-                   {
-                   // Set LED state based on whether device is in CP or not
-
-		    ledMgmt.LedColor = WHITE;
-
-		    ledMgmt.State  = SOLID;
-		    ledMgmt.Interval = 0;
-
-		    iRet = syscfg_get(NULL, "CaptivePortal_Enable", cp_enable, sizeof(cp_enable));
-
-		    if ( iRet == 0  )
-		    {
-                        rc = strcmp_s("true", strlen("true"),cp_enable, &ind);
-                        ERR_CHK(rc);
-                        if ((ind == 0) && (rc == EOK))
-			{
-			iRet=0;
-		   	iRet = syscfg_get(NULL, "redirection_flag", redirect_flag, sizeof(redirect_flag));
-			if (  iRet == 0  )
-			{
-		            rc = strcmp_s("true", strlen("true"),redirect_flag, &ind);
-                            ERR_CHK(rc);
-                            if ((ind == 0) && (rc == EOK))
-                            {
-           	    		if((responsefd = fopen(networkResponse, "r")) != NULL)
-            	    		{
-                			if(fgets(responseCode, sizeof(responseCode), responsefd) != NULL)
-                			{
-                    				iresCode = atoi(responseCode);
-                			}
-
-                        		fclose(responsefd);
-                			responsefd = NULL;
-					if ( 204 == iresCode )
-					{
-
-						ledMgmt.State	 = BLINK;
-						ledMgmt.Interval = 1;
-					}
-            	    		 }
-			     }
-			 }
-                       }
-		    }
-
-		    if ( BLINK == ledMgmt.State )
-		    {
-                        CcspTraceInfo(("Device is in Captive Portal, setting WHITE LED to blink\n"));
-		    }
-		    else
-		    {
-                    	CcspTraceInfo(("Device is not in Captive Portal, setting LED to SOLID WHITE \n"));
-		    }
-
-		    if(0 != platform_hal_setLed(&ledMgmt)) {
-			CcspTraceInfo(("platform_hal_setLed failed\n"));
-
-		    }
-                }
-              }
-            }
-#endif
-            /*else if (ret_value == SNMP_SUBAGENT_STATUS && !snmp_inited)
-            {
-
-                snmp_inited = 1;
-                if (netids_inited) {
-                    if(!factory_mode)
-                        LAN_start();
-                }
-            }*/
-            else if (ret_value == PRIMARY_LAN_13NET)
-            {
-		 CcspTraceInfo((" primary_lan_l3net received \n"));
-                if (pnm_inited)
-                 {
-
-#if defined (_PROPOSED_BUG_FIX_)
-                    CcspTraceInfo(("***STARTING LAN***\n"));
-#endif
-                    LAN_start();
-                 }
-                netids_inited = 1;
-            }
-            else if (ret_value == LAN_STATUS || ret_value == BRIDGE_STATUS )
-            {
-#if defined (_PROPOSED_BUG_FIX_)
-                CcspTraceInfo(("***LAN STATUS/BRIDGE STATUS RECIEVED****\n"));
-                CcspTraceInfo(("THE EVENT =%s VALUE=%s\n",name,val));
-#endif
-                rc = strcmp_s("started", strlen("started"),val, &ind);
-                ERR_CHK(rc);
-                if ((ind == 0) && (rc == EOK)){
-                    if (!webui_started) {
-#if defined(_PLATFORM_RASPBERRYPI_)
-
-                       rc = strcmp_s("bridge-status", strlen("bridge-status"),name, &ind);
-                       ERR_CHK(rc);
-                       if ((ind == 0) && (rc == EOK)) {
-                             GWP_DisableERouter();
-                        }
-                        v_secure_system("/bin/sh /etc/webgui.sh");
-#elif defined(_COSA_INTEL_XB3_ARM_) || defined(_CBR_PRODUCT_REQ_)
-                        // For other devices CcspWebUI.service launches the GUI processes
-                        startWebUIProcess();
-#else
-			if ((ret_value == BRIDGE_STATUS) && (!bridgeModeInBootup))
-			{
-			    char output[ 32 ] = { 0 };
-			    memset(output,0,sizeof(output));
-			    CcspTraceInfo((" bridge-status = %s start webgui.sh \n", val ));
-			    v_secure_system("/bin/sh /etc/webgui.sh &");
-			}
-#endif
-                        webui_started = 1 ;
-#ifdef CONFIG_CISCO_HOME_SECURITY
-			{
-			char buf[10] = {0};
-                        //Piggy back off the webui start event to signal XHS startup
-                        sysevent_get(sysevent_fd_gs, sysevent_token_gs, "homesecurity_lan_l3net", buf, sizeof(buf));
-                        if (buf[0] != '\0') sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv4-up", buf, 0);
-			}
-#endif
-                    }
-#ifdef MULTILAN_FEATURE
-        sysevent_get(sysevent_fd_gs, sysevent_token_gs, "primary_lan_l3net", brlan0_inst, sizeof(brlan0_inst));
-        sysevent_get(sysevent_fd_gs, sysevent_token_gs, "homesecurity_lan_l3net", brlan1_inst, sizeof(brlan1_inst));
-        /*Get the active bridge instances and bring up the bridges */
-        sysevent_get(sysevent_fd_gs, sysevent_token_gs, "l3net_instances", buf, sizeof(buf));
-        l3net_inst = strtok(buf, " ");
-        while(l3net_inst != NULL)
-        {
-            rc = strcmp_s(l3net_inst, strlen(l3net_inst),brlan0_inst, &ind);
-            ERR_CHK(rc);
-            rc1 = strcmp_s(l3net_inst, strlen(l3net_inst),brlan1_inst, &ind1);
-            ERR_CHK(rc1);
-            /*brlan0 and brlan1 are already up. We should not call their instances again*/
-            if(!(((ind == 0) && (rc == EOK)) || ((ind1 == 0) && (rc1 == EOK))))
-            {
-                sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv4-up", l3net_inst, 0);
-            }
-            l3net_inst = strtok(NULL, " ");
-        }
-#endif
-
-                    if (!hotspot_started) {
-#if defined(INTEL_PUMA7) || defined(_COSA_BCM_MIPS_) || defined(_COSA_BCM_ARM_) ||  defined(_COSA_INTEL_XB3_ARM_)
-                        printf("Not Calling hotspot-start for XB3,XB6 and CBR it will be done in \
-				cosa_start_rem.sh,hotspot.service and xfinity_hotspot_bridge_setup.sh respectively\n");
-#else
-                         /* TCXB6-1922: Adding 5 seconds delay as sysevents are not getting handled properly */
-                         sleep(5);
-                        sysevent_set(sysevent_fd_gs, sysevent_token_gs, "hotspot-start", "", 0);
-                        hotspot_started = 1 ;
-#endif
-                    }
-
-                    if (factory_mode && lan_telnet_started == 0) {
-                        v_secure_system("/usr/sbin/telnetd -l /usr/sbin/cli -i brlan0");
-                        lan_telnet_started=1;
-                    }
-#ifdef CONFIG_CISCO_FEATURE_CISCOCONNECT
-
-                    if (!ciscoconnect_started) {
-                        sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ciscoconnect-restart", "", 0);
-                        ciscoconnect_started = 1 ;
-                    }
-#endif
-					if (!once) {
-						check_lan_wan_ready();
-					}
-		    bridgeModeInBootup = 0; // reset after lan/bridge status is received.
-                }
-            } else if (ret_value == DHCPV6_CLIENT_V6ADDR) {
-                Uint8 v6addr[ NETUTILS_IPv6_GLOBAL_ADDR_LEN / sizeof(Uint8) ] = {0};
-                /* Coverity Issue Fix - CID:79291 : UnInitialised varible  */
-                Uint8 soladdr[ NETUTILS_IPv6_GLOBAL_ADDR_LEN / sizeof(Uint8) ] = {0} ;
-                inet_pton(AF_INET6, val, v6addr);
-#if !defined(_PLATFORM_RASPBERRYPI_)
-                getMultiCastGroupAddress(v6addr,soladdr);
-#endif
-                inet_ntop(AF_INET6, soladdr, val, sizeof(val));
-
-
-                sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv6_"ER_NETDEVNAME"_dhcp_solicNodeAddr", val,0);
-
-                unsigned char lan_wan_ready = 0;
-                char result_buf[32];
-                result_buf[0] = '\0';
-
-                sysevent_get(sysevent_fd_gs, sysevent_token_gs, "start-misc", result_buf, sizeof(result_buf));
-                lan_wan_ready = strstr(result_buf, "ready") == NULL ? 0 : 1;
-
-                if(!lan_wan_ready) {
-                    v_secure_system("ip6tables -t mangle -I PREROUTING 1 -i %s -d %s -p ipv6-icmp -m icmp6 --icmpv6-type 135 -m limit --limit 20/sec -j ACCEPT", ER_NETDEVNAME, val);
-                }
-                else
-                    sysevent_set(sysevent_fd_gs, sysevent_token_gs, "firewall-restart", "",0);
-#ifdef DSLITE_FEATURE_SUPPORT
-                    /* Modification for DSLite Service */
-                    if(!strcmp(val, ""))//If erouter0 IPv6 address is null
-                    {
-                        v_secure_system("service_dslite stop &");
-                    }
-                    else
-                    {
-                        v_secure_system("service_dslite restart &");
-                    }
-#endif
-            }
-			else if (ret_value == WAN_STATUS) {
-                                rc = strcmp_s("started", strlen("started"),val, &ind);
-                                ERR_CHK(rc);
-                                if ((!ind) && (rc == EOK))
-				{
-                                    if (!once) {
-						check_lan_wan_ready();
-					}
-                                 }
-			}
-			else if (ret_value == IPV6_PREFIX && strlen(val) > 5) {
-				if (!once) {
-						check_lan_wan_ready();
-					}
-			}
 #if defined (INTEL_PUMA7)
 			//Intel Proposed RDKB Generic Bug Fix from XB6 SDK
 			else if (ret_value == CURRENT_WAN_IPADDR)
             {
                 /* Set the "ipv4-status" to "up" when there is an IPv4 address assigned to gateway WAN interface */
 				sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv4-status", "up", 0);
-                if (!sIPv4_acquired && val )
+                if (!sIPv4_acquired)
                 {
                     rc = strcmp_s("0.0.0.0", strlen("0.0.0.0"),val, &ind);
                     ERR_CHK(rc);
@@ -2246,7 +1994,7 @@ static void *GWP_sysevent_threadfunc(void *data)
             {
                 /* Set the "ipv6-status" to "up" when there is an IPv6 address assigned to gateway WAN interface */
 				sysevent_set(sysevent_fd_gs, sysevent_token_gs, "ipv6-status", "up", 0);
-				if (!sIPv6_acquired && val)
+				if (!sIPv6_acquired)
                 {
                     setGWP_ipv6_event();
                     sIPv6_acquired = 1; /* Setting it here, to send IPv6 event only once. Ignore any further RENEW/REBIND messages*/
@@ -2946,7 +2694,6 @@ static void GWP_act_DocsisInited_callback()
     /* Coverity Issue Fix - CID:73933 : UnInitialised variable */
     char soladdrStr[64] = {0};
     int sysevent_bridge_mode = 0;
-    int i;
     CcspTraceInfo(("Entry %s \n",__FUNCTION__));
 #if !defined(_PLATFORM_RASPBERRYPI_) && !defined(INTEL_PUMA7)
     /* Docsis initialized */
@@ -2958,6 +2705,7 @@ static void GWP_act_DocsisInited_callback()
     //v_secure_system("insmod " ERNETDEV_MODULE " netdevname=" ER_NETDEVNAME);
 
     {
+        int i;
         macaddr_t macAddr;
         
         getWanMacAddress(&macAddr);
@@ -3329,6 +3077,7 @@ static void GWP_act_DocsisTftpOk_callback(){
 }*/
 #endif
 
+#if !defined(INTEL_PUMA7)
 static void LAN_start() {
 #ifdef RDKB_DSLITE
     char _4_to_6_status[2]={0};
@@ -3387,6 +3136,8 @@ static void LAN_start() {
     }
     return;
 }
+#endif
+
 int GWP_PushEventInMsgq(ClbkInfo *pInfo )
 {
     GWPEventQData EventMsg;
@@ -3506,10 +3257,16 @@ void *GWP_EventHandler(void *arg)
 
 void RegisterDocsisCallback()
 {
+#if !defined(INTEL_PUMA7)
      macaddr_t  macAddr_bcm;
-
+#endif
+     
     CcspTraceInfo(("Entry docsis clbk register\n"));
+#if !defined(INTEL_PUMA7)
     eSafeDevice_Initialize(&macAddr_bcm);
+#else
+    Cgm_GatewayApiProxy_Init();
+#endif
     CcspTraceInfo((" create Gwp callback event handler\n"));
     pthread_create(&Gwp_event_tid, NULL, GWP_EventHandler, NULL);
 
@@ -3527,6 +3284,9 @@ void RegisterDocsisCallback()
         obj->pGWP_act_DocsisInited = GWP_act_DocsisInited_callback;
         obj->pGWP_act_ProvEntry = GWP_act_ProvEntry_callback;
         obj->pDocsis_gotEnable = docsis_gotEnable_callback;
+#if defined(INTEL_PUMA7)
+       obj->pDocsis_GetRATransInterval = (fpDocsisRATransInterval)docsis_GetRATransInterval_callback;
+#endif
         obj->pGW_Tr069PaSubTLVParse = GW_Tr069PaSubTLVParse;
 #ifdef CISCO_CONFIG_DHCPV6_PREFIX_DELEGATION
         obj->pGW_SetTopologyMode = GW_setTopologyMode;

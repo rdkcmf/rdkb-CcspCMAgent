@@ -61,7 +61,7 @@
 #define GW_SUBTLV_TR069_CONNREQ_USERNAME_EXTIF            5
 #define GW_SUBTLV_TR069_CONNREQ_PASSWORD_EXTIF            6
 #define GW_SUBTLV_TR069_ACS_OVERRIDE_EXTIF                7
-#if 10
+#if defined(_PLATFORM_RASPBERRYPI_) || defined(_COSA_BCM_ARM_)
 typedef enum
 {
     False = 0,
@@ -91,10 +91,8 @@ typedef enum Status
     STATUS_OK = OK,
     STATUS_NOK = NOK,
 } STATUS;
-#endif
 #define MAC_ADDR_LEN    6
 
-#if 1
 typedef struct mac_addr
 {
     Uint8 hw[ MAC_ADDR_LEN ];
@@ -224,6 +222,9 @@ typedef void (*fpBefCfgfileEntry)();
 typedef void (*fpDocsisInited)();
 typedef void (*fpProvEntry)();
 typedef void (*fpDocsisEnabled)(Uint8);
+#if defined(INTEL_PUMA7)
+typedef void (*fpDocsisRATransInterval)(Uint16);
+#endif
 typedef void (*fpGW_Tr069PaSubTLVParse)(Uint8 type, Uint16 length, const Uint8* value);
 #ifdef CISCO_CONFIG_DHCPV6_PREFIX_DELEGATION
 typedef void (*fpGW_SetTopologyMode)(Uint8 type, Uint16 length, const Uint8* value);
@@ -259,6 +260,10 @@ typedef struct __appCallBack
 	fpDocsisInited pGWP_act_DocsisInited;
 	fpProvEntry pGWP_act_ProvEntry;
         fpDocsisEnabled pDocsis_gotEnable;
+    #if defined(INTEL_PUMA7)
+        fpDocsisRATransInterval pDocsis_GetRATransInterval;
+    #endif
+
         fpGW_Tr069PaSubTLVParse pGW_Tr069PaSubTLVParse;
 }appCallBack;
 #endif
