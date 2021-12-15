@@ -80,12 +80,28 @@
 #define  PVALUE_MAX 1023 
 #if defined (FEATURE_RDKB_WAN_MANAGER)
 #define WAN_INTERFACE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Wan.Name"
+
+#ifdef _COSA_BCM_ARM_
 #define DOCSIS_INF_NAME "cm0"
+#elif defined(INTEL_PUMA7)
+#define DOCSIS_INF_NAME "dpdmta1"
+#else
+#define DOCSIS_INF_NAME "cm0"
+#endif
+
 #define WAN_PHY_NAME "erouter0"
 #define MONITOR_PHY_STATUS_MAX_TIMEOUT 240
 #define MONITOR_OPER_STATUS_MAX_TIMEOUT 240
 #define MONITOR_OPER_STATUS_QUERY_INTERVAL 10
 #define MONITOR_PHY_STATUS_QUERY_INTERVAL 2
+
+typedef enum WanMode
+{
+    WAN_MODE_AUTO = 0,
+    WAN_MODE_ETH,
+    WAN_MODE_DOCSIS,
+    WAN_MODE_UNKNOWN
+}WanMode_t;
 #endif
 
 static pthread_mutex_t __gw_cm_client_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -318,7 +334,6 @@ CosaDmlCMWanUpdateCustomConfig
         BOOL             bValue
     )
 {
-#ifdef _COSA_BCM_ARM_
     char command[256] = {0};
     if (bValue == TRUE)
     {
@@ -347,9 +362,6 @@ CosaDmlCMWanUpdateCustomConfig
         snprintf(command,sizeof(command),"brctl delif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
         system(command);
     }
-#else
-    UNREFERENCED_PARAMETER(bValue);
-#endif
     UNREFERENCED_PARAMETER(arg);
     return ANSC_STATUS_SUCCESS;
 }
@@ -367,6 +379,7 @@ void* ThreadMonitorPhyStatusAndNotify(void *args)
         BOOLEAN rfStatus = FALSE;
         char acSetParamName[256];
         char acSetParamValue[128];
+        char buf[64];
         ANSC_STATUS retval = ANSC_STATUS_SUCCESS;
         if (pWanCfg)
         {
@@ -390,7 +403,28 @@ void* ThreadMonitorPhyStatusAndNotify(void *args)
                 {
                     if (rfStatus == TRUE)
                     {
-                        break;
+                        INT lastKnownWanMode = WAN_MODE_DOCSIS;
+                        memset(buf,0,sizeof(buf));
+                        if (syscfg_get(NULL, "last_wan_mode", buf, sizeof(buf)) == 0)
+                        {
+                            lastKnownWanMode = atoi(buf);
+                        }
+                        if (lastKnownWanMode == WAN_MODE_DOCSIS)
+                        {
+                            /* This file "/tmp/phylink_wan_state_up"
+                             * is created in docsis link up callback.
+                             * Send Phy Status up immediately if rf status and this file present
+                             * otherwise wait till timeout in docsis mode.
+                             */
+                            if (0 == access( "/tmp/phylink_wan_state_up" , F_OK ))
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
                 if (counter >= MONITOR_PHY_STATUS_MAX_TIMEOUT)

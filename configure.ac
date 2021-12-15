@@ -86,13 +86,15 @@ AC_ARG_ENABLE([notify],
            ],
          [echo "systemd notify is disabled."])
 
+FEATURE_RDKB_WAN_MANAGER=no
 AC_ARG_ENABLE([wanmgr],
         AS_HELP_STRING([--enable-wanmgr],[enable wanmgr]),
         [
           case "${enableval}" in
            yes) WANMGR_CFLAGS="-DENABLE_RDK_WANMANAGER"
                 WANMGR_SOURCE_T="gw_prov_sm.c"
-                WANMGR_LDFLAGS="-lgwprovappabs -lsysevent -lulog -lsecure_wrapper" ;;
+                WANMGR_LDFLAGS="-lsysevent -lulog -lsecure_wrapper" 
+		FEATURE_RDKB_WAN_MANAGER=yes ;;
            no) AC_MSG_ERROR([wanmgr is disabled]) ;;
           *) AC_MSG_ERROR([bad value ${enableval} for --enable-notify ]) ;;
            esac
@@ -128,5 +130,7 @@ AC_CONFIG_FILES(
 
 AC_SUBST(GTEST_ENABLE_FLAG)
 
+AM_CONDITIONAL([PLATFORM_PUMA7_ENABLED], [test $PLATFORM_PUMA7_ENABLED = yes])
+AM_CONDITIONAL([FEATURE_RDKB_WAN_MANAGER], [test $FEATURE_RDKB_WAN_MANAGER = yes])
 AC_OUTPUT
 

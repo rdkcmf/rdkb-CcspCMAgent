@@ -35,3 +35,14 @@ if FEATURE_WAN_FAIL_OVER
 CcspCMAgentSsp_DEPENDENCIES = ${top_builddir}/source/TR-181/middle_layer_src/libCcspCMAgent_middle_layer_src.la
 CcspCMAgentSsp_LDADD = $(CcspCMAgentSsp_DEPENDENCIES)
 endif
+
+
+if !PLATFORM_PUMA7_ENABLED
+if FEATURE_RDKB_WAN_MANAGER
+CcspCMAgentSsp_LDFLAGS += -lgwprovappabs
+endif
+endif
+
+if PLATFORM_PUMA7_ENABLED
+CcspCMAgentSsp_LDFLAGS += -lgwapiproxy -lgwgimproxy -ltlv
+endif

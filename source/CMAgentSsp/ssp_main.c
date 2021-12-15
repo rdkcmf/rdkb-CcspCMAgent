@@ -74,7 +74,15 @@ static cap_user appcaps;
 #define WAN_BOOTINFORM_PHYPATH_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Phy.Path"
 #define WAN_BOOTINFORM_INTERFACE_PARAM_NAME "Device.X_RDK_WanManager.CPEInterface.%d.Wan.Name"
 #define WAN_PHYIF_NAME_PRIMARY "erouter0"
+
+#ifdef _COSA_BCM_ARM_
 #define WAN_PHYIF_DOCSIS_NAME "cm0"
+#elif defined(INTEL_PUMA7)
+#define WAN_PHYIF_DOCSIS_NAME "dpdmta1"
+#else
+#define WAN_PHYIF_DOCSIS_NAME "cm0"
+#endif
+
 #define WAN_PHYPATH_VALUE "Device.X_CISCO_COM_CableModem."
 #define WAN_NOE_PARAM_NAME                "Device.X_RDK_WanManager.CPEInterfaceNumberOfEntries"
 #define WAN_IF_NAME_PARAM_NAME            "Device.X_RDK_WanManager.CPEInterface.%d.Name"
@@ -922,6 +930,7 @@ int main(int argc, char* argv[])
 #endif
 
     syscfg_init();
+
 #ifdef ENABLE_RDK_WANMANAGER
     CcspTraceInfo(("pthread create docsis registration\n"));
     pthread_create(&docsisclbk_tid, NULL, GWP_docsisregistration_threadfunc, NULL);
