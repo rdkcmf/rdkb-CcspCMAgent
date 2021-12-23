@@ -929,8 +929,6 @@ int main(int argc, char* argv[])
     PCD_api_register_exception_handlers( argv[0], NULL );
 #endif
 
-    syscfg_init();
-
 #ifdef ENABLE_RDK_WANMANAGER
     CcspTraceInfo(("pthread create docsis registration\n"));
     pthread_create(&docsisclbk_tid, NULL, GWP_docsisregistration_threadfunc, NULL);
