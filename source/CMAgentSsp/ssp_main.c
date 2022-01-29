@@ -158,7 +158,6 @@ int  cmd_dispatch(int  command)
     {
             case	'e' :
 
-#ifdef _ANSC_LINUX
                 CcspTraceInfo(("Connect to bus daemon...\n"));
 
             {
@@ -181,7 +180,6 @@ int  cmd_dispatch(int  command)
                     );
             }
 
-#endif
 
 #ifdef ENABLE_RDK_WANMANAGER
                 CcspTraceInfo(("pthread create boot inform \n"));
@@ -313,7 +311,6 @@ static void _print_stack_backtrace(void)
 #endif
 }
 
-#if defined(_ANSC_LINUX)
 static void daemonize(void) {
 	switch (fork()) {
 	case 0:
@@ -438,7 +435,6 @@ static int is_core_dump_opened(void)
     fclose(fp);
     return 0;
 }
-#endif
 #endif
 
 #ifdef ENABLE_RDK_WANMANAGER
@@ -872,21 +868,6 @@ int main(int argc, char* argv[])
 
     }
 
-#if  defined(_ANSC_WINDOWSNT)
-
-    AnscStartupSocketWrapper(NULL);
-
-    display_info();
-
-    cmd_dispatch('e');
-
-    while ( cmdChar != 'q' )
-    {
-        cmdChar = getchar();
-
-        cmd_dispatch(cmdChar);
-    }
-#elif defined(_ANSC_LINUX)
 #if (defined(INTEL_PUMA7))
     if(!drop_root()) {
        CcspTraceInfo(("Dropping root privileges for CcspCMAgentSsp is failed\n"));
@@ -993,7 +974,6 @@ int main(int argc, char* argv[])
             cmd_dispatch(cmdChar);
         }
     }
-#endif
 
     err = Cdm_Term();
     if (err != CCSP_SUCCESS)
