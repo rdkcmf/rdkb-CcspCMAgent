@@ -303,7 +303,7 @@ void setGWP_ipv6_event();
 
 void *GWP_UpdateTr069CfgThread( void *data );
 
-void GWP_Util_get_shell_output( char * cmd, char *out, int len );
+void GWP_Util_get_shell_output( FILE *fp, char *out, int len );
 void *GWP_EventHandler(void *arg);
 int GWP_PushEventInMsgq(ClbkInfo *pInfo );
 /**************************************************************************/
@@ -2246,13 +2246,11 @@ static void *GWP_linkstate_threadfunc(void *data)
     int outbufsz = sizeof(out_value);
     errno_t rc = -1;
     int ind = -1;
-
     char buff[50] = { 0 };
-
     char previousLinkStatus[10] = "down";
     if (!syscfg_get(NULL, "wan_physical_ifname", out_value, outbufsz))
     {
-		rc = strcpy_s(wanPhyName,sizeof(wanPhyName),out_value);
+	rc = strcpy_s(wanPhyName,sizeof(wanPhyName),out_value);
         if(rc != EOK)
         {
             ERR_CHK(rc);
@@ -2264,22 +2262,21 @@ static void *GWP_linkstate_threadfunc(void *data)
     {
         return (void *) -1;
     }
-    sprintf(command, "cat /sys/class/net/%s/operstate", wanPhyName);
 
     while(1)
     {
         FILE *fp;
-        rc =  memset_s(buff,sizeof(buff), 0, sizeof(buff));
-        ERR_CHK(rc);
         /* Open the command for reading. */
-        fp = popen(command, "r");
+        sprintf_s(buff, sizeof(buff), "/sys/class/net/%s/operstate", wanPhyName);
+        fp = fopen(buff, "r");
         if (fp == NULL)
         {
             printf("<%s>:<%d> Error popen\n", __FUNCTION__, __LINE__);
+            sleep(5);
             continue;
         }
-
         /* Read the output a line at a time - output it. */
+        buff[0] = '\0';
         while (fgets(buff, 50, fp) != NULL)
         {
             /*printf("Ethernet status :%s", buff);*/
@@ -2289,7 +2286,7 @@ static void *GWP_linkstate_threadfunc(void *data)
         }
 
         /* close */
-        pclose(fp);
+        fclose(fp);           
         rc = strcmp_s(buff, strlen(buff),(const char *)previousLinkStatus, &ind);
         ERR_CHK(rc);
         if ((!ind) && (rc == EOK))
@@ -2341,32 +2338,16 @@ static void *GWP_linkstate_threadfunc(void *data)
 #endif
 
 /* GWP_Util_get_shell_output() */
-void GWP_Util_get_shell_output( char * cmd, char *out, int len )
+void GWP_Util_get_shell_output( FILE *fp, char *out, int len )
 {
-    FILE  *fp = NULL;
-    char   buf[ 16 ] = { 0 };
     char  *p = NULL;
-    errno_t rc = -1;
-
-    fp = popen( cmd, "r" );
-
     if ( fp )
-    {
-        fgets( buf, sizeof( buf ), fp );
-        
-        /*we need to remove the \n char in buf*/
-        if ( ( p = strchr( buf, '\n' ) ) ) 
-		*p = 0;
-
-        rc = strcpy_s(out, len, buf);
-        if(rc != EOK)
+    {   
+        fgets(out, len, fp);
+        if ((p = strchr(out, '\n'))) 
         {
-           ERR_CHK(rc);
-	   pclose( fp );
-           return;
-        }         
-
-        pclose( fp );        
+            *p = '\0';
+        }      
     }
 }
 
@@ -2394,15 +2375,27 @@ void *GWP_UpdateTr069CfgThread( void *data )
 	if( IsNeedtoProceedFurther )
 	{
 		char	output[ 16 ] = { 0 };
-
+                FILE *fp = NULL;
+		int ret = 0;
 		//Get Tr069 process PID
-		GWP_Util_get_shell_output( "pidof CcspTr069PaSsp", output, sizeof( output ) );
-		
+		fp = v_secure_popen("r","pidof CcspTr069PaSsp");
+		if(fp == NULL)
+		{
+		    CcspTraceInfo((" %s Error in opening pipe! \n",__FUNCTION__));
+                }
+                else
+                {
+		    GWP_Util_get_shell_output( fp, output, sizeof( output ) );
+		    ret = v_secure_pclose(fp);
+		    if(ret < 0) {
+		        CcspTraceInfo((" %s Error in closing pipe! [%d] \n",__FUNCTION__,ret));
+		    }
+                }
 		/*
 		 * Check Tr069 process is running or not. If not then no need to configure TLV data because it will get 
 		 * update during Tr069 process initialization. so break the loop
 		 */
-		if( ( '\0' == output[ 0 ] ) || ( 0 == strlen( output ) ) )
+		if('\0' == output[0])
 		{
 			CcspTraceInfo(("%s CcspTr069PaSsp is not running. No need to configure\n", __FUNCTION__));
 			IsNeedtoProceedFurther= FALSE;
