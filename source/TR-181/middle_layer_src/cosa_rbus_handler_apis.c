@@ -475,8 +475,7 @@ Rbus_CMAgent_SetParamUintValue
 	 	if(cmAgent_Link_Status.DocsisLinkDownTimeOut!=uValue)
 		{ 
 			cmAgent_Link_Status.DocsisLinkDownTimeOut= uValue;
-			syscfg_set_u( NULL, DOCSISLINKDOWNTIMEOUT,cmAgent_Link_Status.DocsisLinkDownTimeOut);
-			syscfg_commit( );
+			syscfg_set_u_commit( NULL, DOCSISLINKDOWNTIMEOUT,cmAgent_Link_Status.DocsisLinkDownTimeOut);
 			CcspTraceInfo(("%s : parameter name ='%s', value = '%d'\n", __FUNCTION__,pParamName,cmAgent_Link_Status.DocsisLinkDownTimeOut));
 			return TRUE;
 		 }

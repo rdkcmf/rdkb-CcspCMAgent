@@ -254,7 +254,7 @@ int CosaDmlDISetProtocol(PCOSA_DATAMODEL_DEVICEINFO pMyObject)
 {
     if(AnscEqualString2(pMyObject->DownloadURL,"https", 5, FALSE))
     {
-        if(syscfg_set(NULL,"fw_dl_protocol","HTTPS")!=0)
+        if(syscfg_set_commit(NULL, "fw_dl_protocol", "HTTPS") != 0)
         {
             CcspTraceWarning(("%s: syscfg_set failed \n", __FUNCTION__));
             return -1;
@@ -262,7 +262,7 @@ int CosaDmlDISetProtocol(PCOSA_DATAMODEL_DEVICEINFO pMyObject)
     }
     else if(AnscEqualString2(pMyObject->DownloadURL,"http", 4, FALSE))
     {
-        if(syscfg_set(NULL,"fw_dl_protocol","HTTP")!=0)
+        if(syscfg_set_commit(NULL, "fw_dl_protocol", "HTTP") != 0)
         {
             CcspTraceWarning(("%s: syscfg_set failed \n", __FUNCTION__));
             return -1;
@@ -270,7 +270,7 @@ int CosaDmlDISetProtocol(PCOSA_DATAMODEL_DEVICEINFO pMyObject)
     }
     else if(AnscEqualString2(pMyObject->DownloadURL,"", 1, FALSE))
     {
-        if(syscfg_set(NULL,"fw_dl_protocol","")!=0)
+        if(syscfg_set_commit(NULL, "fw_dl_protocol", "") != 0)
         {
             CcspTraceWarning(("%s: syscfg_set failed \n", __FUNCTION__));
             return -1;
@@ -278,16 +278,13 @@ int CosaDmlDISetProtocol(PCOSA_DATAMODEL_DEVICEINFO pMyObject)
     }
     else
     {
-        if(syscfg_set(NULL,"fw_dl_protocol","INVALID")!=0)
+        if(syscfg_set_commit(NULL, "fw_dl_protocol", "INVALID") != 0)
         {
             CcspTraceWarning(("%s: syscfg_set failed \n", __FUNCTION__));
             return -1;
         }
     }
-    if (syscfg_commit() != 0)
-    {
-        CcspTraceWarning(("%s: syscfg commit failed \n", __FUNCTION__));
-    }
+
     return 0;
 }
 
@@ -317,10 +314,9 @@ ANSC_STATUS CosaDmlDIGetImage(ANSC_HANDLE hContext)
                 ERR_CHK(rc);
                 return ANSC_STATUS_FAILURE;
             }
-            if(syscfg_set(NULL, "fw_to_upgrade", pMyObject->Firmware_To_Download) == 0)
+            if(syscfg_set_commit(NULL, "fw_to_upgrade", pMyObject->Firmware_To_Download) != 0)
             {
-                if(syscfg_commit() != 0)
-                    CcspTraceWarning(("%s: syscfg commit failed \n", __FUNCTION__));
+                CcspTraceWarning(("%s: syscfg_set failed \n", __FUNCTION__));
             }
             return ANSC_STATUS_SUCCESS;
         }
