@@ -1311,17 +1311,10 @@ static void GWP_EnterBridgeMode(void)
 	CcspTraceInfo((" Entry %s \n", __FUNCTION__));
 	syscfg_get(NULL, "MoCA_current_status", MocaStatus, sizeof(MocaStatus));
 	CcspTraceInfo((" MoCA_current_status = %s \n", MocaStatus));
-	if ((syscfg_set(NULL, "MoCA_previous_status", MocaStatus) != 0)) 
+	if ((syscfg_set_commit(NULL, "MoCA_previous_status", MocaStatus) != 0)) 
     {
         printf("syscfg_set failed\n");
     }
-    else 
-    {
-        if (syscfg_commit() != 0) 
-        {
-		    printf("syscfg_commit failed\n");
-	    }
-	}
 	v_secure_system("ccsp_bus_client_tool eRT setv Device.MoCA.Interface.1.Enable bool false");
     snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", active_mode);
     v_secure_system("sysevent set bridge_mode %d", active_mode);
@@ -1349,20 +1342,11 @@ char MocaStatus[16] = {0};
 
 	syscfg_get(NULL, "MoCA_current_status", MocaStatus, sizeof(MocaStatus));
 	CcspTraceInfo((" MoCA_current_status = %s \n", MocaStatus));
-	if ((syscfg_set(NULL, "MoCA_previous_status", MocaStatus) != 0)) 
+	if ((syscfg_set_commit(NULL, "MoCA_previous_status", MocaStatus) != 0))
     {
         printf("syscfg_set failed\n");
         
     }
-    else 
-    {
-        if (syscfg_commit() != 0) 
-        {
-		    printf("syscfg_commit failed\n");
-		    
-	    }	    
-	}	
-	
 	v_secure_system("ccsp_bus_client_tool eRT setv Device.MoCA.Interface.1.Enable bool false");	
     snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", BRMODE_PRIMARY_BRIDGE);
     v_secure_system(sysevent_cmd);
