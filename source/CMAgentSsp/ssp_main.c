@@ -59,10 +59,6 @@
 #include <systemd/sd-daemon.h>
 #endif
 
-#ifndef DISABLE_LOGAGENT
-#include "ccsp_custom_logs.h"
-#endif
-
 #if (defined(INTEL_PUMA7))
 #include "cap.h"
 static cap_user appcaps;
@@ -370,7 +366,6 @@ static void daemonize(void) {
  */
 void sig_handler(int sig)
 {
-	extern ANSC_HANDLE bus_handle;
     CcspBaseIf_deadlock_detection_log_print(sig);
 
     if ( sig == SIGINT ) {
@@ -381,12 +376,6 @@ void sig_handler(int sig)
     else if ( sig == SIGUSR1 ) {
     	signal(SIGUSR1, sig_handler); /* reset it to this function */
     	CcspTraceInfo(("SIGUSR1 received!\n"));
-	#ifndef DISABLE_LOGAGENT
-		RDKLogEnable = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable");
-		RDKLogLevel = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_LogLevel");
-		CM_RDKLogLevel = GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel");
-		CM_RDKLogEnable = (char)GetLogInfo(bus_handle,"eRT.","Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable");
-		#endif
     }
     else if ( sig == SIGUSR2 ) {
     	CcspTraceInfo(("SIGUSR2 received!\n"));
@@ -958,28 +947,6 @@ int main(int argc, char* argv[])
 #endif
 	
     cmd_dispatch('e');
-    CcspTraceInfo(("CM_DBG:-------Read Log Info\n"));
-    char buffer[5] = {0};
-    if( 0 == syscfg_get( NULL, "X_RDKCENTRAL-COM_LoggerEnable" , buffer, sizeof( buffer ) ) &&  ( buffer[0] != '\0' ) )
-    {
-        RDKLogEnable = (BOOL)atoi(buffer);
-    }
-    memset(buffer, 0, sizeof(buffer));
-    if( 0 == syscfg_get( NULL, "X_RDKCENTRAL-COM_LogLevel" , buffer, sizeof( buffer ) ) &&  ( buffer[0] != '\0' ) )
-    {
-        RDKLogLevel = (ULONG )atoi(buffer);
-    }
-    memset(buffer, 0, sizeof(buffer));
-    if( 0 == syscfg_get( NULL, "X_RDKCENTRAL-COM_CM_LogLevel" , buffer, sizeof( buffer ) ) &&  ( buffer[0] != '\0' ) )
-    {
-        CM_RDKLogLevel = (ULONG)atoi(buffer);
-    }
-    memset(buffer, 0, sizeof(buffer));
-    if( 0 == syscfg_get( NULL, "X_RDKCENTRAL-COM_CM_LoggerEnable" , buffer, sizeof( buffer ) ) &&  ( buffer[0] != '\0' ) )
-    {
-        CM_RDKLogEnable = (BOOL)atoi(buffer);
-    }
-    CcspTraceInfo(("CM_DBG:-------Log Info values RDKLogEnable:%d,RDKLogLevel:%u,CM_RDKLogLevel:%u,CM_RDKLogEnable:%d\n",RDKLogEnable,RDKLogLevel,CM_RDKLogLevel, CM_RDKLogEnable ));
     // printf("Calling Docsis\n");
 
     // ICC_init();
