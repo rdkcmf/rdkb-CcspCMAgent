@@ -113,8 +113,6 @@ CosaRDKCentralComCableModemCreate
         return  (ANSC_HANDLE)NULL;
     }
 
-    AnscZeroMemory(pMyObject, sizeof(COSA_DATAMODEL_RDKCENTRAL_CABLEMODEM));
-
     /*
      * Initialize the common variables and functions for a container object.
      */

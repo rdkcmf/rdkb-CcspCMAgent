@@ -113,8 +113,6 @@ CosaCableModemCreate
         return  (ANSC_HANDLE)NULL;
     }
 
-    AnscZeroMemory(pMyObject, sizeof(COSA_DATAMODEL_CABLEMODEM));
-
     /*
      * Initialize the common variables and functions for a container object.
      */
