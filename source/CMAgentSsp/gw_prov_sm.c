@@ -1885,9 +1885,9 @@ static void *GWP_sysevent_threadfunc(void *data)
     for (;;)
     {
 #ifdef MULTILAN_FEATURE
-        char name[25], val[42], buf[BUF_SIZE];
+        char name[40], val[42], buf[BUF_SIZE];
 #else
-        char name[25], val[42];
+        char name[40], val[42];
 #endif
         int namelen = sizeof(name);
         int vallen  = sizeof(val);
