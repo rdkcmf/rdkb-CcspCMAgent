@@ -40,6 +40,20 @@ AC_ARG_ENABLE([gtestapp],
              [echo "Gtestapp is disabled"])
 AM_CONDITIONAL([WITH_GTEST_SUPPORT], [test x$GTEST_SUPPORT_ENABLED = xtrue])
 
+FEATURE_WAN_FAIL_OVER=no
+AC_ARG_ENABLE([wanfailover],
+        AS_HELP_STRING([--enable-wanfailover],[enable wanfailover]),
+        [
+          case "${enableval}" in
+           yes) FEATURE_WAN_FAIL_OVER=yes ;;
+           no) AC_MSG_ERROR([wanfailover is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-wanfailover ]) ;;
+           esac
+           ],
+         [echo "wanfailover is disabled."])
+
+AM_CONDITIONAL([FEATURE_WAN_FAIL_OVER], [test $FEATURE_WAN_FAIL_OVER = yes])
+
 AC_PREFIX_DEFAULT(`pwd`)
 AC_ENABLE_SHARED
 AC_DISABLE_STATIC

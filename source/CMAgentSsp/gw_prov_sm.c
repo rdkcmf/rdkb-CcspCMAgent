@@ -96,6 +96,10 @@
 #define PORT 8081
 #endif
 
+#if defined (WAN_FAILOVER_SUPPORTED)
+#include "cosa_rbus_handler_apis.h"
+#endif
+
 #ifdef FEATURE_SUPPORT_ONBOARD_LOGGING
 #include "cimplog.h"
 #define LOGGING_MODULE           "GWPROV"
@@ -2093,6 +2097,10 @@ static void GWP_act_DocsisLinkDown_callback_2()
        v_secure_system("sysevent set dhcpv6_client-stop");
    #endif
     }
+	
+#if defined (WAN_FAILOVER_SUPPORTED)
+	publishDocsisLinkStatus(false);
+#endif
      return;
 }
 
@@ -2136,6 +2144,10 @@ static int GWP_act_DocsisLinkUp_callback()
     printf("\n**************************\n");
     printf("\nsysevent set phylink_wan_state up\n");
     printf("\n**************************\n\n");
+	
+#if defined (WAN_FAILOVER_SUPPORTED)
+	publishDocsisLinkStatus(true);
+#endif
 
     
 #if defined(_PLATFORM_RASPBERRYPI_)
@@ -3308,6 +3320,11 @@ void RegisterDocsisCallback()
 #else
     Cgm_GatewayApiProxy_Init();
 #endif
+
+#if defined (WAN_FAILOVER_SUPPORTED)
+	cmAgentRbusInit();
+#endif	
+
     CcspTraceInfo((" create Gwp callback event handler\n"));
     pthread_create(&Gwp_event_tid, NULL, GWP_EventHandler, NULL);
 
