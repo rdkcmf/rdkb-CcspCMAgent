@@ -21,15 +21,12 @@ SUBDIRS = source
 lib_LTLIBRARIES = libcm_tr181.la
 
 libcm_tr181_la_CPPFLAGS = \
-    -D_ANSC_LINUX \
-    -D_ANSC_USER \
-    -D_ANSC_LITTLE_ENDIAN_ \
     -I$(top_srcdir)/source/TR-181/board_sbapi \
     -I$(top_srcdir)/source/TR-181/middle_layer_src \
     -I$(top_srcdir)/source/TR-181/include \
     -I$(top_srcdir)/source/Custom
 
-libcm_tr181_la_LDFLAGS =
+libcm_tr181_la_LDFLAGS = -lsyscfg
 libcm_tr181_la_SOURCES =
 libcm_tr181_la_DEPENDENCIES = \
 	source/TR-181/middle_layer_src/libCcspCMAgent_middle_layer_src.la \
