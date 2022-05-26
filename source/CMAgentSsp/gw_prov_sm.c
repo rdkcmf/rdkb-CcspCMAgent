@@ -1232,7 +1232,6 @@ static void GWP_EnableERouter(void)
 //Actually enter router mode
 static void GWP_EnterRouterMode(void)
 {
-         char sysevent_cmd[80] = {0};
          /* Coverity Issue Fix - CID:71381 : UnInitialised varible */
 	char MocaPreviousStatus[16] = {0};
        	int prev;
@@ -1245,7 +1244,6 @@ static void GWP_EnterRouterMode(void)
 //     DOCSIS_ESAFE_SetEsafeProvisioningStatusProgress(DOCSIS_EROUTER_INTERFACE, ESAFE_PROV_STATE_IN_PROGRESS);
 
 //    bridge_mode = 0;
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", BRMODE_ROUTER);
     v_secure_system("sysevent set bridge_mode %d", BRMODE_ROUTER);
 	syscfg_get(NULL, "MoCA_previous_status", MocaPreviousStatus, sizeof(MocaPreviousStatus));
 	prev = atoi(MocaPreviousStatus);
@@ -1285,9 +1283,7 @@ static void GWP_DisableERouter(void)
     /* Reset Switch, to remove all VLANs */ 
     eSafeDevice_SetProvisioningStatusProgress(ESAFE_PROV_STATE_NOT_INITIATED_extIf);
 #endif
-//    char sysevent_cmd[80];
-//     snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", bridge_mode);
-//     v_secure_system(sysevent_cmd);
+//     v_secure_system("sysevent set bridge_mode %d", bridge_mode);
 //     v_secure_system("sysevent set forwarding-restart");
     
     
@@ -1306,7 +1302,6 @@ static void GWP_EnterBridgeMode(void)
     /* Reset Switch, to remove all VLANs */ 
     // GSWT_ResetSwitch();
     //DOCSIS_ESAFE_SetEsafeProvisioningStatusProgress(DOCSIS_EROUTER_INTERFACE, ESAFE_PROV_STATE_NOT_INITIATED);
-    char sysevent_cmd[80] = {0};
 	char MocaStatus[16]  = {0};
 	CcspTraceInfo((" Entry %s \n", __FUNCTION__));
 	syscfg_get(NULL, "MoCA_current_status", MocaStatus, sizeof(MocaStatus));
@@ -1316,7 +1311,6 @@ static void GWP_EnterBridgeMode(void)
         printf("syscfg_set failed\n");
     }
 	v_secure_system("ccsp_bus_client_tool eRT setv Device.MoCA.Interface.1.Enable bool false");
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", active_mode);
     v_secure_system("sysevent set bridge_mode %d", active_mode);
     v_secure_system("ccsp_bus_client_tool eRT setv Device.X_CISCO_COM_DeviceControl.ErouterEnable bool false");
     
@@ -1336,8 +1330,7 @@ static void GWP_EnterPseudoBridgeMode(void)
 //     GWP_UpdateEsafeAdminMode(eRouterMode);
 //     DOCSIS_ESAFE_SetErouterOperMode(DOCESAFE_EROUTER_OPER_NOIPV4_NOIPV6);
 //     DOCSIS_ESAFE_SetEsafeProvisioningStatusProgress(DOCSIS_EROUTER_INTERFACE, ESAFE_PROV_STATE_IN_PROGRESS);
-    char sysevent_cmd[80] = {0};
-	
+
 char MocaStatus[16] = {0};
 
 	syscfg_get(NULL, "MoCA_current_status", MocaStatus, sizeof(MocaStatus));
@@ -1348,8 +1341,7 @@ char MocaStatus[16] = {0};
         
     }
 	v_secure_system("ccsp_bus_client_tool eRT setv Device.MoCA.Interface.1.Enable bool false");	
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", BRMODE_PRIMARY_BRIDGE);
-    v_secure_system(sysevent_cmd);
+    v_secure_system("sysevent set bridge_mode %d", BRMODE_PRIMARY_BRIDGE);
     v_secure_system("ccsp_bus_client_tool eRT setv Device.X_CISCO_COM_DeviceControl.ErouterEnable bool false");
     v_secure_system("sysevent set forwarding-restart");
     sendPseudoBridgeModeMessage(TRUE);
@@ -2802,8 +2794,6 @@ static void GWP_act_DocsisInited_callback()
     sysevent_bridge_mode = getSyseventBridgeMode(eRouterMode, bridge_mode);
     active_mode = sysevent_bridge_mode;
 	CcspTraceInfo((" active_mode %d \n", active_mode));
-    char sysevent_cmd[80];
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", sysevent_bridge_mode);
     v_secure_system("sysevent set bridge_mode %d", sysevent_bridge_mode);
 #endif
   
@@ -3045,8 +3035,6 @@ if( uid == 0 )
     active_mode = sysevent_bridge_mode;
 	CcspTraceInfo((" active_mode %d \n", active_mode));
 
-    char sysevent_cmd[80] = { 0 };
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "sysevent set bridge_mode %d", sysevent_bridge_mode);
     v_secure_system("sysevent set bridge_mode %d", sysevent_bridge_mode);
 
     /* Now that we have the ICC que (SME) and we are registered on the docsis INIT    */
@@ -3064,34 +3052,34 @@ if( uid == 0 )
 #endif
 
 #ifdef MULTILAN_FEATURE
+
+    char buf[20];
+
     /* Update LAN side base mac address */
     getNetworkDeviceMacAddress(&macAddr);
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "%02x:%02x:%02x:%02x:%02x:%02x",
+    snprintf(buf, sizeof(buf), "%02x:%02x:%02x:%02x:%02x:%02x",
         macAddr.hw[0],macAddr.hw[1],
         macAddr.hw[2],macAddr.hw[3],
         macAddr.hw[4],macAddr.hw[5]);
-    if ((syscfg_set(NULL, BASE_MAC_SYSCFG_KEY, sysevent_cmd) != 0))
+    if ((syscfg_set(NULL, BASE_MAC_SYSCFG_KEY, buf) != 0))
     {
         fprintf(stderr, "Error in %s: Failed to set %s!\n", __FUNCTION__, BASE_MAC_SYSCFG_KEY);
     }
 
     /* Update LAN bridge mac address offset */
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "%d", BASE_MAC_BRIDGE_OFFSET);
-    if ((syscfg_set(NULL, BASE_MAC_BRIDGE_OFFSET_SYSCFG_KEY, sysevent_cmd) != 0))
+    if ((syscfg_set_u(NULL, BASE_MAC_BRIDGE_OFFSET_SYSCFG_KEY, BASE_MAC_BRIDGE_OFFSET) != 0))
     {
         fprintf(stderr, "Error in %s: Failed to set %s!\n", __FUNCTION__, BASE_MAC_BRIDGE_OFFSET_SYSCFG_KEY);
     }
 
     /* Update wired LAN interface mac address offset */
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "%d", BASE_MAC_LAN_OFFSET);
-    if ((syscfg_set(NULL, BASE_MAC_LAN_OFFSET_SYSCFG_KEY, sysevent_cmd) != 0))
+    if ((syscfg_set_u(NULL, BASE_MAC_LAN_OFFSET_SYSCFG_KEY, BASE_MAC_LAN_OFFSET) != 0))
     {
         fprintf(stderr, "Error in %s: Failed to set %s!\n", __FUNCTION__, BASE_MAC_LAN_OFFSET_SYSCFG_KEY);
     }
 
     /* Update WiFi interface mac address offset */
-    snprintf(sysevent_cmd, sizeof(sysevent_cmd), "%d", BASE_MAC_WLAN_OFFSET);
-    if ((syscfg_set(NULL, BASE_MAC_WLAN_OFFSET_SYSCFG_KEY, sysevent_cmd) != 0))
+    if ((syscfg_set_u(NULL, BASE_MAC_WLAN_OFFSET_SYSCFG_KEY, BASE_MAC_WLAN_OFFSET) != 0))
     {
         fprintf(stderr, "Error in %s: Failed to set %s!\n", __FUNCTION__, BASE_MAC_WLAN_OFFSET_SYSCFG_KEY);
     }
