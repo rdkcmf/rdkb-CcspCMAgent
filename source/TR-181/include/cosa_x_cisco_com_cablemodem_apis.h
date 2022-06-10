@@ -80,6 +80,10 @@
  * @addtogroup CM_AGENT_TYPES
  * @{
  */
+
+/*
+   Warning: The COSA_CM_DHCP_INFO struct must exactly match CMMGMT_CM_DHCP_INFO in halinterface/cm_hal.h
+*/
 typedef  struct
 _COSA_CM_DHCP_INFO
 {
