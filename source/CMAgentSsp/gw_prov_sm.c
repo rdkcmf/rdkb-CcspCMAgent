@@ -2123,6 +2123,7 @@ static void GWP_act_DocsisLinkDown_callback_2()
 	
 #if defined (WAN_FAILOVER_SUPPORTED)
 	publishDocsisLinkStatus(false);
+    publishCableModemRfSignalStatus();    
 #endif
      return;
 }
@@ -2178,6 +2179,7 @@ static int GWP_act_DocsisLinkUp_callback()
 	
 #if defined (WAN_FAILOVER_SUPPORTED)
 	publishDocsisLinkStatus(true);
+    publishCableModemRfSignalStatus();
 #endif
 
     

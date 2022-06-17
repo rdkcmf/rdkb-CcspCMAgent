@@ -37,7 +37,6 @@ rbusHandle_t handle;
 
 unsigned int gSubscribersCount = 0;
 
-
 BOOL
 Rbus_CMAgent_SetParamUintValue
     (
@@ -52,6 +51,8 @@ Rbus_CMAgent_SetParamBoolValue
         char*                       pParamName,
         BOOL                        bValue
     );
+unsigned int g_CMRfSigStatSubCount = 0;
+
 /***********************************************************************
 
   Data Elements declaration:
@@ -62,6 +63,9 @@ rbusDataElement_t cmAgentRbusDataElements[] = {
 	{DOCSIS_LINK_STATUS_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, NULL, NULL, NULL, eventSubHandler, NULL}},
 	{DOCSIS_LINKDOWN_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, SetBoolHandler, NULL, NULL, NULL, NULL}},
 	{DOCSIS_LINKDOWNTIMEOUT_TR181, RBUS_ELEMENT_TYPE_EVENT, {getuintHandler, SetUintHandler, NULL, NULL, NULL, NULL}}
+	{CABLE_MODEM_RF_SIGNAL_STATUS, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, NULL, NULL, NULL, eventSubHandler, NULL}},
+
+
 };
 
 /***********************************************************************
@@ -82,6 +86,12 @@ rbusError_t getBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusGet
 		CcspTraceWarning(("Getting DOCSIS link status value, new value = '%d'\n", cmAgent_Link_Status.DocsisLinkStatus));
 		rbusValue_SetBoolean(value, cmAgent_Link_Status.DocsisLinkStatus);
 	}
+	else if (strcmp(name, CABLE_MODEM_RF_SIGNAL_STATUS) == 0)
+       {
+                  CcspTraceWarning(("Getting DOCSIS link status value, new value = '%s'\n", cmAgent_Link_Status.CableModemRfSignalStatus?"true":"false"));
+                  rbusValue_SetBoolean(value, cmAgent_Link_Status.CableModemRfSignalStatus);
+       }
+
 	else if(strcmp(name, DOCSIS_LINKDOWN_TR181) == 0)
 	{
 		CcspTraceWarning(("Getting DOCSIS link Down value, new value = '%d'\n", cmAgent_Link_Status.DocsisLinkDown));
@@ -242,6 +252,21 @@ rbusError_t eventSubHandler(rbusHandle_t handle, rbusEventSubAction_t action, co
 		}
 		CcspTraceWarning(("Subscribers count changed, new value=%d\n", gSubscribersCount));
 	}
+	else if (!strcmp(CABLE_MODEM_RF_SIGNAL_STATUS, eventName))
+	{
+		if (action == RBUS_EVENT_ACTION_SUBSCRIBE)
+		{
+			g_CMRfSigStatSubCount += 1;
+		}
+		else
+		{
+			if (g_CMRfSigStatSubCount > 0)
+			{
+				g_CMRfSigStatSubCount -= 1;
+			}
+		}
+		CcspTraceWarning(("Cable Modem Rf Signal Status Subscribers count changed, new value=%d\n", g_CMRfSigStatSubCount));
+	}
 	else
 	{
 		CcspTraceWarning(("provider: eventSubHandler unexpected eventName %s\n", eventName));
@@ -257,6 +282,11 @@ rbusError_t eventSubHandler(rbusHandle_t handle, rbusEventSubAction_t action, co
 rbusError_t cmAgentRbusInit()
 {
 	int rc = RBUS_ERROR_SUCCESS;
+	if(RBUS_ENABLED != rbus_checkStatus())
+    {
+		CcspTraceWarning(("%s: RBUS not available. Events are not supported\n", __FUNCTION__));
+		return RBUS_ERROR_BUS_ERROR;
+    }
 	rc = rbus_open(&handle, RBUS_COMPONENT_NAME);
 	if (rc != RBUS_ERROR_SUCCESS)
 	{
@@ -275,6 +305,7 @@ rbusError_t cmAgentRbusInit()
 		return rc;
 	}
 	
+	// Initialize CmAgent_Link_Status struct with default values 
 	initLinkStatus();
 
 	return rc;
@@ -296,6 +327,12 @@ void initLinkStatus()
 		cmAgent_Link_Status.DocsisLinkDownTimeOut=atoi(ParamValue);
 		CcspTraceWarning(("Initialized DOCSIS cmAgent_Link_Status.DocsisLinkDownTimeOut:%d\n",cmAgent_Link_Status.DocsisLinkDownTimeOut));
 	}
+	
+	/* fetch and set cable modem RF signal status */
+	docsis_IsEnergyDetected(&cmAgent_Link_Status.CableModemRfSignalStatus);
+	CcspTraceWarning(("Initialized Cable modem Rf signal status with value='%s'.\n", cmAgent_Link_Status.CableModemRfSignalStatus?"true":"false"));
+
+	CcspTraceWarning(("Initializing CM agent link status with default values.\n"));
 }
 
 
@@ -469,4 +506,42 @@ BOOL SetDocsisLinkdowSignalfunc(fpDocsisLinkdownSignal CreateThreadandSendCondSi
 	cmAgent_Link_Status.pDocsisLinkdowSignal=CreateThreadandSendCondSignalToPthreadfunc;
 	return TRUE;
 }
+  publishCableModemRfSignalStatus(): publish CableModemRfSignalStatus event after event value gets updated
+
+ ********************************************************************************/
+void publishCableModemRfSignalStatus() {
+	/* fetch current and previous cable modem rf signal status value */
+    BOOL currentRfSignalStatus, prevRfSignalStatus;
+    if (ANSC_STATUS_SUCCESS == docsis_IsEnergyDetected(&currentRfSignalStatus)) {
+        prevRfSignalStatus = cmAgent_Link_Status.CableModemRfSignalStatus;
+	CcspTraceInfo(("Current RF Signal Value=%s\n", currentRfSignalStatus? "true" : "false"));
+        /* publish the cable modem rf signal status value if valu changed */
+        if (prevRfSignalStatus != currentRfSignalStatus) {
+
+	    CcspTraceInfo(("Current RF Signal value is not equal to previous Value\n"));
+	    cmAgent_Link_Status.CableModemRfSignalStatus = currentRfSignalStatus;
+            publishCableModemRfSignalStatusValue(currentRfSignalStatus);
+        }
+    }
+    else {
+        CcspTraceError((" Failed to get RfSignalStatus \n"));
+    }
+}
+
+void publishCableModemRfSignalStatusValue(bool link_status)
+{	
+	rbusError_t ret = RBUS_ERROR_SUCCESS;
+	bool oldCableModemRfSignalStatus = cmAgent_Link_Status.CableModemRfSignalStatus;
+	//update DocsisLinkStatus with new value
+	cmAgent_Link_Status.DocsisLinkStatus = link_status;
+	CcspTraceInfo(("Publishing cable modem Rf signal status with updated value=%s\n", cmAgent_Link_Status.CableModemRfSignalStatus ? "true" : "false"));
+	if (g_CMRfSigStatSubCount > 0)
+	{
+		ret = sendBoolUpdateEvent(CABLE_MODEM_RF_SIGNAL_STATUS, cmAgent_Link_Status.CableModemRfSignalStatus, oldCableModemRfSignalStatus);
+		if(ret == RBUS_ERROR_SUCCESS) {
+			CcspTraceInfo(("Published cable modem Rf signal status with updated value.\n"));
+		}
+	}
+}
+
 #endif

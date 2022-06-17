@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <rbus.h>
 
+
 //#define NUM_OF_RBUS_PARAMS	3
 #define RBUS_COMPONENT_NAME	"RbusCMAgent"
 #define DOCSISLINKDOWNTIMEOUT "DocsisLinkDownTimeOut"
@@ -31,7 +32,10 @@
 #define DOCSIS_LINKDOWN_TR181   "Device.X_RDK_DOCSIS.LinkDown"
 #define DOCSIS_LINKDOWNTIMEOUT_TR181 "Device.X_RDK_DOCSIS.LinkDownTimeout"
 
+
 typedef void (*fpDocsisLinkdownSignal)();
+#define CABLE_MODEM_RF_SIGNAL_STATUS	"Device.X_RDKCENTRAL-COM_CableModem.CableRfSignalStatus"
+
 typedef struct 
 _CmAgent_Link_Status_
 {
@@ -39,7 +43,9 @@ _CmAgent_Link_Status_
     bool DocsisLinkDown;
     uint DocsisLinkDownTimeOut;
     fpDocsisLinkdownSignal pDocsisLinkdowSignal;
+    BOOL CableModemRfSignalStatus;
 } CmAgent_Link_Status;
+
 
 rbusError_t getBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t* opts);
 rbusError_t getuintHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t *opts);
@@ -58,5 +64,8 @@ void publishDocsisLinkStatus(bool link_status);
 
 char const* GetParamName(char const* path);
 BOOL SetDocsisLinkdowSignalfunc(fpDocsisLinkdownSignal CreateThreadandSendCondSignalToPthreadfunc);
+void publishCableModemRfSignalStatus();
+
+void publishCableModemRfSignalStatusValue(bool link_status);
 #endif
 #endif
