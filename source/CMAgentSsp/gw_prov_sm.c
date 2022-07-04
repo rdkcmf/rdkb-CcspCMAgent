@@ -176,7 +176,7 @@
 #define WAN_COMPONENT_NAME                "eRT.com.cisco.spvtg.ccsp.wanmanager"
 #define WAN_INTERFACE_PHYPATH_PARAM_NAME        "Device.X_RDK_WanManager.CPEInterface.1.Phy.Path"
 #define WAN_INTERFACE_PHY_STATUS_PARAM_NAME        "Device.X_RDK_WanManager.CPEInterface.1.Phy.Status"
-
+#define DOCSISLINKDOWN_TESTFILE "/tmp/.DocsisLinkDown_TestRunning.txt"
 typedef enum {
     EVENT_GWP_NONE = -1,
     EVENT_GWP_LINK_UP,
@@ -309,6 +309,12 @@ void *GWP_UpdateTr069CfgThread( void *data );
 void GWP_Util_get_shell_output( FILE *fp, char *out, int len );
 void *GWP_EventHandler(void *arg);
 int GWP_PushEventInMsgq(ClbkInfo *pInfo );
+#if defined (WAN_FAILOVER_SUPPORTED)
+void *WAN_Failover_Simulation(void *arg);
+void set_time(uint32_t TimeSec);
+void CreateDocsisLinkDown_TestFile();
+void CreateThreadandSendCondSignalToPthread();
+#endif //WAN_FAILOVER_SUPPORTED
 /**************************************************************************/
 /*      LOCAL VARIABLES:                                                  */
 /**************************************************************************/
@@ -354,7 +360,21 @@ static pthread_t Gwp_event_tid;
 static int sIPv4_acquired = 0;
 static int sIPv6_acquired = 0;
 #endif
-
+#if defined (WAN_FAILOVER_SUPPORTED)
+// Declaration of thread condition variable
+pthread_cond_t LinkdownCond=PTHREAD_COND_INITIALIZER;
+// declaring mutex
+pthread_mutex_t Linkdownlock=PTHREAD_MUTEX_INITIALIZER;
+pthread_condattr_t LinkdownAttr;
+static pthread_t WANSimptr;
+struct timespec ts;
+extern CmAgent_Link_Status cmAgent_Link_Status;
+typedef struct{
+	bool DocsisLinkdownSim_running;
+	bool HAL_DocsisLinkdownEnable;
+}docsis_linkdow_testcase;
+docsis_linkdow_testcase DocsisLd_cfg={false,false};
+#endif //WAN_FAILOVER_SUPPORTED
 /**************************************************************************/
 /*      LOCAL FUNCTIONS:                                                  */
 /**************************************************************************/
@@ -2037,6 +2057,14 @@ static void *GWP_sysevent_threadfunc(void *data)
 static void GWP_act_DocsisLinkDown_callback_1()
 {
 
+#if defined (WAN_FAILOVER_SUPPORTED)
+	if(DocsisLd_cfg.DocsisLinkdownSim_running==true)
+	{
+		DocsisLd_cfg.HAL_DocsisLinkdownEnable=true;
+		return;
+	}
+#endif
+
     if (TRUE == IsEthWanEnabled())
     {
         return;
@@ -2053,6 +2081,15 @@ static void GWP_act_DocsisLinkDown_callback_1()
 
 static void GWP_act_DocsisLinkDown_callback_2()
 {
+
+#if defined (WAN_FAILOVER_SUPPORTED)
+	if(DocsisLd_cfg.DocsisLinkdownSim_running==true)
+	{
+		DocsisLd_cfg.HAL_DocsisLinkdownEnable=true;
+		return;
+	}
+#endif
+
     if (TRUE == IsEthWanEnabled())
     {
         return;
@@ -2117,6 +2154,14 @@ static int GWP_act_DocsisLinkUp_callback()
     int uptime = 0;
     char buffer[64] = {0};
     FILE *fp = NULL;
+#if defined (WAN_FAILOVER_SUPPORTED)
+	if(DocsisLd_cfg.DocsisLinkdownSim_running==true)
+	{
+		DocsisLd_cfg.HAL_DocsisLinkdownEnable=false;
+		return 0;
+	}
+#endif
+
     if (TRUE == IsEthWanEnabled())
     {
         return -1;
@@ -3288,14 +3333,127 @@ void *GWP_EventHandler(void *arg)
     } while(1);
    pthread_exit(NULL);
 }
+#if defined (WAN_FAILOVER_SUPPORTED)
+/*************************************************************************************************
+ *  @brief set the timer value
+ *  @param arg1 timer value in sec
+ * **********************************************************************************************/
+void set_time(uint32_t TimeSec)
+{  	
+	memset(&ts,0,sizeof(ts));
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	ts.tv_nsec = 0;
+	ts.tv_sec +=TimeSec;
+}
+/******************************************************************************************
+ @brief This function check the respective file is exist or not , if exit remove that file 
+ @param fname : File path and name
+ @param return : function retuns 1 when file is prasent otherwise it return 0
+*********************************************************************************************/
+
+int RemoveIfFileExists(const char *fname)
+{
+	if(access(fname, F_OK) == 0) 
+	{
+		remove(fname);
+		return 0;
+	}
+	return -1;
+}
+/***********************************************************************************************
+ * send signal to conditional pthread
+ * ********************************************************************************************/
+void CreateThreadandSendCondSignalToPthread()
+{
+	int status=0;
+	if(cmAgent_Link_Status.DocsisLinkDown==true)
+	{
+		status=pthread_create(&WANSimptr, NULL, WAN_Failover_Simulation, NULL);
+		if(status)
+		{
+			CcspTraceInfo(("WAN_Failover_Simulation pthread create fail \n"));
+			return;
+		}
+		else
+		{
+			CcspTraceInfo((" WAN_Failover_Simulation Pthread is created\n"));
+		}
+	}
+	else if(cmAgent_Link_Status.DocsisLinkDown==false)
+	{
+		pthread_cond_signal(&LinkdownCond);
+		CcspTraceInfo((" pthread_cond_signal CmAgent_Link.DocsisLinkDown false \n"));
+	}
+}
+/************************************************************************************
+ *  for DocsisLinkDown_TestFile creation 
+ * ********************************************************************************/
+void CreateDocsisLinkDown_TestFile()
+{
+	FILE *LinkdownPtr;
+	LinkdownPtr=fopen(DOCSISLINKDOWN_TESTFILE,"w");
+	if(LinkdownPtr==NULL)
+	{
+		CcspTraceInfo(("%s file creates fail\n",DOCSISLINKDOWN_TESTFILE));
+		return;
+	}
+	fclose(LinkdownPtr);
+}
+/************************************************************************************
+ * 
+ *   for WAN_Failover_Simulation
+ * ***********************************************************************************/
+
+
+void *WAN_Failover_Simulation(void *arg)
+{
+	pthread_detach(pthread_self());
+	CcspTraceInfo((" Enter into %s thread!!\n",__FUNCTION__));
+	pthread_condattr_init(&LinkdownAttr);
+	pthread_condattr_setclock(&LinkdownAttr, CLOCK_MONOTONIC);
+	pthread_cond_init(&LinkdownCond,&LinkdownAttr);
+	pthread_mutex_lock(&Linkdownlock);
+	set_time(cmAgent_Link_Status.DocsisLinkDownTimeOut);
+	if(cmAgent_Link_Status.DocsisLinkStatus== true)
+	{
+		/*********Docsis Link down callback*****/	
+		GWP_act_DocsisLinkDown_callback_1(); // Link down
+		GWP_act_DocsisLinkDown_callback_2();//Link down
+		DocsisLd_cfg.DocsisLinkdownSim_running=true;
+		CreateDocsisLinkDown_TestFile();
+	}
+	/********* wait for CmAgent_Link.DocsisLinkDownTimeOut****/
+	if(cmAgent_Link_Status.DocsisLinkDownTimeOut==0)
+	{
+		pthread_cond_wait(&LinkdownCond, &Linkdownlock);// conditional wait
+	}
+	else
+	{
+		pthread_cond_timedwait(&LinkdownCond,&Linkdownlock,&ts);//sleep based on tr181 link down timeout
+		cmAgent_Link_Status.DocsisLinkDown=false;
+	}
+	
+	if(DocsisLd_cfg.HAL_DocsisLinkdownEnable==false)
+	{
+		DocsisLd_cfg.DocsisLinkdownSim_running=false; 
+		GWP_act_DocsisLinkUp_callback(); // Link up
+	}
+  	RemoveIfFileExists(DOCSISLINKDOWN_TESTFILE);
+	DocsisLd_cfg.DocsisLinkdownSim_running=false;
+	DocsisLd_cfg.HAL_DocsisLinkdownEnable=false;
+	// release lock
+	pthread_mutex_unlock(&Linkdownlock);
+	CcspTraceInfo((" Exit %s \n",__FUNCTION__));
+	return arg;
+}
+#endif //WAN_FAILOVER_SUPPORTED
 
 void RegisterDocsisCallback()
 {
 #if !defined(INTEL_PUMA7)
      macaddr_t  macAddr_bcm;
 #endif
-     
-    CcspTraceInfo(("Entry docsis clbk register\n"));
+    CcspTraceInfo(("Entry docsis clbk register!!\n"));
 #if !defined(INTEL_PUMA7)
     eSafeDevice_Initialize(&macAddr_bcm);
 #else
@@ -3304,6 +3462,7 @@ void RegisterDocsisCallback()
 
 #if defined (WAN_FAILOVER_SUPPORTED)
 	cmAgentRbusInit();
+	SetDocsisLinkdowSignalfunc(CreateThreadandSendCondSignalToPthread);
 #endif	
 
     syscfg_init();
@@ -3338,7 +3497,12 @@ void RegisterDocsisCallback()
 	void* pGW_setTopologyMode = GW_setTopologyMode;
         obj->pGW_SetTopologyMode = (fpGW_SetTopologyMode)pGW_setTopologyMode;
 #endif
-
+#if defined (WAN_FAILOVER_SUPPORTED)
+        if(RemoveIfFileExists(DOCSISLINKDOWN_TESTFILE)==0)// file is removed then link up during crash 
+	    {
+		    GWP_act_DocsisLinkUp_callback(); // Link up
+	    }
+#endif //WAN_FAILOVER_SUPPORTED
         CcspTraceInfo(("Create event handler\n"));
         /* Command line - ignored */
         SME_CreateEventHandler(obj);

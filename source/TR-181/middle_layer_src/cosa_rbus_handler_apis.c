@@ -21,8 +21,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "ccsp_trace.h"
 #include "cosa_rbus_handler_apis.h"
+#include "cm_hal.h"
+#include "cosa_apis.h"
+#include <sysevent/sysevent.h>
+#include "syscfg/syscfg.h"
+#define NUM_OF_RBUS_PARAMS sizeof(cmAgentRbusDataElements)/sizeof(cmAgentRbusDataElements[0])
 
 CmAgent_Link_Status cmAgent_Link_Status;
 
@@ -30,15 +37,31 @@ rbusHandle_t handle;
 
 unsigned int gSubscribersCount = 0;
 
+
+BOOL
+Rbus_CMAgent_SetParamUintValue
+    (
+       void*                 hInsContext,
+       char*                       pParamName,
+       uint                        uValue
+    );
+BOOL
+Rbus_CMAgent_SetParamBoolValue
+    (
+        void*                 hInsContext,
+        char*                       pParamName,
+        BOOL                        bValue
+    );
 /***********************************************************************
 
   Data Elements declaration:
 
  ***********************************************************************/
-rbusDataElement_t cmAgentRbusDataElements[NUM_OF_RBUS_PARAMS] = {
+rbusDataElement_t cmAgentRbusDataElements[] = {
 
 	{DOCSIS_LINK_STATUS_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, NULL, NULL, NULL, eventSubHandler, NULL}},
-
+	{DOCSIS_LINKDOWN_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, SetBoolHandler, NULL, NULL, NULL, NULL}},
+	{DOCSIS_LINKDOWNTIMEOUT_TR181, RBUS_ELEMENT_TYPE_EVENT, {getuintHandler, SetUintHandler, NULL, NULL, NULL, NULL}}
 };
 
 /***********************************************************************
@@ -59,6 +82,11 @@ rbusError_t getBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusGet
 		CcspTraceWarning(("Getting DOCSIS link status value, new value = '%d'\n", cmAgent_Link_Status.DocsisLinkStatus));
 		rbusValue_SetBoolean(value, cmAgent_Link_Status.DocsisLinkStatus);
 	}
+	else if(strcmp(name, DOCSIS_LINKDOWN_TR181) == 0)
+	{
+		CcspTraceWarning(("Getting DOCSIS link Down value, new value = '%d'\n", cmAgent_Link_Status.DocsisLinkDown));
+		rbusValue_SetBoolean(value, cmAgent_Link_Status.DocsisLinkDown);
+	}
 	else
 	{
 		CcspTraceWarning(("CMAgent rbus get handler invalid input\n"));
@@ -69,6 +97,123 @@ rbusError_t getBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusGet
 
 	return RBUS_ERROR_SUCCESS;
 }
+/***********************************************************************
+
+ Set Handler API for objects of type RBUS_BOOLEAN for objects:
+
+***********************************************************************/
+
+rbusError_t SetBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusSetHandlerOptions_t* opts)
+{
+    (void)handle;
+    (void)opts;
+    
+    bool rc = false;
+    char const* propName = rbusProperty_GetName(property);
+    char* param = strdup(GetParamName(propName));
+    rbusValue_t value = rbusProperty_GetValue(property);
+
+    CcspTraceWarning(("%s called for param='%s'\n", __FUNCTION__, param));
+ 
+    if(value)
+    {
+        if(rbusValue_GetType(value) == RBUS_BOOLEAN)
+        {
+            rc = Rbus_CMAgent_SetParamBoolValue(NULL,param,rbusValue_GetBoolean(value));
+            free(param);
+            if(!rc)
+            {
+                CcspTraceWarning(("Set_DocsisTr181Link_Param DOCSIS_LINKDOWN_TR181 failed\n"));
+                return RBUS_ERROR_BUS_ERROR;
+            }
+            return RBUS_ERROR_SUCCESS;
+        }
+	else
+	{
+            CcspTraceWarning(("%s result:FAIL error:'unexpected type %d'\n", __FUNCTION__, rbusValue_GetType(value)));
+	}
+    }
+    else
+    {
+        CcspTraceWarning(("%s result:FAIL value=NULL param='%s'\n", __FUNCTION__, param));
+    }
+    free(param);
+    return RBUS_ERROR_BUS_ERROR;
+}
+/***********************************************************************
+
+  Get Handler APIs for objects of type RBUS_UINT:
+
+ ***********************************************************************/
+rbusError_t getuintHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t *opts)
+{
+	char const *name = rbusProperty_GetName(property);
+	char ParamValue[16];
+	(void)handle;
+	(void)opts;
+	rbusValue_t value;
+	rbusValue_Init(&value);
+
+	if (strcmp(name, DOCSIS_LINKDOWNTIMEOUT_TR181) == 0)
+	{
+		syscfg_get(NULL, DOCSISLINKDOWNTIMEOUT, ParamValue, sizeof(ParamValue));
+		cmAgent_Link_Status.DocsisLinkDownTimeOut=atoi(ParamValue);
+		CcspTraceWarning(("Getting DOCSIS link Down TimeOut value, new value = '%d'\n", cmAgent_Link_Status.DocsisLinkDownTimeOut));
+		rbusValue_SetUInt32(value, cmAgent_Link_Status.DocsisLinkDownTimeOut);
+	}
+	else
+	{
+		CcspTraceWarning(("CMAgent rbus get handler invalid input\n"));
+		return RBUS_ERROR_INVALID_INPUT;
+	}
+	rbusProperty_SetValue(property, value);
+	rbusValue_Release(value);
+
+	return RBUS_ERROR_SUCCESS;
+}
+/***********************************************************************
+
+ Set Handler API for objects of type RBUS_UINT for objects:
+
+***********************************************************************/
+rbusError_t SetUintHandler(rbusHandle_t handle, rbusProperty_t property, rbusSetHandlerOptions_t* opts)
+{
+    (void)handle;
+    (void)opts;
+    
+    bool rc = false;
+    char const* propName = rbusProperty_GetName(property);
+    char* param = strdup(GetParamName(propName));
+    rbusValue_t value = rbusProperty_GetValue(property);
+
+    CcspTraceWarning(("%s called for param='%s'\n", __FUNCTION__, param));
+ 
+    if(value)
+    {
+        if(rbusValue_GetType(value) == RBUS_UINT32)
+        {
+            rc = Rbus_CMAgent_SetParamUintValue(NULL,param,(uint)rbusValue_GetUInt32(value));
+            free(param);
+            if(!rc)
+            {
+                CcspTraceWarning(("Set_DocsisTr181Link_Param DOCSIS_LINKDOWNTIMEOUT_TR181 failed\n"));
+                return RBUS_ERROR_BUS_ERROR;
+            }
+            return RBUS_ERROR_SUCCESS;
+        }
+	else
+        {
+            CcspTraceWarning(("%s result:FAIL error:'unexpected type %d'\n", __FUNCTION__, rbusValue_GetType(value)));
+        }
+    }
+    else
+    {
+        CcspTraceWarning(("%s result:FAIL value=NULL param='%s'\n", __FUNCTION__, param));
+    }
+    free(param);
+    return RBUS_ERROR_BUS_ERROR;
+}
+
 /***********************************************************************
 
   Event subscribe handler API for objects:
@@ -142,8 +287,15 @@ rbusError_t cmAgentRbusInit()
  ********************************************************************************/
 void initLinkStatus()
 {
+	char ParamValue[16];
 	cmAgent_Link_Status.DocsisLinkStatus = false;
 	CcspTraceWarning(("Initialized DOCSIS link status with default values.\n"));
+	cmAgent_Link_Status.DocsisLinkDown = false;
+	if(!syscfg_get(NULL, DOCSISLINKDOWNTIMEOUT, ParamValue, sizeof(ParamValue)))
+	{
+		cmAgent_Link_Status.DocsisLinkDownTimeOut=atoi(ParamValue);
+		CcspTraceWarning(("Initialized DOCSIS cmAgent_Link_Status.DocsisLinkDownTimeOut:%d\n",cmAgent_Link_Status.DocsisLinkDownTimeOut));
+	}
 }
 
 
@@ -212,5 +364,109 @@ void publishDocsisLinkStatus(bool link_status)
 			CcspTraceInfo(("Published DOCSIS link status with updated value.\n"));
 		}
 	}
+}
+
+/*******************************************************************************
+
+ GetParamName from arg and return parameter name
+
+ ********************************************************************************/
+char const* GetParamName(char const* path)
+{
+    char const* p = path + strlen(path);
+    while(p > path && *(p-1) != '.')
+        p--;
+    return p;
+}
+/*******************************************************************************
+
+Set CM agent bool parameters
+
+ ********************************************************************************/
+
+BOOL
+Rbus_CMAgent_SetParamBoolValue
+    (
+        void*                 hInsContext,
+        char*                       pParamName,
+        BOOL                        bValue
+    )
+{
+	UNREFERENCED_PARAMETER(hInsContext);
+	if (AnscEqualString(pParamName, "LinkDown", TRUE))
+	{
+		if(cmAgent_Link_Status.DocsisLinkDown!=bValue)
+		{
+			cmAgent_Link_Status.DocsisLinkDown= bValue;
+			//SendSignalConditionalPthread();
+                        if(cmAgent_Link_Status.pDocsisLinkdowSignal!=NULL)
+			{
+				cmAgent_Link_Status.pDocsisLinkdowSignal();
+			}
+			else
+			{
+				CcspTraceInfo(("%s in this function address not assigned to pDocsisLinkdowSignal function pointer\n",__FUNCTION__));
+			}
+			CcspTraceInfo(("%s : parameter name = '%s', value = '%d'\n",__FUNCTION__,pParamName,cmAgent_Link_Status.DocsisLinkDown));
+			return TRUE;
+		}
+		else
+		{
+		 	CcspTraceInfo(("%s : trying to set same value for parameter '%s', value is '%d'\n",__FUNCTION__,pParamName,cmAgent_Link_Status.DocsisLinkDown));
+			return FALSE;
+		}
+	}
+	CcspTraceInfo(("Unsupported parameter '%s'\n", pParamName));
+	 return FALSE;
+}
+/*******************************************************************************
+
+ set the CM agent uint parameters
+
+ ********************************************************************************/
+BOOL
+Rbus_CMAgent_SetParamUintValue
+    (
+       void*                 hInsContext,
+       char*                       pParamName,
+       uint                        uValue
+    )
+{
+	UNREFERENCED_PARAMETER(hInsContext); 
+	if (AnscEqualString(pParamName, "LinkDownTimeout", TRUE))
+	{
+	 	if(cmAgent_Link_Status.DocsisLinkDownTimeOut!=uValue)
+		{ 
+			cmAgent_Link_Status.DocsisLinkDownTimeOut= uValue;
+			syscfg_set_u( NULL, DOCSISLINKDOWNTIMEOUT,cmAgent_Link_Status.DocsisLinkDownTimeOut);
+			syscfg_commit( );
+			CcspTraceInfo(("%s : parameter name ='%s', value = '%d'\n", __FUNCTION__,pParamName,cmAgent_Link_Status.DocsisLinkDownTimeOut));
+			return TRUE;
+		 }
+		else
+		{
+			CcspTraceWarning(("%s trying to set same value for parameter '%s', value is '%d' \n",__FUNCTION__, pParamName,cmAgent_Link_Status.DocsisLinkDownTimeOut));
+			return FALSE;
+ 		}
+	}
+	CcspTraceInfo(("Unsupported parameter '%s'\n", pParamName));
+	return FALSE;
+}
+
+/*******************************************************************************
+
+ SetDocsisLinkdowSignalfunc is used to assigned function to function pointer
+ 
+ ********************************************************************************/
+BOOL SetDocsisLinkdowSignalfunc(fpDocsisLinkdownSignal CreateThreadandSendCondSignalToPthreadfunc)
+{
+	if(CreateThreadandSendCondSignalToPthreadfunc==NULL)
+	{
+		CcspTraceInfo(("%s Received NULL pointer, assigning pDocsisLinkdowSignal to NULL\n",__FUNCTION__));
+          	cmAgent_Link_Status.pDocsisLinkdowSignal = NULL;
+		return FALSE;
+	}
+	cmAgent_Link_Status.pDocsisLinkdowSignal=CreateThreadandSendCondSignalToPthreadfunc;
+	return TRUE;
 }
 #endif

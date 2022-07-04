@@ -24,19 +24,27 @@
 #include <stdbool.h>
 #include <rbus.h>
 
-#define NUM_OF_RBUS_PARAMS	1
+//#define NUM_OF_RBUS_PARAMS	3
 #define RBUS_COMPONENT_NAME	"RbusCMAgent"
-
+#define DOCSISLINKDOWNTIMEOUT "DocsisLinkDownTimeOut"
 #define DOCSIS_LINK_STATUS_TR181	"Device.X_RDK_DOCSIS.LinkStatus"
+#define DOCSIS_LINKDOWN_TR181   "Device.X_RDK_DOCSIS.LinkDown"
+#define DOCSIS_LINKDOWNTIMEOUT_TR181 "Device.X_RDK_DOCSIS.LinkDownTimeout"
 
+typedef void (*fpDocsisLinkdownSignal)();
 typedef struct 
 _CmAgent_Link_Status_
 {
     bool DocsisLinkStatus;
-	
+    bool DocsisLinkDown;
+    uint DocsisLinkDownTimeOut;
+    fpDocsisLinkdownSignal pDocsisLinkdowSignal;
 } CmAgent_Link_Status;
 
 rbusError_t getBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t* opts);
+rbusError_t getuintHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t *opts);
+rbusError_t SetBoolHandler(rbusHandle_t handle, rbusProperty_t property, rbusSetHandlerOptions_t* opts);
+rbusError_t SetUintHandler(rbusHandle_t handle, rbusProperty_t property, rbusSetHandlerOptions_t* opts);
 
 rbusError_t eventSubHandler(rbusHandle_t handle, rbusEventSubAction_t action, const char* eventName, rbusFilter_t filter, int32_t interval, bool* autoPublish);
 
@@ -48,5 +56,7 @@ rbusError_t sendBoolUpdateEvent(char* event_name , bool eventNewData, bool event
 
 void publishDocsisLinkStatus(bool link_status);
 
+char const* GetParamName(char const* path);
+BOOL SetDocsisLinkdowSignalfunc(fpDocsisLinkdownSignal CreateThreadandSendCondSignalToPthreadfunc);
 #endif
 #endif
