@@ -358,9 +358,22 @@ CosaDmlCMWanUpdateCustomConfig
     }
     else
     {
-        memset(command,0,sizeof(command));
-        snprintf(command,sizeof(command),"brctl delif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
-        system(command);
+        // Dont remove cm interface from wan bridge if device is in bridge mode.
+#ifdef _COSA_BCM_ARM_
+        INT bridge_mode = 0;
+        char buf[64];
+         memset(buf,0,sizeof(buf));
+        if (syscfg_get(NULL, "bridge_mode", buf, sizeof(buf)) == 0)
+        {
+            bridge_mode = atoi(buf);
+        }
+        if (bridge_mode == 0)
+#endif
+        {
+            memset(command,0,sizeof(command));
+            snprintf(command,sizeof(command),"brctl delif %s %s",WAN_PHY_NAME,DOCSIS_INF_NAME);
+            system(command);
+        }
     }
     UNREFERENCED_PARAMETER(arg);
     return ANSC_STATUS_SUCCESS;
