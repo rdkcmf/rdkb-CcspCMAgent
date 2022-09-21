@@ -62,7 +62,7 @@ rbusDataElement_t cmAgentRbusDataElements[] = {
 
 	{DOCSIS_LINK_STATUS_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, NULL, NULL, NULL, eventSubHandler, NULL}},
 	{DOCSIS_LINKDOWN_TR181, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, SetBoolHandler, NULL, NULL, NULL, NULL}},
-	{DOCSIS_LINKDOWNTIMEOUT_TR181, RBUS_ELEMENT_TYPE_EVENT, {getuintHandler, SetUintHandler, NULL, NULL, NULL, NULL}}
+	{DOCSIS_LINKDOWNTIMEOUT_TR181, RBUS_ELEMENT_TYPE_EVENT, {getuintHandler, SetUintHandler, NULL, NULL, NULL, NULL}},
 	{CABLE_MODEM_RF_SIGNAL_STATUS, RBUS_ELEMENT_TYPE_EVENT, {getBoolHandler, NULL, NULL, NULL, eventSubHandler, NULL}},
 
 
@@ -506,6 +506,8 @@ BOOL SetDocsisLinkdowSignalfunc(fpDocsisLinkdownSignal CreateThreadandSendCondSi
 	cmAgent_Link_Status.pDocsisLinkdowSignal=CreateThreadandSendCondSignalToPthreadfunc;
 	return TRUE;
 }
+
+/*******************************************************************************
   publishCableModemRfSignalStatus(): publish CableModemRfSignalStatus event after event value gets updated
 
  ********************************************************************************/
