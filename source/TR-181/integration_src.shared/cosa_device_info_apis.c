@@ -621,7 +621,13 @@ void *FWDL_ThreadFunc(void *args)
 		}
 		CcspTraceInfo((" Waiting for reboot ready over, setting last reboot reason \n"));
 
+#if (defined (_XB6_PRODUCT_REQ_) && defined (_COSA_BCM_ARM_)) || defined (_CBR_PRODUCT_REQ_)
+		v_secure_system("syscfg set X_RDKCENTRAL-COM_LastRebootReason Forced_Software_upgrade");
+                v_secure_system("syscfg set X_RDKCENTRAL-COM_LastRebootCounter 1");
+                v_secure_system("syscfg commit");
+#else		
 		v_secure_system("dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason string Forced_Software_upgrade");
+#endif
 
 		ret = RETURN_ERR;
 		ret = cm_hal_HTTP_Download_Reboot_Now();
