@@ -665,7 +665,17 @@ void convert_to_validFW(char *fw,char *valid_fw)
 	 * _svn_d30_signed.bin to get valid firmware name.
 	 */
 	index = 0;
-    strncpy(fw_name_str, fw, VALID_fW_LEN);
+    /* CID 174247 fix */
+    if(strlen(fw) < VALID_fW_LEN)
+    {
+	strncpy(fw_name_str, fw, VALID_fW_LEN);
+    }
+    else
+    {
+	fw_name_str[0] = '\0';
+	CcspTraceError((" Fireware name error \n"));
+    }
+
 	do {
 		  if ((buff = strstr(fw_name_str, fw_file_name_type_table[index])) != NULL) {
 			  found = 1;

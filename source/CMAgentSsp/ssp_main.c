@@ -696,7 +696,18 @@ INT InitBootInformInfo(WAN_BOOTINFORM_MSG *pMsg)
 
     memset(acSetParamName, 0, sizeof(acSetParamName));
     snprintf(acSetParamName, sizeof(acSetParamName), WAN_BOOTINFORM_INTERFACE_PARAM_NAME, WAN_CM_INTERFACE_INSTANCE_NUM);
-    strncpy(pMsg->param[MSG_WAN_NAME].paramName,acSetParamName,sizeof(pMsg->param[MSG_WAN_NAME].paramName));
+
+    /* CID 187493 fix */
+    if( strlen(acSetParamName) < sizeof(pMsg->param[MSG_WAN_NAME].paramName) )
+    {
+	strncpy(pMsg->param[MSG_WAN_NAME].paramName,acSetParamName,sizeof(pMsg->param[MSG_WAN_NAME].paramName));
+    }
+    else
+    {
+	pMsg->param[MSG_WAN_NAME].paramName[0] = '\0';
+	CcspTraceError(("acSetParamName string length error \n"));
+    }
+
     pMsg->param[MSG_WAN_NAME].paramType = ccsp_string;
 
     if (bEthWanEnable == TRUE)

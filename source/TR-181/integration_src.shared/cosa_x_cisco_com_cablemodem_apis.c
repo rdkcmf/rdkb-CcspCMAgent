@@ -165,8 +165,6 @@ ANSC_STATUS SetParamValues( char *pComponent, char *pBus, char *pParamName, char
 void *PollDocsisInformations(void *args)
 {
   UNREFERENCED_PARAMETER(args);
-  creat("/nvram/docsispolltime.txt",S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
   FILE *fp;
   char buff[30];
   int pollinterval=4*3600;
@@ -174,6 +172,18 @@ void *PollDocsisInformations(void *args)
   ULONG i;
   errno_t rc = -1;
   int ind = -1;
+
+  /* CID 258230 fix */
+  int fd = creat("/nvram/docsispolltime.txt",S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if(fd == -1)
+  {
+        CcspTraceError(("Error creating the file docsispolltime.txt.\n"));
+  }
+  else
+  {
+        close(fd);
+  }
+
   while(1)
   { 
           
@@ -1250,6 +1260,15 @@ CosaDmlCmGetCPEList
         AnscCopyMemory(*ppCPEList, pInfo, sizeof(COSA_DML_CPE_LIST)*(*pulInstanceNumber));
         free(pInfo);
     }
+    else
+    {
+	/* CID 79510 Resource leak fix */
+	if(pInfo != NULL)
+	{
+	    free(pInfo);
+	}
+    }
+
 
     return ANSC_STATUS_SUCCESS;
 }

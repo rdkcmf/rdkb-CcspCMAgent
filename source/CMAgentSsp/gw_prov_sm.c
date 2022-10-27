@@ -3240,6 +3240,8 @@ int GWP_PushEventInMsgq(ClbkInfo *pInfo )
     }
     memset(buffer, 0, MAX_SIZE);
     EventMsg.EventType = pInfo->eventType;
+    /* CID 190357 fix */
+    EventMsg.EventInfo[0] = '\0';
 
     memcpy(buffer,&EventMsg,sizeof(EventMsg));
     CcspTraceInfo(("%s:%d: before send \n", __FUNCTION__, __LINE__));
