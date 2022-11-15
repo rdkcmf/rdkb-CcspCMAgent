@@ -657,6 +657,7 @@
 
       </parameter>
 
+<?ifdef FEATURE_RDKB_WAN_MANAGER?>
        <parameter>
 
           <name>RequestPhyStatus</name>
@@ -716,6 +717,7 @@
           <writable>true</writable>
 
         </parameter>
+<?endif?>
 
       </parameters>
 
