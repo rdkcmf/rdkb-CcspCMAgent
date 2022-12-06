@@ -39,7 +39,6 @@ CcspCMAgentSsp_DEPENDENCIES = ${top_builddir}/source/TR-181/middle_layer_src/lib
 CcspCMAgentSsp_LDADD = $(CcspCMAgentSsp_DEPENDENCIES)
 endif
 
-
 if !PLATFORM_PUMA7_ENABLED
 if FEATURE_RDKB_WAN_MANAGER
 CcspCMAgentSsp_LDFLAGS += -lgwprovappabs
