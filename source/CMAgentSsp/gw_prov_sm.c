@@ -3002,8 +3002,6 @@ static void GWP_act_ProvEntry_callback()
 
     v_secure_system("/etc/utopia/utopia_init.sh");
 
-    syscfg_init();
-
     sleep(2);
 
     char command[50];
@@ -3467,7 +3465,6 @@ void RegisterDocsisCallback()
 	SetDocsisLinkdowSignalfunc(CreateThreadandSendCondSignalToPthread);
 #endif	
 
-    syscfg_init();
     CcspTraceInfo((" create Gwp callback event handler\n"));
     pthread_create(&Gwp_event_tid, NULL, GWP_EventHandler, NULL);
 

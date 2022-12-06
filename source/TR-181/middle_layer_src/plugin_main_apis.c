@@ -198,14 +198,6 @@ CosaBackEndManagerInitialize
     AnscTraceWarning(("%s...\n", __FUNCTION__));
     printf("************* CM initialize ******************\n");
 
-#ifdef _COSA_INTEL_XB3_ARM_
-	//syscfg init
-    if ( 0 != syscfg_init( ) ) 
-	{
-		AnscTraceWarning(("%s syscfg_init() fails\n", __FUNCTION__));
-    }  
-#endif /* _COSA_INTEL_XB3_ARM_ */	
-		
     pMyObject->hCM            = (ANSC_HANDLE)CosaCableModemCreate();
     AnscTraceWarning(("  CosaCableModemCreate done!\n"));
     
